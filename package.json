@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:server": "tsx watch src/server.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -15,10 +16,12 @@
     "boardgame.io": "^0.50.2",
     "classnames": "^2.5.1",
     "invariant": "^2.2.4",
+    "koa-bodyparser": "^4.4.1",
     "next": "15.0.2",
     "react": "19.0.0-rc-02c0e824-20241028",
     "react-dom": "19.0.0-rc-02c0e824-20241028",
     "react-hotkeys-hook": "^4.5.1",
+    "tsx": "^4.19.2",
     "xstate": "^5.18.2"
   },
   "devDependencies": {

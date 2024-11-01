@@ -1,5 +1,6 @@
-import type { Game, Move } from "boardgame.io";
+import type { Game, Move, State } from "boardgame.io";
 import { INVALID_MOVE } from "boardgame.io/core";
+import { PluginPlayer } from "boardgame.io/plugins";
 
 export const Units: {
   [key: string]: {
@@ -71,6 +72,11 @@ export type ReserveFleet = {
 };
 
 export interface GHQState {
+  isOnline?: boolean;
+  userIds: {
+    "0": string;
+    "1": string;
+  };
   board: [
     [Square, Square, Square, Square, Square, Square, Square, Square],
     [Square, Square, Square, Square, Square, Square, Square, Square],
@@ -232,6 +238,10 @@ export const GHQGame: Game<GHQState> = {
         ARMORED_ARTILLERY: 1,
         HEAVY_ARTILLERY: 1,
       },
+      userIds: {
+        "0": setupData?.players?.["0"] || "Player 1",
+        "1": setupData?.players?.["1"] || "Player 2",
+      },
     };
   },
   turn: {
@@ -241,3 +251,25 @@ export const GHQGame: Game<GHQState> = {
   maxPlayers: 2,
   moves: GameMoves,
 };
+
+export const OnlineGHQGame: Game<GHQState> = (() => {
+  const game = { ...GHQGame };
+
+  const oldSetup = game.setup;
+  game.setup = ({ ctx, ...plugins }, setupData): GHQState => {
+    if (!oldSetup) throw new Error("No setup function found");
+    const state = oldSetup({ ctx, ...plugins }, setupData);
+    state.isOnline = true;
+    return state;
+  };
+
+  game.validateSetupData = (setupData, numPlayers) => {
+    if (numPlayers !== 2) {
+      return "Invalid number of players";
+    }
+    if (!setupData.players["0"] || !setupData.players["1"]) {
+      return "Missing player IDs";
+    }
+  };
+  return game;
+})();
