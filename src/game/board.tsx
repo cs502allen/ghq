@@ -258,7 +258,7 @@ function ReserveBank(props: {
         }}
         key={`${kind}-${index++}`}
         className={[
-          "flex items-end justify-end col-span-1 select-none font-bold text-3xl",
+          "flex items-end justify-end col-span-1 select-none font-bold text-3xl p-1",
           props.player === "RED" ? "text-red-600" : "text-blue-600",
           { ["cursor-pointer"]: props.selectable },
         ].join(" ")}
