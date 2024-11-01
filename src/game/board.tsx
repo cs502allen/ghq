@@ -74,8 +74,21 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
       }
     });
 
+    const { selectedPiece } = state.context;
+    if (selectedPiece) {
+      annotate[`${selectedPiece.at[0]},${selectedPiece.at[1]}`] = {
+        ...annotate[`${selectedPiece.at[0]},${selectedPiece.at[1]}`],
+        selectedPiece: true,
+      };
+    }
+
     return annotate;
   }, [state.context]);
+
+  function getBoxShadow(isSelected?: boolean) {
+    if (isSelected) return "inset 0 0 8px darkgray";
+    return "";
+  }
 
   const cells = Array.from({ length: rows }).map((_, rowIndex) => (
     <tr key={rowIndex}>
@@ -124,6 +137,7 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
             })}
             style={{
               border: "1px solid black",
+              boxShadow: getBoxShadow(annotationsForSquare?.selectedPiece),
               textAlign: "center",
               width: "90px",
               height: "90px",
