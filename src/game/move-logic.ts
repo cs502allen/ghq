@@ -1,4 +1,4 @@
-import { Coordinate, GHQState, Units } from "@/game/engine";
+import { Coordinate, GHQState, Player, Units } from "@/game/engine";
 
 export function movesForActivePiece(
   coordinate: Coordinate,
@@ -32,6 +32,23 @@ export function movesForActivePiece(
   } else {
     return [];
   }
+}
+
+export function spawnPositionsForPlayer(
+  board: GHQState["board"],
+  player: Player
+): Coordinate[] {
+  const rank = player === "RED" ? 7 : 0;
+
+  const spawnable: Coordinate[] = [];
+
+  board[rank].forEach((piece, index) => {
+    if (!piece) {
+      spawnable.push([rank, index]);
+    }
+  });
+
+  return spawnable;
 }
 
 function getMoves(

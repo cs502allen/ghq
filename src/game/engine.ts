@@ -1,4 +1,5 @@
 import type { Game, Move } from "boardgame.io";
+import { INVALID_MOVE } from "boardgame.io/core";
 
 export const Units: {
   [key: string]: {
@@ -6,30 +7,48 @@ export const Units: {
     canCapture: boolean;
     artilleryRange?: number;
     canParachute?: true;
+    symbol: string; // replace with icon
   };
 } = {
-  HQ: { mobility: 1, canCapture: false },
-  INFANTRY: { mobility: 1, canCapture: true },
-  ARMORED_INFANTRY: { mobility: 2, canCapture: true },
-  AIRBORNE_INFANTRY: { mobility: 1, canCapture: true, canParachute: true },
-  ARTILLERY: { mobility: 1, artilleryRange: 2, canCapture: false },
-  ARMORED_ARTILLERY: { mobility: 2, artilleryRange: 2, canCapture: false },
-  HEAVY_ARTILLERY: { mobility: 1, artilleryRange: 3, canCapture: false },
+  HQ: { mobility: 1, canCapture: false, symbol: "✪" },
+  INFANTRY: { mobility: 1, canCapture: true, symbol: "⇧" },
+  ARMORED_INFANTRY: { mobility: 2, canCapture: true, symbol: "△" },
+  AIRBORNE_INFANTRY: {
+    mobility: 1,
+    canCapture: true,
+    canParachute: true,
+    symbol: "∩",
+  },
+  ARTILLERY: { mobility: 1, artilleryRange: 2, canCapture: false, symbol: "❍" },
+  ARMORED_ARTILLERY: {
+    mobility: 2,
+    artilleryRange: 2,
+    canCapture: false,
+    symbol: "◉",
+  },
+  HEAVY_ARTILLERY: {
+    mobility: 1,
+    artilleryRange: 3,
+    canCapture: false,
+    symbol: "✺",
+  },
 };
 
 export type UnitType = keyof typeof Units;
 
 type Orientation = 0 | 45 | 90 | 135 | 180 | 225 | 270 | 315;
 export type Coordinate = [number, number];
-type Color = "RED" | "BLUE";
+export type Player = "RED" | "BLUE";
 
 export type Square = {
   type: UnitType;
-  player: Color;
+  player: Player;
   orientation?: Orientation;
 } | null;
 
-type ReserveFleet = {
+export type NonNullSquare = Exclude<Square, null>;
+
+export type ReserveFleet = {
   INFANTRY: number;
   ARMORED_INFANTRY: number;
   AIRBORNE_INFANTRY: number;
@@ -55,9 +74,36 @@ export interface GHQState {
 
 const Reinforce: Move<GHQState> = (
   { G, ctx },
-  unitType: UnitType,
+  unitType: keyof ReserveFleet,
   to: Coordinate
-) => {};
+) => {
+  const reserve = ctx.currentPlayer === "0" ? G.redReserve : G.blueReserve;
+
+  if (reserve[unitType] === 0) {
+    return INVALID_MOVE;
+  }
+
+  // decrement reserves
+  reserve[unitType]--;
+
+  if (ctx.currentPlayer === "0") {
+    G.redReserve = reserve;
+  } else {
+    G.blueReserve = reserve;
+  }
+
+  // spawn
+  const s: NonNullSquare = {
+    type: unitType,
+    player: ctx.currentPlayer === "0" ? "RED" : "BLUE",
+    orientation: unitType.includes("ARTILLERY")
+      ? ctx.currentPlayer === "0"
+        ? 0
+        : 180
+      : undefined,
+  };
+  G.board[to[0]][to[1]] = s;
+};
 const Move: Move<GHQState> = (
   { G, ctx },
   from: Coordinate,
@@ -65,7 +111,9 @@ const Move: Move<GHQState> = (
   orientation?: Orientation,
   capturePreference?: Coordinate
 ) => {
-  console.log(from, to);
+  const piece = G.board[from[0]][from[1]];
+  G.board[from[0]][from[1]] = null;
+  G.board[to[0]][to[1]] = piece;
 };
 const ChangeOrientation: Move<GHQState> = (
   { G, ctx },
@@ -75,6 +123,15 @@ const ChangeOrientation: Move<GHQState> = (
 const Skip: Move<GHQState> = ({ G, ctx, events }) => {
   events.endTurn();
 };
+
+export const GameMoves = {
+  Reinforce,
+  Move,
+  ChangeOrientation,
+  Skip,
+};
+
+export type GameMoveType = typeof GameMoves;
 
 export const GHQGame: Game<GHQState> = {
   setup: ({ ctx, ...plugins }, setupData) => {
@@ -148,10 +205,5 @@ export const GHQGame: Game<GHQState> = {
   },
   minPlayers: 2,
   maxPlayers: 2,
-  moves: {
-    Reinforce,
-    Move,
-    ChangeOrientation,
-    Skip,
-  },
+  moves: GameMoves,
 };

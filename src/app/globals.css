@@ -19,3 +19,11 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.scale-animate {
+  transition: transform 0.3s ease; /* Smooth animation for scaling */
+}
+
+.scale-animate:hover {
+  transform: scale(1.2); /* Scale up the element on hover */
+}
