@@ -5,12 +5,17 @@ import { useMachine } from "@xstate/react";
 import { turnStateMachine } from "@/game/board-state";
 import classNames from "classnames";
 import { useHotkeys } from "react-hotkeys-hook";
+import { bombardedSquares } from "@/game/move-logic";
 
 const rows = 8;
 const columns = 8;
 //coordinate string x,y
 type Annotations = {
-  [key: string]: { moveTo?: true; bombardedBy?: Player; selectedPiece?: true };
+  [key: string]: {
+    moveTo?: true;
+    bombardedBy?: { RED?: true; BLUE?: true };
+    selectedPiece?: true;
+  };
 };
 
 export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
@@ -60,6 +65,15 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
         : { moveTo: true };
     });
 
+    const bombarded = bombardedSquares(G.board);
+    Object.entries(bombarded).forEach(([key, value]) => {
+      if (annotate[key]) {
+        annotate[key].bombardedBy = value;
+      } else {
+        annotate[key] = { bombardedBy: value };
+      }
+    });
+
     return annotate;
   }, [state.context]);
 
@@ -89,7 +103,7 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
               }
             }}
             key={colIndex}
-            className={classNames("relative", {
+            className={classNames("relative stripe-red-transparent", {
               ["cursor-pointer"]:
                 annotationsForSquare?.moveTo ||
                 square?.player === (ctx.currentPlayer === "0" ? "RED" : "BLUE"),

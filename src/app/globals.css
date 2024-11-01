@@ -27,3 +27,35 @@ body {
 .scale-animate:hover {
   transform: scale(1.2); /* Scale up the element on hover */
 }
+
+.stripe-red-blue {
+  background: repeating-linear-gradient(
+          45deg,      /* Diagonal stripes */
+          rgb(252 165 165),        /* Start with red */
+          rgb(252 165 165) 10px,   /* Red stripe width */
+          rgb(147 197 253) 10px,  /* Start of blue */
+          rgb(147 197 253) 20px   /* Blue stripe width */
+  );
+}
+
+/* Red and Transparent striped background */
+.stripe-red-transparent {
+  background: repeating-linear-gradient(
+          45deg,          /* Diagonal stripes */
+          rgb(252 165 165),            /* Start with red */
+          rgb(252 165 165) 10px,       /* Red stripe width */
+          transparent 10px, /* Start of transparent */
+          transparent 20px  /* Transparent stripe width */
+  );
+}
+
+/* Blue and Transparent striped background */
+.stripe-blue-transparent {
+  background: repeating-linear-gradient(
+          45deg,          /* Diagonal stripes */
+          rgb(147 197 253),           /* Start with blue */
+          rgb(147 197 253) 10px,      /* Blue stripe width */
+          transparent 10px, /* Start of transparent */
+          transparent 20px  /* Transparent stripe width */
+  );
+}

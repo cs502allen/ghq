@@ -1,5 +1,4 @@
 import { Coordinate, GHQState, Player, Units } from "@/game/engine";
-import { invariant } from "jest-util";
 
 export function movesForActivePiece(
   coordinate: Coordinate,
@@ -125,10 +124,6 @@ export function bombardedSquares(board: GHQState["board"]): Bombarded {
       if (square && typeof Units[square.type].artilleryRange !== "undefined") {
         const range = Units[square.type].artilleryRange!;
         const orientation = square.orientation!;
-        invariant(
-          typeof orientation !== "undefined",
-          "Orientation must be set for artillery pieces"
-        );
 
         const orientationVector = orientationVectors[orientation];
 
