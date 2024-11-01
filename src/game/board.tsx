@@ -6,6 +6,7 @@ import { turnStateMachine } from "@/game/board-state";
 import classNames from "classnames";
 import { useHotkeys } from "react-hotkeys-hook";
 import { bombardedSquares } from "@/game/move-logic";
+import Image from "next/image";
 
 const rows = 8;
 const columns = 8;
@@ -146,7 +147,7 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
             {square ? (
               <div
                 className={classNames(
-                  " select-none font-bold text-3xl",
+                  "flex items-center justify-center select-none font-bold text-3xl",
                   square.player === "RED" ? "text-red-600" : "text-blue-600",
                   {
                     // @todo this is really only for infantry. Adjust when we do orientation
@@ -156,7 +157,14 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
                   }
                 )}
               >
-                {Units[square.type].symbol}
+                <Image
+                  src={`/${Units[square.type].imagePathPrefix}-${
+                    square.player
+                  }.png`}
+                  width="64"
+                  height="64"
+                  alt={Units[square.type].imagePathPrefix}
+                />
               </div>
             ) : null}
             {annotationsForSquare?.moveTo ? (
@@ -250,12 +258,17 @@ function ReserveBank(props: {
         }}
         key={`${kind}-${index++}`}
         className={[
-          "col-span-1 select-none font-bold text-3xl",
+          "flex items-end justify-end col-span-1 select-none font-bold text-3xl",
           props.player === "RED" ? "text-red-600" : "text-blue-600",
           { ["cursor-pointer"]: props.selectable },
         ].join(" ")}
       >
-        {Units[kind].symbol}
+        <Image
+          src={`/${Units[kind].imagePathPrefix}-${props.player}.png`}
+          width="64"
+          height="64"
+          alt={Units[kind].imagePathPrefix}
+        />
       </div>
     ));
   });

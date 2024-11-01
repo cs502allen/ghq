@@ -7,30 +7,43 @@ export const Units: {
     canCapture: boolean;
     artilleryRange?: number;
     canParachute?: true;
-    symbol: string; // replace with icon
+    imagePathPrefix: string;
   };
 } = {
-  HQ: { mobility: 1, canCapture: false, symbol: "✪" },
-  INFANTRY: { mobility: 1, canCapture: true, symbol: "⇧" },
-  ARMORED_INFANTRY: { mobility: 2, canCapture: true, symbol: "△" },
+  HQ: { mobility: 1, canCapture: false, imagePathPrefix: "hq" },
+  INFANTRY: {
+    mobility: 1,
+    canCapture: true,
+    imagePathPrefix: "regular-infantry",
+  },
+  ARMORED_INFANTRY: {
+    mobility: 2,
+    canCapture: true,
+    imagePathPrefix: "armored-infantry",
+  },
   AIRBORNE_INFANTRY: {
     mobility: 1,
     canCapture: true,
     canParachute: true,
-    symbol: "∩",
+    imagePathPrefix: "paratrooper-infantry",
   },
-  ARTILLERY: { mobility: 1, artilleryRange: 2, canCapture: false, symbol: "❍" },
+  ARTILLERY: {
+    mobility: 1,
+    artilleryRange: 2,
+    canCapture: false,
+    imagePathPrefix: "regular-artillery",
+  },
   ARMORED_ARTILLERY: {
     mobility: 2,
     artilleryRange: 2,
     canCapture: false,
-    symbol: "◉",
+    imagePathPrefix: "armored-artillery",
   },
   HEAVY_ARTILLERY: {
     mobility: 1,
     artilleryRange: 3,
     canCapture: false,
-    symbol: "✺",
+    imagePathPrefix: "heavy-artillery",
   },
 };
 
