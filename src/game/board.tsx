@@ -84,6 +84,20 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
 
         const annotationsForSquare = annotations[`${rowIndex},${colIndex}`];
 
+        const bombardmentClass =
+          annotationsForSquare && annotationsForSquare.bombardedBy
+            ? annotationsForSquare.bombardedBy
+              ? annotationsForSquare.bombardedBy.BLUE &&
+                annotationsForSquare.bombardedBy.RED
+                ? "stripe-red-blue"
+                : annotationsForSquare.bombardedBy.BLUE
+                ? "stripe-blue-transparent"
+                : annotationsForSquare.bombardedBy.RED
+                ? "stripe-red-transparent"
+                : ""
+              : ""
+            : "";
+
         return (
           <td
             onClick={() => {
@@ -103,7 +117,7 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
               }
             }}
             key={colIndex}
-            className={classNames("relative stripe-red-transparent", {
+            className={classNames("relative", bombardmentClass, {
               ["cursor-pointer"]:
                 annotationsForSquare?.moveTo ||
                 square?.player === (ctx.currentPlayer === "0" ? "RED" : "BLUE"),
