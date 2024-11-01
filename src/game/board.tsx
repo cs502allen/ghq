@@ -4,6 +4,7 @@ import { BoardProps } from "boardgame.io/react";
 import { useMachine } from "@xstate/react";
 import { turnStateMachine } from "@/game/board-state";
 import classNames from "classnames";
+import { useHotkeys } from "react-hotkeys-hook";
 
 const rows = 8;
 const columns = 8;
@@ -28,6 +29,8 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
       },
     })
   );
+
+  useHotkeys("escape", () => send({ type: "DESELECT" }), [send]);
 
   useEffect(() => {
     send({

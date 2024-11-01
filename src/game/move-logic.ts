@@ -1,4 +1,5 @@
 import { Coordinate, GHQState, Player, Units } from "@/game/engine";
+import { invariant } from "jest-util";
 
 export function movesForActivePiece(
   coordinate: Coordinate,
@@ -32,23 +33,6 @@ export function movesForActivePiece(
   } else {
     return [];
   }
-}
-
-export function spawnPositionsForPlayer(
-  board: GHQState["board"],
-  player: Player
-): Coordinate[] {
-  const rank = player === "RED" ? 7 : 0;
-
-  const spawnable: Coordinate[] = [];
-
-  board[rank].forEach((piece, index) => {
-    if (!piece) {
-      spawnable.push([rank, index]);
-    }
-  });
-
-  return spawnable;
 }
 
 function getMoves(
@@ -100,4 +84,75 @@ function getMoves(
   }
 
   return allowedMoves;
+}
+
+export function spawnPositionsForPlayer(
+  board: GHQState["board"],
+  player: Player
+): Coordinate[] {
+  const rank = player === "RED" ? 7 : 0;
+
+  const spawnable: Coordinate[] = [];
+
+  board[rank].forEach((piece, index) => {
+    if (!piece) {
+      spawnable.push([rank, index]);
+    }
+  });
+
+  return spawnable;
+}
+
+// keys will be 'x,y'
+type Bombarded = { [key: string]: { RED?: true; BLUE?: true } };
+
+export function bombardedSquares(board: GHQState["board"]): Bombarded {
+  const orientationVectors = {
+    0: [-1, 0], // Up
+    45: [-1, 1], // Top-Right
+    90: [0, 1], // Right
+    135: [1, 1], // Bottom-Right
+    180: [1, 0], // Down
+    225: [1, -1], // Bottom-Left
+    270: [0, -1], // Left
+    315: [-1, -1], // Top-Left
+  };
+
+  const bombarded: Bombarded = {};
+
+  board.forEach((rows, x) => {
+    rows.forEach((square, y) => {
+      if (square && typeof Units[square.type].artilleryRange !== "undefined") {
+        const range = Units[square.type].artilleryRange!;
+        const orientation = square.orientation!;
+        invariant(
+          typeof orientation !== "undefined",
+          "Orientation must be set for artillery pieces"
+        );
+
+        const orientationVector = orientationVectors[orientation];
+
+        let currentX = x;
+        let currentY = y;
+
+        for (let i = 0; i < range; i++) {
+          currentX += orientationVector[0];
+          currentY += orientationVector[1];
+
+          // off board, stop
+          if (
+            !(currentX >= 0 && currentX < 8 && currentY >= 0 && currentY < 8)
+          ) {
+            break;
+          }
+
+          const updateMe = bombarded[`${currentX},${currentY}`] || {};
+          updateMe[square.player] = true;
+          bombarded[`${currentX},${currentY}`] = updateMe;
+        }
+      }
+    });
+  });
+
+  return bombarded;
 }

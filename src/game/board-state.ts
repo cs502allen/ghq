@@ -54,6 +54,9 @@ export const turnStateMachine = createMachine({
           type: "SELECT_SQUARE";
           at: Coordinate;
           currentBoard: GHQState["board"];
+        }
+      | {
+          type: "DESELECT";
         };
   },
   on: {
@@ -63,6 +66,9 @@ export const turnStateMachine = createMachine({
         moves: 0,
         player: event.player,
       })),
+      target: ".ready",
+    },
+    DESELECT: {
       target: ".ready",
     },
   },
