@@ -1,9 +1,24 @@
-import { GHQState } from "@/game/engine";
+import {GHQState, Orientation, Player, Square} from "@/game/engine";
+
+
+
+const shorthands = (player: Player) => {
+  return {
+     HQ:{ type: "HQ", player: player } as Square,
+     AIRBORNE: { type: "AIRBORNE_INFANTRY", player: player } as Square,
+     INFANTRY: { type: "INFANTRY", player: player } as Square,
+     ARTILLERY: (orientation: Orientation) => ({ type: "ARTILLERY", player: player, orientation }) as Square,
+  }
+}
+
+
+export const Blue = shorthands("BLUE")
+export const Red = shorthands("RED")
 
 export const initialBoardSetup: GHQState["board"] = [
   [
-    { type: "HQ", player: "BLUE" },
-    { type: "ARTILLERY", player: "BLUE", orientation: 180 },
+    Blue.HQ,
+    Blue.ARTILLERY(180),
     null,
     null,
     null,
@@ -12,9 +27,9 @@ export const initialBoardSetup: GHQState["board"] = [
     null,
   ],
   [
-    { type: "INFANTRY", player: "BLUE" },
-    { type: "INFANTRY", player: "BLUE" },
-    { type: "INFANTRY", player: "BLUE" },
+    Blue.INFANTRY,
+    Blue.INFANTRY,
+    Blue.INFANTRY,
     null,
     null,
     null,
@@ -31,9 +46,9 @@ export const initialBoardSetup: GHQState["board"] = [
     null,
     null,
     null,
-    { type: "INFANTRY", player: "RED" },
-    { type: "INFANTRY", player: "RED" },
-    { type: "INFANTRY", player: "RED" },
+    Red.INFANTRY,
+    Red.INFANTRY,
+    Red.INFANTRY,
   ],
   [
     null,
@@ -42,15 +57,15 @@ export const initialBoardSetup: GHQState["board"] = [
     null,
     null,
     null,
-    { type: "ARTILLERY", player: "RED", orientation: 0 },
-    { type: "HQ", player: "RED" },
+    Red.ARTILLERY(0),
+    Red.HQ,
   ],
 ];
 
 export const initialBoardSetupWithAnArmored: GHQState["board"] = [
   [
-    { type: "HQ", player: "BLUE" },
-    { type: "ARTILLERY", player: "BLUE", orientation: 180 },
+    Blue.HQ,
+    Blue.ARTILLERY(180),
     null,
     null,
     null,
@@ -59,9 +74,9 @@ export const initialBoardSetupWithAnArmored: GHQState["board"] = [
     { type: "ARMORED_INFANTRY", player: "BLUE", orientation: 180 },
   ],
   [
-    { type: "INFANTRY", player: "BLUE" },
-    { type: "INFANTRY", player: "BLUE" },
-    { type: "INFANTRY", player: "BLUE" },
+    Blue.INFANTRY,
+    Blue.INFANTRY,
+    Blue.INFANTRY,
     null,
     null,
     null,
@@ -78,9 +93,9 @@ export const initialBoardSetupWithAnArmored: GHQState["board"] = [
     null,
     null,
     null,
-    { type: "INFANTRY", player: "RED" },
-    { type: "INFANTRY", player: "RED" },
-    { type: "INFANTRY", player: "RED" },
+    Red.INFANTRY,
+    Red.INFANTRY,
+    Red.INFANTRY,
   ],
   [
     null,
@@ -89,26 +104,26 @@ export const initialBoardSetupWithAnArmored: GHQState["board"] = [
     null,
     null,
     null,
-    { type: "ARTILLERY", player: "RED", orientation: 0 },
-    { type: "HQ", player: "RED" },
+    Red.ARTILLERY(0),
+    Red.HQ,
   ],
 ];
 
 export const initialBoardSetupWithAnAirborneBack: GHQState["board"] = [
   [
-    { type: "HQ", player: "BLUE" },
-    { type: "ARTILLERY", player: "BLUE", orientation: 180 },
+    Blue.HQ,
+    Blue.ARTILLERY(180),
     null,
     null,
     null,
     null,
     null,
-    { type: "AIRBORNE_INFANTRY", player: "BLUE" },
+    Blue.AIRBORNE,
   ],
   [
-    { type: "INFANTRY", player: "BLUE" },
-    { type: "INFANTRY", player: "BLUE" },
-    { type: "INFANTRY", player: "BLUE" },
+    Blue.INFANTRY,
+    Blue.INFANTRY,
+    Blue.INFANTRY,
     null,
     null,
     null,
@@ -119,32 +134,32 @@ export const initialBoardSetupWithAnAirborneBack: GHQState["board"] = [
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-    { type: "INFANTRY", player: "RED" },
-    { type: "INFANTRY", player: "RED" },
-    { type: "INFANTRY", player: "RED" },
-  ],
   [
     null,
     null,
     null,
     null,
     null,
+    Red.INFANTRY,
+    Red.INFANTRY,
+    Red.INFANTRY,
+  ],
+  [
     null,
-    { type: "ARTILLERY", player: "RED", orientation: 0 },
-    { type: "HQ", player: "RED" },
+    null,
+    null,
+    null,
+    null,
+    null,
+    Red.ARTILLERY(0),
+    Red.HQ,
   ],
 ];
 
 export const initialBoardSetupWithAnAirborneNotBack: GHQState["board"] = [
   [
-    { type: "HQ", player: "BLUE" },
-    { type: "ARTILLERY", player: "BLUE", orientation: 180 },
+    Blue.HQ,
+    Blue.ARTILLERY(180),
     null,
     null,
     null,
@@ -153,10 +168,10 @@ export const initialBoardSetupWithAnAirborneNotBack: GHQState["board"] = [
     null,
   ],
   [
-    { type: "INFANTRY", player: "BLUE" },
-    { type: "INFANTRY", player: "BLUE" },
-    { type: "INFANTRY", player: "BLUE" },
-    { type: "AIRBORNE_INFANTRY", player: "BLUE" },
+    Blue.INFANTRY,
+    Blue.INFANTRY,
+    Blue.INFANTRY,
+    Blue.AIRBORNE,
     null,
     null,
     null,
@@ -172,9 +187,9 @@ export const initialBoardSetupWithAnAirborneNotBack: GHQState["board"] = [
     null,
     null,
     null,
-    { type: "INFANTRY", player: "RED" },
-    { type: "INFANTRY", player: "RED" },
-    { type: "INFANTRY", player: "RED" },
+    Red.INFANTRY,
+    Red.INFANTRY,
+    Red.INFANTRY,
   ],
   [
     null,
@@ -183,8 +198,8 @@ export const initialBoardSetupWithAnAirborneNotBack: GHQState["board"] = [
     null,
     null,
     null,
-    { type: "ARTILLERY", player: "RED", orientation: 0 },
-    { type: "HQ", player: "RED" },
+    Red.ARTILLERY(0),
+    Red.HQ,
   ],
 ];
 
@@ -194,9 +209,9 @@ export const artillaryFaceOff: GHQState["board"] = [
   [null, null, null, null, null, null, null, null],
   [
     null,
-    { type: "ARTILLERY", player: "RED", orientation: 90 },
+    Red.ARTILLERY(90),
     null,
-    { type: "ARTILLERY", player: "BLUE", orientation: 270 },
+    Blue.ARTILLERY(270),
     null,
     null,
     null,

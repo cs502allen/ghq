@@ -49,7 +49,7 @@ export const Units: {
 
 export type UnitType = keyof typeof Units;
 
-type Orientation = 0 | 45 | 90 | 135 | 180 | 225 | 270 | 315;
+export type Orientation = 0 | 45 | 90 | 135 | 180 | 225 | 270 | 315;
 export type Coordinate = [number, number];
 export type Player = "RED" | "BLUE";
 
