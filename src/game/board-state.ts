@@ -3,8 +3,10 @@ import {
   Coordinate,
   GHQState,
   NonNullSquare,
+  Orientation,
   Player,
   ReserveFleet,
+  Units,
 } from "@/game/engine";
 import {
   movesForActivePiece,
@@ -56,6 +58,10 @@ export const turnStateMachine = createMachine({
           currentBoard: GHQState["board"];
         }
       | {
+          type: "CHANGE_ORIENTATION";
+          orientation: Orientation;
+        }
+      | {
           type: "DESELECT";
         };
   },
@@ -82,7 +88,7 @@ export const turnStateMachine = createMachine({
       on: {
         SELECT_RESERVE_PIECE: {
           // has a reserve here
-          guard: ({ context, event }) => {
+          guard: ({ event }) => {
             return event.reserve[event.kind] > 0;
           },
           actions: assign(({ context, event }) => {
@@ -138,6 +144,25 @@ export const turnStateMachine = createMachine({
             };
           }),
           target: "activePieceSelected",
+        },
+        CHANGE_ORIENTATION: {
+          guard: ({ context, event }) => {
+            // is artillery
+            return (
+              typeof Units[context.selectedPiece!.piece.type].artilleryRange !==
+              "undefined"
+            );
+          },
+          actions: [
+            "changeOrientation",
+            assign(({ event, context }) => ({
+              disabledPieces: [
+                ...context.disabledPieces,
+                context.selectedPiece!.at,
+              ],
+            })),
+          ],
+          target: "ready",
         },
         SELECT_SQUARE: {
           guard: ({ context, event }) => {

@@ -132,7 +132,12 @@ const ChangeOrientation: Move<GHQState> = (
   { G, ctx },
   on: Coordinate,
   orientation: Orientation
-) => {};
+) => {
+  const piece = G.board[on[0]][on[1]];
+  piece!.orientation = orientation;
+  G.board[on[0]][on[1]] = piece;
+};
+
 const Skip: Move<GHQState> = ({ G, ctx, events }) => {
   events.endTurn();
 };

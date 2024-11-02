@@ -1,12 +1,8 @@
 import { describe, expect, it } from "@jest/globals";
-import { GHQState } from "@/game/engine";
-import { bombardedSquares, movesForActivePiece } from "@/game/move-logic";
+import { bombardedSquares } from "@/game/move-logic";
 import {
   artillaryFaceOff,
   initialBoardSetup,
-  initialBoardSetupWithAnAirborneBack,
-  initialBoardSetupWithAnAirborneNotBack,
-  initialBoardSetupWithAnArmored,
 } from "@/game/tests/test-boards";
 
 describe("computing bombarded squares ", () => {

@@ -1,5 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
-import { GHQState, Player, ReserveFleet, Units } from "@/game/engine";
+import {
+  GHQState,
+  Orientation,
+  Player,
+  ReserveFleet,
+  Units,
+} from "@/game/engine";
 import { BoardProps } from "boardgame.io/react";
 import { useMachine } from "@xstate/react";
 import { turnStateMachine } from "@/game/board-state";
@@ -7,6 +13,7 @@ import classNames from "classnames";
 import { useHotkeys } from "react-hotkeys-hook";
 import { bombardedSquares } from "@/game/move-logic";
 import Image from "next/image";
+import { SelectOrientation } from "@/game/select-orientation";
 
 const rows = 8;
 const columns = 8;
@@ -27,6 +34,13 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
       actions: {
         movePiece: ({ context, event }) => {
           if ("at" in event) moves.Move(context.selectedPiece!.at, event.at);
+        },
+        changeOrientation: ({ context, event }) => {
+          if ("orientation" in event)
+            moves.ChangeOrientation(
+              context.selectedPiece!.at,
+              event.orientation
+            );
         },
         spawnPiece: ({ context, event }) => {
           if (context.unitKind && "at" in event)
@@ -86,17 +100,22 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
     return annotate;
   }, [state.context]);
 
-  function getBoxShadow(isSelected?: boolean) {
-    if (isSelected) return "inset 0 0 8px darkgray";
-    return "";
-  }
-
   const cells = Array.from({ length: rows }).map((_, rowIndex) => (
     <tr key={rowIndex}>
       {Array.from({ length: columns }).map((_, colIndex) => {
         const square = G.board[rowIndex][colIndex];
 
         const annotationsForSquare = annotations[`${rowIndex},${colIndex}`];
+
+        const rotation =
+          square && "orientation" in square
+            ? square && square.orientation
+            : undefined;
+
+        const add180 =
+          square &&
+          ((ctx.currentPlayer === "0" && square.player === "BLUE") ||
+            (ctx.currentPlayer === "1" && square.player === "RED"));
 
         const bombardmentClass =
           annotationsForSquare && annotationsForSquare.bombardedBy
@@ -138,7 +157,8 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
             })}
             style={{
               border: "1px solid black",
-              boxShadow: getBoxShadow(annotationsForSquare?.selectedPiece),
+              boxShadow:
+                annotationsForSquare?.selectedPiece && "inset 0 0 8px darkgray",
               textAlign: "center",
               width: "90px",
               height: "90px",
@@ -151,9 +171,9 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
                   square.player === "RED" ? "text-red-600" : "text-blue-600",
                   {
                     // @todo this is really only for infantry. Adjust when we do orientation
-                    ["rotate-180"]:
-                      (ctx.currentPlayer === "0" && square.player === "BLUE") ||
-                      (ctx.currentPlayer === "1" && square.player === "RED"),
+                    // ["rotate-180"]:
+                    //   (ctx.currentPlayer === "0" && square.player === "BLUE") ||
+                    //   (ctx.currentPlayer === "1" && square.player === "RED"),
                   }
                 )}
               >
@@ -163,9 +183,29 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
                   }.png`}
                   width="64"
                   height="64"
+                  className="select-none"
+                  draggable="false"
+                  style={{
+                    transform: `rotate(${
+                      rotation ? rotation : add180 ? 180 : 0
+                    }deg)`,
+                  }}
                   alt={Units[square.type].imagePathPrefix}
                 />
               </div>
+            ) : null}
+            {square &&
+            Units[square.type].artilleryRange &&
+            annotationsForSquare?.selectedPiece ? (
+              <SelectOrientation
+                player={square.player}
+                onChange={(orientation: Orientation) => {
+                  send({
+                    type: "CHANGE_ORIENTATION",
+                    orientation: orientation,
+                  });
+                }}
+              />
             ) : null}
             {annotationsForSquare?.moveTo ? (
               <div className="rounded-full w-8 h-8 m-auto bg-gray-300" />
