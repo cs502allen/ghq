@@ -4,7 +4,7 @@ export function captureCandidates(
   lastMovedInfantry: Coordinate,
   board: GHQState["board"]
 ): Coordinate[] {
-  const engagedPairs = maximizeEngagement(board);
+  const engagedPairs = maximizeEngagement(lastMovedInfantry, board);
   const attacker = board[lastMovedInfantry[0]][lastMovedInfantry[1]];
 
   if (!attacker) {
@@ -15,14 +15,6 @@ export function captureCandidates(
   for (const pairs of engagedPairs) {
     engagedPieces[`${pairs.RED[0]},${pairs.RED[1]}`] = "RED";
     engagedPieces[`${pairs.BLUE[0]},${pairs.BLUE[1]}`] = "BLUE";
-  }
-
-  // If the last moved infantry is engaged, it can't attack
-  const isLastMovedInfantryEngaged =
-    engagedPieces[`${lastMovedInfantry[0]},${lastMovedInfantry[1]}`] ===
-    attacker.player;
-  if (!isLastMovedInfantryEngaged) {
-    return [];
   }
 
   // Find the adjacent pieces to the last moved infantry
@@ -43,16 +35,33 @@ export function captureCandidates(
     }
   }
 
+  // Find out if the opponent has any unengaged pieces near us, if so we need to engage with it
+  for (const coord of attackerAdjacentPieces) {
+    const piece = board[coord[0]][coord[1]];
+    if (
+      piece &&
+      piece.player !== attacker.player &&
+      !engagedPieces[`${coord[0]},${coord[1]}`]
+    ) {
+      return [];
+    }
+  }
+
   // Filter for only already-engaged pieces of the opponent
   const attackablePieces = attackerAdjacentPieces.filter((coord) => {
     const piece = board[coord[0]][coord[1]];
-    return piece && piece.player !== attacker.player;
+    return (
+      piece &&
+      engagedPieces[`${coord[0]},${coord[1]}`] &&
+      piece.player !== attacker.player
+    );
   });
 
   return attackablePieces;
 }
 
 function maximizeEngagement(
+  excludeCoordinate: Coordinate,
   board: GHQState["board"]
 ): Record<Player, Coordinate>[] {
   const N = 8; // Size of the board
@@ -71,6 +80,11 @@ function maximizeEngagement(
   // Populate pieces0 and pieces1 arrays and their indices
   for (let i = 0; i < N; i++) {
     for (let j = 0; j < N; j++) {
+      // Skip the last moved piece, we want to calculate engagement as if they weren't there
+      if (excludeCoordinate[0] === i && excludeCoordinate[1] === j) {
+        continue;
+      }
+
       if (board[i]?.[j]?.player === "RED") {
         pieces0.push({ x: i, y: j });
         piece0Index[`${i},${j}`] = index0++;
@@ -105,6 +119,9 @@ function maximizeEngagement(
         y1 < N &&
         board[x1]?.[y1]?.player === "BLUE"
       ) {
+        if (excludeCoordinate[0] === x1 && excludeCoordinate[1] === y1) {
+          continue;
+        }
         const idx1 = piece1Index[`${x1},${y1}`];
         adjList[i].push(idx1);
       }

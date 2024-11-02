@@ -33,7 +33,7 @@ describe("computing allowed captures", () => {
       [null, null, null, null, null, null, null, null],
       [null, null, null, null, null, null, null, null],
       [null, BINF, RINF, null, null, null, null, null],
-      [null, RINF, BINF, RINF, BINF, null, null, null],
+      [null, RINF, BINF, RINF, BINF, RINF, null, null],
       [RINF, BINF, null, null, null, null, null, null],
       [null, null, null, null, null, null, null, null],
       [null, null, null, null, null, null, null, null],
@@ -45,5 +45,18 @@ describe("computing allowed captures", () => {
         [3, 2],
       ])
     );
+  });
+  it("it doesn't doesn't allow capturing when the piece is engaged", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, BINF, RINF, null, null, null, null, null],
+      [null, RINF, BINF, RINF, null, null, null, null],
+      [RINF, BINF, RINF, BINF, null, null, null, null],
+      [null, null, BINF, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+    ];
+    expect(captureCandidates([4, 1], board)).toEqual([]);
   });
 });
