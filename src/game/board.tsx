@@ -216,8 +216,8 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
                   src={`/${Units[square.type].imagePathPrefix}-${
                     square.player
                   }.png`}
-                  width="40"
-                  height="40"
+                  width="35"
+                  height="35"
                   className="select-none"
                   draggable="false"
                   style={{
