@@ -1,5 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
-import { GHQState, Player, ReserveFleet, Units } from "@/game/engine";
+import {
+  GHQState,
+  Orientation,
+  Player,
+  ReserveFleet,
+  Units,
+} from "@/game/engine";
 import { BoardProps } from "boardgame.io/react";
 import { useMachine } from "@xstate/react";
 import { turnStateMachine } from "@/game/board-state";
@@ -7,6 +13,7 @@ import classNames from "classnames";
 import { useHotkeys } from "react-hotkeys-hook";
 import { bombardedSquares } from "@/game/move-logic";
 import Image from "next/image";
+import { SelectOrientation } from "@/game/select-orientation";
 
 const rows = 8;
 const columns = 8;
@@ -16,6 +23,8 @@ type Annotations = {
     moveTo?: true;
     bombardedBy?: { RED?: true; BLUE?: true };
     selectedPiece?: true;
+    showAim?: true;
+    hidePiece?: true;
   };
 };
 
@@ -28,9 +37,25 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
         movePiece: ({ context, event }) => {
           if ("at" in event) moves.Move(context.selectedPiece!.at, event.at);
         },
+        changeOrientation: ({ context, event }) => {
+          if ("orientation" in event)
+            moves.ChangeOrientation(
+              context.selectedPiece!.at,
+              event.orientation
+            );
+        },
         spawnPiece: ({ context, event }) => {
           if (context.unitKind && "at" in event)
             moves.Reinforce(context.unitKind, event.at);
+        },
+        moveAndOrient: ({ context, event }) => {
+          if ("orientation" in event) {
+            moves.MoveAndOrient(
+              context.selectedPiece!.at,
+              context.stagedArtilleryMove,
+              event.orientation
+            );
+          }
         },
       },
     })
@@ -83,13 +108,20 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
       };
     }
 
+    const aiming = state.matches("activePieceSelected.selectOrientation");
+    if (aiming && state.context.stagedArtilleryMove) {
+      const [x, y] = state.context.stagedArtilleryMove;
+      annotate[`${x},${y}`] = { ...annotate[`${x},${y}`], showAim: true };
+
+      const [oldX, oldY] = state.context.selectedPiece!.at;
+      annotate[`${oldX},${oldY}`] = {
+        ...annotate[`${oldX},${oldY}`],
+        hidePiece: true,
+      };
+    }
+
     return annotate;
   }, [state.context]);
-
-  function getBoxShadow(isSelected?: boolean) {
-    if (isSelected) return "inset 0 0 8px darkgray";
-    return "";
-  }
 
   const cells = Array.from({ length: rows }).map((_, rowIndex) => (
     <tr key={rowIndex}>
@@ -97,6 +129,16 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
         const square = G.board[rowIndex][colIndex];
 
         const annotationsForSquare = annotations[`${rowIndex},${colIndex}`];
+
+        const rotation =
+          square && "orientation" in square
+            ? square && square.orientation
+            : undefined;
+
+        const add180 =
+          square &&
+          ((ctx.currentPlayer === "0" && square.player === "BLUE") ||
+            (ctx.currentPlayer === "1" && square.player === "RED"));
 
         const bombardmentClass =
           annotationsForSquare && annotationsForSquare.bombardedBy
@@ -111,6 +153,17 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
                 : ""
               : ""
             : "";
+
+        const selectingOrientation = Boolean(
+          square &&
+            Units[square.type].artilleryRange &&
+            annotationsForSquare?.selectedPiece
+        );
+
+        const aiming = Boolean(annotations[`${rowIndex},${colIndex}`]?.showAim);
+        const hidePiece = Boolean(
+          annotations[`${rowIndex},${colIndex}`]?.hidePiece
+        );
 
         return (
           <td
@@ -138,22 +191,25 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
             })}
             style={{
               border: "1px solid black",
-              boxShadow: getBoxShadow(annotationsForSquare?.selectedPiece),
+              boxShadow:
+                (annotationsForSquare?.selectedPiece && !hidePiece) || aiming
+                  ? "inset 0 0 8px darkgray"
+                  : "",
               textAlign: "center",
               width: "90px",
               height: "90px",
             }}
           >
-            {square ? (
+            {square && !selectingOrientation && !hidePiece ? (
               <div
                 className={classNames(
                   "flex items-center justify-center select-none font-bold text-3xl",
                   square.player === "RED" ? "text-red-600" : "text-blue-600",
                   {
                     // @todo this is really only for infantry. Adjust when we do orientation
-                    ["rotate-180"]:
-                      (ctx.currentPlayer === "0" && square.player === "BLUE") ||
-                      (ctx.currentPlayer === "1" && square.player === "RED"),
+                    // ["rotate-180"]:
+                    //   (ctx.currentPlayer === "0" && square.player === "BLUE") ||
+                    //   (ctx.currentPlayer === "1" && square.player === "RED"),
                   }
                 )}
               >
@@ -161,14 +217,87 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
                   src={`/${Units[square.type].imagePathPrefix}-${
                     square.player
                   }.png`}
-                  width="64"
-                  height="64"
+                  width="52"
+                  height="52"
+                  className="select-none"
+                  draggable="false"
+                  style={{
+                    transform: square.orientation
+                      ? ctx.currentPlayer === "1"
+                        ? `rotate(${180 - square.orientation}deg)`
+                        : `rotate(${square.orientation}deg)`
+                      : `rotate(${add180 ? 180 : 0}deg)`,
+                  }}
                   alt={Units[square.type].imagePathPrefix}
                 />
               </div>
             ) : null}
-            {annotationsForSquare?.moveTo ? (
+            {square && selectingOrientation && !hidePiece ? (
+              <SelectOrientation
+                player={square.player}
+                onChange={(orientation: Orientation) => {
+                  send({
+                    type: "CHANGE_ORIENTATION",
+                    orientation: orientation,
+                  });
+                }}
+              >
+                <Image
+                  src={`/${Units[square.type].imagePathPrefix}-${
+                    square.player
+                  }.png`}
+                  width="35"
+                  height="35"
+                  className="select-none"
+                  draggable="false"
+                  style={{
+                    transform: square.orientation
+                      ? ctx.currentPlayer === "1"
+                        ? `rotate(${180 - square.orientation}deg)`
+                        : `rotate(${square.orientation}deg)`
+                      : `rotate(${add180 ? 180 : 0}deg)`,
+                  }}
+                  alt={Units[square.type].imagePathPrefix}
+                />
+              </SelectOrientation>
+            ) : null}
+            {annotationsForSquare?.moveTo && !aiming ? (
               <div className="rounded-full w-8 h-8 m-auto bg-gray-300" />
+            ) : null}
+            {aiming && state.context.selectedPiece ? (
+              <SelectOrientation
+                player={state.context.player}
+                onChange={(orientation: Orientation) => {
+                  send({
+                    type: "CHANGE_ORIENTATION",
+                    orientation: orientation,
+                  });
+                }}
+              >
+                <Image
+                  src={`/${
+                    Units[state.context.selectedPiece.piece.type]
+                      .imagePathPrefix
+                  }-${state.context.player}.png`}
+                  width="35"
+                  height="35"
+                  className="select-none"
+                  draggable="false"
+                  style={{
+                    transform: state.context.selectedPiece.piece.orientation
+                      ? ctx.currentPlayer === "1"
+                        ? `rotate(${
+                            180 - state.context.selectedPiece.piece.orientation
+                          }deg)`
+                        : `rotate(${state.context.selectedPiece.piece.orientation}deg)`
+                      : `rotate(${add180 ? 180 : 0}deg)`,
+                  }}
+                  alt={
+                    Units[state.context.selectedPiece.piece.type]
+                      .imagePathPrefix
+                  }
+                />
+              </SelectOrientation>
             ) : null}
           </td>
         );
