@@ -186,9 +186,11 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
                   className="select-none"
                   draggable="false"
                   style={{
-                    transform: `rotate(${
-                      rotation ? rotation : add180 ? 180 : 0
-                    }deg)`,
+                    transform: square.orientation
+                      ? ctx.currentPlayer === "1"
+                        ? `rotate(${180 - square.orientation}deg)`
+                        : `rotate(${square.orientation}deg)`
+                      : `rotate(${add180 ? 180 : 0}deg)`,
                   }}
                   alt={Units[square.type].imagePathPrefix}
                 />
