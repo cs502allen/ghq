@@ -131,6 +131,12 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
               : ""
             : "";
 
+        const selectingOrientation = Boolean(
+          square &&
+            Units[square.type].artilleryRange &&
+            annotationsForSquare?.selectedPiece
+        );
+
         return (
           <td
             onClick={() => {
@@ -164,7 +170,7 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
               height: "90px",
             }}
           >
-            {square ? (
+            {square && !selectingOrientation ? (
               <div
                 className={classNames(
                   "flex items-center justify-center select-none font-bold text-3xl",
@@ -181,8 +187,8 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
                   src={`/${Units[square.type].imagePathPrefix}-${
                     square.player
                   }.png`}
-                  width="64"
-                  height="64"
+                  width="52"
+                  height="52"
                   className="select-none"
                   draggable="false"
                   style={{
@@ -196,9 +202,7 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
                 />
               </div>
             ) : null}
-            {square &&
-            Units[square.type].artilleryRange &&
-            annotationsForSquare?.selectedPiece ? (
+            {square && selectingOrientation ? (
               <SelectOrientation
                 player={square.player}
                 onChange={(orientation: Orientation) => {
@@ -207,7 +211,25 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
                     orientation: orientation,
                   });
                 }}
-              />
+              >
+                <Image
+                  src={`/${Units[square.type].imagePathPrefix}-${
+                    square.player
+                  }.png`}
+                  width="40"
+                  height="40"
+                  className="select-none"
+                  draggable="false"
+                  style={{
+                    transform: square.orientation
+                      ? ctx.currentPlayer === "1"
+                        ? `rotate(${180 - square.orientation}deg)`
+                        : `rotate(${square.orientation}deg)`
+                      : `rotate(${add180 ? 180 : 0}deg)`,
+                  }}
+                  alt={Units[square.type].imagePathPrefix}
+                />
+              </SelectOrientation>
             ) : null}
             {annotationsForSquare?.moveTo ? (
               <div className="rounded-full w-8 h-8 m-auto bg-gray-300" />

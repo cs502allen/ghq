@@ -1,11 +1,13 @@
-import React from "react";
+import React, { PropsWithChildren } from "react";
 import { Orientation, Player } from "@/game/engine";
 import classNames from "classnames";
 
-export function SelectOrientation(props: {
-  player: Player;
-  onChange: (orientation: Orientation) => void;
-}) {
+export function SelectOrientation(
+  props: PropsWithChildren<{
+    player: Player;
+    onChange: (orientation: Orientation) => void;
+  }>
+) {
   const color = props.player === "RED" ? "text-red-600" : "text-blue-600";
 
   const asBlue = props.player === "BLUE";
@@ -54,7 +56,7 @@ export function SelectOrientation(props: {
         >
           ▲
         </div>
-        <div className="col-span-3"></div>
+        <div className="col-span-3">{props.children}</div>
         <div
           className="col-span-2  bg-slate-400 rotate-90"
           onClick={() => {
