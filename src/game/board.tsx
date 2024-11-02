@@ -14,8 +14,6 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { bombardedSquares } from "@/game/move-logic";
 import Image from "next/image";
 import { SelectOrientation } from "@/game/select-orientation";
-import { PluginState } from "boardgame.io";
-import { HistoryState } from "./move-history-plugin";
 
 const rows = 8;
 const columns = 8;
