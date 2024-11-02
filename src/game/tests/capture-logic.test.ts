@@ -11,18 +11,39 @@ import {
 } from "@/game/tests/test-boards";
 import { captureCandidates } from "@/game/capture-logic";
 
+const BINF = Blue.INFANTRY;
+const RINF = Red.INFANTRY;
+
 describe("computing allowed captures", () => {
   it("captures one piece when two on cardinal sides", () => {
     const board: GHQState["board"] = [
       [null, null, null, null, null, null, null, null],
       [null, null, null, null, null, null, null, null],
-      [null, Blue.INFANTRY, null, null, null, null, null, null],
-      [null, Red.INFANTRY, Blue.INFANTRY, null, null, null, null, null],
+      [null, BINF, null, null, null, null, null, null],
+      [null, RINF, BINF, null, null, null, null, null],
       [null, null, null, null, null, null, null, null],
       [null, null, null, null, null, null, null, null],
       [null, null, null, null, null, null, null, null],
       [null, null, null, null, null, null, null, null],
     ];
     expect(captureCandidates([2, 1], board)).toEqual([[3, 1]]);
+  });
+  it("allows capturing two pieces when two on cardinal sides", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, BINF, RINF, null, null, null, null, null],
+      [null, RINF, BINF, RINF, BINF, null, null, null],
+      [RINF, BINF, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+    ];
+    expect(captureCandidates([3, 3], board)).toEqual(
+      expect.arrayContaining([
+        [3, 4],
+        [3, 2],
+      ])
+    );
   });
 });
