@@ -121,10 +121,25 @@ const Move: Move<GHQState> = (
   { G, ctx },
   from: Coordinate,
   to: Coordinate,
-  orientation?: Orientation,
   capturePreference?: Coordinate
 ) => {
   const piece = G.board[from[0]][from[1]];
+  G.board[from[0]][from[1]] = null;
+  G.board[to[0]][to[1]] = piece;
+};
+
+const MoveAndOrient: Move<GHQState> = (
+  { G, ctx },
+  from: Coordinate,
+  to: Coordinate,
+  orientation?: Orientation
+) => {
+  const piece = G.board[from[0]][from[1]]!;
+  if (typeof Units[piece.type].artilleryRange === "undefined") {
+    return INVALID_MOVE;
+  }
+
+  piece!.orientation = orientation;
   G.board[from[0]][from[1]] = null;
   G.board[to[0]][to[1]] = piece;
 };
@@ -146,6 +161,7 @@ export const GameMoves = {
   Reinforce,
   Move,
   ChangeOrientation,
+  MoveAndOrient,
   Skip,
 };
 
