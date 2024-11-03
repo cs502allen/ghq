@@ -1,3 +1,5 @@
+import { LoaderCircle } from "lucide-react";
+
 export default function LoadingModal({
   onCancel,
 }: Readonly<{ onCancel: () => void }>) {
@@ -39,21 +41,7 @@ export default function LoadingModal({
             <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
               <div className="sm:flex sm:items-start">
                 <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-                  <svg
-                    className="h-6 w-6 text-blue-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                    data-slot="icon"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M5 12h.01M12 12h.01M19 12h.01"
-                    />
-                  </svg>
+                  <LoaderCircle className="w-4 h-4 animate-spin" />
                 </div>
                 <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                   <h3
