@@ -11,10 +11,10 @@ export function captureCandidates(
     throw new Error("No piece at the last moved infantry position");
   }
 
-  const engagedPieces: Record<string, Player> = {};
+  const engagedInfantry: Record<string, Player> = {};
   for (const pairs of engagedPairs) {
-    engagedPieces[`${pairs.RED[0]},${pairs.RED[1]}`] = "RED";
-    engagedPieces[`${pairs.BLUE[0]},${pairs.BLUE[1]}`] = "BLUE";
+    engagedInfantry[`${pairs.RED[0]},${pairs.RED[1]}`] = "RED";
+    engagedInfantry[`${pairs.BLUE[0]},${pairs.BLUE[1]}`] = "BLUE";
   }
 
   // Find the adjacent pieces to the last moved infantry
@@ -35,24 +35,26 @@ export function captureCandidates(
     }
   }
 
-  // Find out if the opponent has any unengaged pieces near us, if so we need to engage with it
+  // Find out if the opponent has any unengaged infantry near us, if so we need to engage with it
   for (const coord of attackerAdjacentPieces) {
     const piece = board[coord[0]][coord[1]];
     if (
       piece &&
       piece.player !== attacker.player &&
-      !engagedPieces[`${coord[0]},${coord[1]}`]
+      piece.type === "INFANTRY" &&
+      !engagedInfantry[`${coord[0]},${coord[1]}`]
     ) {
       return [];
     }
   }
 
-  // Filter for only already-engaged pieces of the opponent
+  // Filter for only already-engaged infantry of the opponent or non-infantry pieces
   const attackablePieces = attackerAdjacentPieces.filter((coord) => {
     const piece = board[coord[0]][coord[1]];
     return (
       piece &&
-      engagedPieces[`${coord[0]},${coord[1]}`] &&
+      (engagedInfantry[`${coord[0]},${coord[1]}`] ||
+        piece.type !== "INFANTRY") &&
       piece.player !== attacker.player
     );
   });
@@ -85,10 +87,20 @@ function maximizeEngagement(
         continue;
       }
 
-      if (board[i]?.[j]?.player === "RED") {
+      const unit = board[i]?.[j];
+      if (!unit) {
+        continue;
+      }
+
+      // Only infantry can be engaged
+      if (unit.type !== "INFANTRY") {
+        continue;
+      }
+
+      if (unit.player === "RED") {
         pieces0.push({ x: i, y: j });
         piece0Index[`${i},${j}`] = index0++;
-      } else if (board[i]?.[j]?.player === "BLUE") {
+      } else if (unit.player === "BLUE") {
         pieces1.push({ x: i, y: j });
         piece1Index[`${i},${j}`] = index1++;
       }
