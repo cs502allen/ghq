@@ -28,7 +28,14 @@ type Annotations = {
   };
 };
 
-export function GHQBoard({ ctx, G, moves, playerID }: BoardProps<GHQState>) {
+export function GHQBoard({
+  ctx,
+  G,
+  moves,
+  playerID,
+  undo,
+  redo,
+}: BoardProps<GHQState>) {
   const divRef = useRef(null); // Create a ref
 
   const isPrimaryPlayer = useCallback(
@@ -73,6 +80,8 @@ export function GHQBoard({ ctx, G, moves, playerID }: BoardProps<GHQState>) {
   );
 
   useHotkeys("escape", () => send({ type: "DESELECT" }), [send]);
+  useHotkeys("left", () => undo(), [undo]);
+  useHotkeys("right", () => redo(), [redo]);
 
   useEffect(() => {
     send({
