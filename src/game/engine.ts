@@ -177,7 +177,7 @@ const clearBombardedSquares = (G: GHQState, ctx: Ctx) => {
       }
 
       // We only bombard on our turn.
-      // For example, if it's red's turn, and this is a blue bombarded square, don't remove it.
+      // For example, if it's red's turn, and this is a blue bombarded square, do nothing.
       const currentColor = ctx.currentPlayer === "0" ? "RED" : "BLUE";
       if (!bombardedSquare[currentColor]) {
         return;
@@ -191,6 +191,8 @@ const clearBombardedSquares = (G: GHQState, ctx: Ctx) => {
       G.board[x][y] = null;
     });
   });
+
+  // TODO: add log message for user indicating that a bombarded piece was destroyed
 };
 
 export const GameMoves = {
