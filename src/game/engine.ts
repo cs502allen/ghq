@@ -1,6 +1,7 @@
-import type { Game, Move, State } from "boardgame.io";
+import type { Ctx, Game, Move, State } from "boardgame.io";
 import { INVALID_MOVE } from "boardgame.io/core";
 import { PluginPlayer } from "boardgame.io/plugins";
+import { bombardedSquares } from "./move-logic";
 
 export const Units: {
   [key: string]: {
@@ -163,6 +164,35 @@ const Skip: Move<GHQState> = ({ G, ctx, events }) => {
   events.endTurn();
 };
 
+const clearBombardedSquares = (G: GHQState, ctx: Ctx) => {
+  const bombarded = bombardedSquares(G.board);
+
+  G.board.forEach((rows, x) => {
+    rows.forEach((square, y) => {
+      const bombardedSquare = bombarded[`${x},${y}`];
+
+      // If there is nothing here or it's not bombarded, do nothing.
+      if (!square || !bombardedSquare) {
+        return;
+      }
+
+      // We only bombard on our turn.
+      // For example, if it's red's turn, and this is a blue bombarded square, don't remove it.
+      const currentColor = ctx.currentPlayer === "0" ? "RED" : "BLUE";
+      if (!bombardedSquare[currentColor]) {
+        return;
+      }
+
+      // If the square is bombarded by its own pieces, don't remove it.
+      if (bombardedSquare[square.player]) {
+        return;
+      }
+
+      G.board[x][y] = null;
+    });
+  });
+};
+
 export const GameMoves = {
   Reinforce,
   Move,
@@ -251,6 +281,9 @@ export const GHQGame: Game<GHQState> = {
       audio.volume = 0.2;
       audio.play();
       return G;
+    },
+    onBegin: ({ G, ctx, events, random, ...plugins }) => {
+      clearBombardedSquares(G, ctx);
     },
   },
   minPlayers: 2,
