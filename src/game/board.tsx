@@ -28,8 +28,19 @@ type Annotations = {
   };
 };
 
-export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
+export function GHQBoard({ ctx, G, moves, playerID }: BoardProps<GHQState>) {
   const divRef = useRef(null); // Create a ref
+
+  const isPrimaryPlayer = useCallback(
+    (playerId: string) => {
+      if (G.isOnline) {
+        return playerId === playerID;
+      }
+
+      return ctx.currentPlayer === playerId;
+    },
+    [G.isOnline, playerID, ctx.currentPlayer]
+  );
 
   const [state, send] = useMachine(
     turnStateMachine.provide({
@@ -66,20 +77,20 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
   useEffect(() => {
     send({
       type: "START_TURN",
-      player: ctx.currentPlayer === "0" ? "RED" : "BLUE",
+      player: isPrimaryPlayer("0") ? "RED" : "BLUE",
     });
-  }, [ctx.currentPlayer]);
+  }, [isPrimaryPlayer]);
 
   const selectReserve = useCallback(
     (kind: keyof ReserveFleet) => {
       send({
         type: "SELECT_RESERVE_PIECE",
         currentBoard: G.board,
-        reserve: ctx.currentPlayer === "0" ? G.redReserve : G.blueReserve,
+        reserve: isPrimaryPlayer("0") ? G.redReserve : G.blueReserve,
         kind,
       });
     },
-    [G.board, G.redReserve, G.blueReserve]
+    [G.board, G.redReserve, G.blueReserve, isPrimaryPlayer]
   );
 
   const annotations = useMemo(() => {
@@ -137,8 +148,8 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
 
         const add180 =
           square &&
-          ((ctx.currentPlayer === "0" && square.player === "BLUE") ||
-            (ctx.currentPlayer === "1" && square.player === "RED"));
+          ((isPrimaryPlayer("0") && square.player === "BLUE") ||
+            (isPrimaryPlayer("1") && square.player === "RED"));
 
         const bombardmentClass =
           annotationsForSquare && annotationsForSquare.bombardedBy
@@ -187,7 +198,7 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
             className={classNames("relative", bombardmentClass, {
               ["cursor-pointer"]:
                 annotationsForSquare?.moveTo ||
-                square?.player === (ctx.currentPlayer === "0" ? "RED" : "BLUE"),
+                square?.player === (isPrimaryPlayer("0") ? "RED" : "BLUE"),
             })}
             style={{
               border: "1px solid black",
@@ -208,8 +219,8 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
                   {
                     // @todo this is really only for infantry. Adjust when we do orientation
                     // ["rotate-180"]:
-                    //   (ctx.currentPlayer === "0" && square.player === "BLUE") ||
-                    //   (ctx.currentPlayer === "1" && square.player === "RED"),
+                    //   (isPrimaryPlayer("0") && square.player === "BLUE") ||
+                    //   (isPrimaryPlayer("1") && square.player === "RED"),
                   }
                 )}
               >
@@ -223,7 +234,7 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
                   draggable="false"
                   style={{
                     transform: square.orientation
-                      ? ctx.currentPlayer === "1"
+                      ? isPrimaryPlayer("1")
                         ? `rotate(${180 - square.orientation}deg)`
                         : `rotate(${square.orientation}deg)`
                       : `rotate(${add180 ? 180 : 0}deg)`,
@@ -252,7 +263,7 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
                   draggable="false"
                   style={{
                     transform: square.orientation
-                      ? ctx.currentPlayer === "1"
+                      ? isPrimaryPlayer("1")
                         ? `rotate(${180 - square.orientation}deg)`
                         : `rotate(${square.orientation}deg)`
                       : `rotate(${add180 ? 180 : 0}deg)`,
@@ -285,7 +296,7 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
                   draggable="false"
                   style={{
                     transform: state.context.selectedPiece.piece.orientation
-                      ? ctx.currentPlayer === "1"
+                      ? isPrimaryPlayer("1")
                         ? `rotate(${
                             180 - state.context.selectedPiece.piece.orientation
                           }deg)`
@@ -310,26 +321,30 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
       <div className="col-span-5 border-r-2 border-gray-100 flex items-center justify-center">
         <table ref={divRef} style={{ borderCollapse: "collapse" }}>
           {/*flip board*/}
-          <tbody>{ctx.currentPlayer === "0" ? cells : cells.reverse()}</tbody>
+          <tbody>{isPrimaryPlayer("0") ? cells : cells.reverse()}</tbody>
         </table>
       </div>
       <div
         className={classNames(
-          "col-span-2 bg-white pt-10 flex flex-col ",
-          ctx.currentPlayer === "0" ? "bg-red-50" : "bg-blue-50",
-          { ["flex-col-reverse"]: ctx.currentPlayer === "1" }
+          "col-span-2 bg-white pt-10 flex flex-col justify-between",
+          isPrimaryPlayer("0") ? "bg-red-50" : "bg-blue-50",
+          { ["flex-col-reverse"]: isPrimaryPlayer("1") }
         )}
       >
-        <div className="flex-1 items-center justify-center flex">
-          <ReserveBank
-            player="BLUE"
-            reserve={G.blueReserve}
-            selectable={
-              ctx.currentPlayer === "1" && !state.matches("activePieceSelected")
-            }
-            selectReserve={selectReserve}
-          />
+        <div className="flex flex-col gap-2 p-4">
+          <div className="text-xl font-bold">{G.userIds[0]}</div>
+          <div className="items-center justify-center flex">
+            <ReserveBank
+              player="BLUE"
+              reserve={G.blueReserve}
+              selectable={
+                isPrimaryPlayer("1") && !state.matches("activePieceSelected")
+              }
+              selectReserve={selectReserve}
+            />
+          </div>
         </div>
+
         <h2
           className={classNames(
             "text-center font-semibold text-2xl",
@@ -347,15 +362,18 @@ export function GHQBoard({ ctx, G, moves }: BoardProps<GHQState>) {
             </button>
           </div>
         </h2>
-        <div className="flex-1 items-center justify-center flex">
-          <ReserveBank
-            player="RED"
-            reserve={G.redReserve}
-            selectable={
-              ctx.currentPlayer === "0" && !state.matches("activePieceSelected")
-            }
-            selectReserve={selectReserve}
-          />
+        <div className="flex flex-col gap-2 p-4">
+          <div className="text-xl font-bold">{G.userIds[1]}</div>
+          <div className="items-center justify-center flex">
+            <ReserveBank
+              player="RED"
+              reserve={G.redReserve}
+              selectable={
+                isPrimaryPlayer("0") && !state.matches("activePieceSelected")
+              }
+              selectReserve={selectReserve}
+            />
+          </div>
         </div>
       </div>
     </div>
