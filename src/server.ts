@@ -1,4 +1,4 @@
-import { Server, Origins } from "boardgame.io/server";
+import { Server, Origins, FlatFile } from "boardgame.io/server";
 import { OnlineGHQGame } from "./game/engine";
 import crypto from "crypto";
 import { StorageAPI } from "boardgame.io";
@@ -17,6 +17,9 @@ interface Match {
 const server = Server({
   games: [OnlineGHQGame],
   origins: [Origins.LOCALHOST],
+  db: new FlatFile({
+    dir: ".data/flatfiledb",
+  }),
 });
 
 const queue: Set<string> = new Set<string>();
@@ -99,12 +102,9 @@ server.router.get("/matches", async (ctx) => {
   const matches = await Promise.all(
     allLiveMatches.slice(0, 10).map(async (matchId) => {
       const res = await server.db.fetch(matchId, { state: true });
-      console.log(res);
       return { ...res, id: matchId };
     })
   );
-
-  console.log(matches);
 
   ctx.body = JSON.stringify({ matches });
 });

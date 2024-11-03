@@ -87,7 +87,7 @@ function App() {
 
     if (isMatchmaking) {
       checkMatchmaking(userId);
-      interval = setInterval(() => checkMatchmaking(userId), 5000); // Poll every 5 seconds
+      interval = setInterval(() => checkMatchmaking(userId), 2000); // Poll every 2 seconds
     }
 
     return () => {

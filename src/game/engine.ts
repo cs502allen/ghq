@@ -2,6 +2,7 @@ import type { Ctx, Game, Move, State } from "boardgame.io";
 import { INVALID_MOVE } from "boardgame.io/core";
 import { PluginPlayer } from "boardgame.io/plugins";
 import { bombardedSquares } from "./move-logic";
+import { playMoveSound } from "./audio";
 
 export const Units: {
   [key: string]: {
@@ -133,6 +134,7 @@ const Move: Move<GHQState> = (
   const piece = G.board[from[0]][from[1]];
   G.board[from[0]][from[1]] = null;
   G.board[to[0]][to[1]] = piece;
+  playMoveSound(); // TODO(tyler): figure out where this should go
 };
 
 const MoveAndOrient: Move<GHQState> = (
@@ -278,12 +280,6 @@ export const GHQGame: Game<GHQState> = {
   },
   turn: {
     maxMoves: 3,
-    onMove: ({ G, ctx, events, random, ...plugins }) => {
-      const audio = new Audio("/move-piece.mp3");
-      audio.volume = 0.2;
-      audio.play();
-      return G;
-    },
     onBegin: ({ G, ctx, events, random, ...plugins }) => {
       clearBombardedSquares(G, ctx);
     },

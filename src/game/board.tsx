@@ -35,6 +35,7 @@ export function GHQBoard({
   playerID,
   undo,
   redo,
+  plugins,
 }: BoardProps<GHQState>) {
   const divRef = useRef(null); // Create a ref
 
