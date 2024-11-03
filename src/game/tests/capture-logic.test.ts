@@ -13,6 +13,8 @@ import { captureCandidates } from "@/game/capture-logic";
 
 const BINF = Blue.INFANTRY;
 const RINF = Red.INFANTRY;
+const RART = Red.ARTILLERY(0);
+const R_HQ = Red.HQ;
 
 describe("computing allowed captures", () => {
   it("captures one piece when two on cardinal sides", () => {
@@ -58,5 +60,23 @@ describe("computing allowed captures", () => {
       [null, null, null, null, null, null, null, null],
     ];
     expect(captureCandidates([4, 1], board)).toEqual([]);
+  });
+  it.only("allows capturing artillery", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, RART, null, null, null, null, null],
+      [null, RART, BINF, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+    ];
+    expect(captureCandidates([2, 2], board)).toEqual(
+      expect.arrayContaining([
+        [2, 1],
+        [1, 2],
+      ])
+    );
   });
 });
