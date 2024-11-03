@@ -246,6 +246,12 @@ export const GHQGame: Game<GHQState> = {
   },
   turn: {
     maxMoves: 3,
+    onMove: ({ G, ctx, events, random, ...plugins }) => {
+      const audio = new Audio("/move-piece.mp3");
+      audio.volume = 0.2;
+      audio.play();
+      return G;
+    },
   },
   minPlayers: 2,
   maxPlayers: 2,
