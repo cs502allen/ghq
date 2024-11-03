@@ -100,7 +100,7 @@ server.router.get("/matches", async (ctx) => {
     allLiveMatches.slice(0, 10).map(async (matchId) => {
       const res = await server.db.fetch(matchId, { state: true });
       console.log(res);
-      return res;
+      return { ...res, id: matchId };
     })
   );
 

@@ -99,33 +99,24 @@ function App() {
 
   async function cancelMatchmaking() {
     setIsMatchmaking(false);
-    fetch(`http://localhost:8000/api/matchmaking?userId=${userId}`, {
+    fetch(`http://localhost:8000/matchmaking?userId=${userId}`, {
       method: "DELETE",
     });
   }
 
   useEffect(() => {
-    // GET /api/games
-    setGames([
-      {
-        id: "1",
-        player1: "tyler",
-        player2: "aidan",
-        status: "in progress",
-      },
-      {
-        id: "2",
-        player1: "steve",
-        player2: "chris",
-        status: "in progress",
-      },
-      {
-        id: "3",
-        player1: "aidan",
-        player2: "tyler",
-        status: "finished",
-      },
-    ]);
+    fetch("http://localhost:8000/matches")
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res.matches[0]);
+        const games = res.matches.map((match: any) => ({
+          id: match.id,
+          player1: match.state.G.userIds["0"],
+          player2: match.state.G.userIds["1"],
+          status: `Turn ${match.state.ctx.turn}`,
+        }));
+        setGames(games);
+      });
   }, []);
 
   async function playLocal() {
