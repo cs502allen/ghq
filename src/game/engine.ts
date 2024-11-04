@@ -1,4 +1,4 @@
-import type { Ctx, Game, Move, State } from "boardgame.io";
+import type { Ctx, FnContext, Game, Move, State } from "boardgame.io";
 import { INVALID_MOVE } from "boardgame.io/core";
 import { PluginPlayer } from "boardgame.io/plugins";
 import { bombardedSquares } from "./move-logic";
@@ -75,6 +75,7 @@ export type ReserveFleet = {
 
 export interface GHQState {
   isOnline?: boolean;
+  matchId: string;
   userIds: {
     "0": string;
     "1": string;
@@ -166,6 +167,10 @@ const Skip: Move<GHQState> = ({ G, ctx, events }) => {
   events.endTurn();
 };
 
+const Resign: Move<GHQState> = ({ G, ctx, events }) => {
+  events.endGame();
+};
+
 const clearBombardedSquares = (G: GHQState, ctx: Ctx) => {
   const bombarded = bombardedSquares(G.board);
 
@@ -198,6 +203,7 @@ export const GameMoves = {
   ChangeOrientation,
   MoveAndOrient,
   Skip,
+  Resign,
 };
 
 export type GameMoveType = typeof GameMoves;
@@ -271,6 +277,7 @@ export const GHQGame: Game<GHQState> = {
         "0": setupData?.players?.["0"] || "Player 1",
         "1": setupData?.players?.["1"] || "Player 2",
       },
+      matchId: setupData?.matchId || "",
     };
   },
   turn: {
@@ -284,7 +291,11 @@ export const GHQGame: Game<GHQState> = {
   moves: GameMoves,
 };
 
-export const OnlineGHQGame: Game<GHQState> = (() => {
+export function newOnlineGHQGame({
+  onEnd,
+}: {
+  onEnd?: (args: FnContext<GHQState>) => void | GHQState;
+}): Game<GHQState> {
   const game = { ...GHQGame };
 
   const oldSetup = game.setup;
@@ -302,6 +313,14 @@ export const OnlineGHQGame: Game<GHQState> = (() => {
     if (!setupData.players["0"] || !setupData.players["1"]) {
       return "Missing player IDs";
     }
+    if (!setupData.matchId) {
+      return "Missing match ID";
+    }
   };
+
+  if (onEnd) {
+    game.onEnd = (args) => onEnd(args);
+  }
+
   return game;
-})();
+}

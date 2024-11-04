@@ -61,14 +61,13 @@ function App() {
         const data = await response.json();
         if (data.match) {
           setIsMatchmaking(false);
-          const playerId = data.match.players["0"] === userId ? "0" : "1";
+          const playerId = data.match.playerId;
           localStorage.setItem(
             `credentials:${data.match.id}:${playerId}`,
             data.match.credentials
           );
           router.push(`/live/${data.match.id}?playerId=${playerId}`);
         }
-        console.log(data);
       } catch (error) {
         console.error("Error polling matchmaking API:", error);
       }
@@ -111,7 +110,6 @@ function App() {
     fetch("http://localhost:8000/matches")
       .then((res) => res.json())
       .then((res) => {
-        console.log(res.matches[0]);
         const games = res.matches.map((match: any) => ({
           id: match.id,
           player1: match.state.G.userIds["0"],
