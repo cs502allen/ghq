@@ -4,6 +4,7 @@ import { INVALID_MOVE } from "boardgame.io/core";
 import { isAuthorizedToMovePiece } from "./move-logic";
 import { playMoveSound } from "./audio";
 import { clearBombardedSquares } from "@/game/capture-logic";
+import { appendHistory, HistoryPlugin } from "./move-history-plugin";
 
 export const Units: {
   [key: string]: {
@@ -195,6 +196,7 @@ export const GameMoves = {
 export type GameMoveType = typeof GameMoves;
 
 export const GHQGame: Game<GHQState> = {
+  plugins: [HistoryPlugin],
   setup: ({ ctx, ...plugins }, setupData) => {
     return {
       board: [
@@ -269,7 +271,16 @@ export const GHQGame: Game<GHQState> = {
   turn: {
     maxMoves: 3,
     onBegin: ({ G, ctx, events, random, ...plugins }) => {
-      clearBombardedSquares(G, ctx);
+      const clearedSqures = clearBombardedSquares(G, ctx);
+      if (clearedSqures.length > 0) {
+        appendHistory(plugins, {
+          message: `Move ${
+            ctx.turn
+          }: Artillery destroyed pieces at ${clearedSqures
+            .map(([x, y]) => `(${x},${y})`)
+            .join(", ")}`,
+        });
+      }
     },
   },
   minPlayers: 2,

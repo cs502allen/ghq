@@ -185,7 +185,9 @@ function maximizeEngagement(
   return engagedPairs;
 }
 
-export function clearBombardedSquares(G: GHQState, ctx: Ctx) {
+export function clearBombardedSquares(G: GHQState, ctx: Ctx): Coordinate[] {
+  const clearedSquares: Coordinate[] = [];
+
   const bombarded = bombardedSquares(G.board);
 
   G.board.forEach((rows, x) => {
@@ -204,9 +206,10 @@ export function clearBombardedSquares(G: GHQState, ctx: Ctx) {
         square.player !== currentPlayerColor
       ) {
         G.board[x][y] = null;
+        clearedSquares.push([x, y]);
       }
     });
   });
 
-  // TODO: add log message for user indicating that a bombarded piece was destroyed
+  return clearedSquares;
 }
