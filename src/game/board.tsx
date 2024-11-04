@@ -305,7 +305,7 @@ export function GHQBoard({
                 </SelectOrientation>
               ) : null}
               {annotationsForSquare?.moveTo && !aiming ? (
-                <div className="rounded-full w-8 h-8 m-auto bg-gray-300" />
+                <div className="rounded-full w-6 h-6 m-auto bg-green-600/40" />
               ) : null}
               {aiming && state.context.selectedPiece ? (
                 <SelectOrientation
