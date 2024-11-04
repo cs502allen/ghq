@@ -218,13 +218,17 @@ export function GHQBoard({
                 }
               }}
               key={colIndex}
-              className={classNames("relative", bombardmentClass, {
-                ["cursor-pointer"]:
-                  annotationsForSquare?.moveTo ||
-                  square?.player === (isPrimaryPlayer("0") ? "RED" : "BLUE"),
-              })}
+              className={classNames(
+                "relative",
+                bombardmentClass,
+                {
+                  ["cursor-pointer"]:
+                    annotationsForSquare?.moveTo ||
+                    square?.player === (isPrimaryPlayer("0") ? "RED" : "BLUE"),
+                },
+                (rowIndex + colIndex) % 2 === 0 ? "bg-gray-300" : "bg-gray-200"
+              )}
               style={{
-                border: "1px solid black",
                 boxShadow:
                   (annotationsForSquare?.selectedPiece && !hidePiece) || aiming
                     ? "inset 0 0 8px darkgray"
@@ -347,7 +351,7 @@ export function GHQBoard({
   });
 
   return (
-    <div className="grid bg-gray-200 absolute w-full h-full grid-cols-7">
+    <div className="grid bg-gray-100 absolute w-full h-full grid-cols-7">
       <div className="col-span-5 border-r-2 border-gray-100 flex items-center justify-center">
         <table ref={divRef} style={{ borderCollapse: "collapse" }}>
           {/*flip board*/}
