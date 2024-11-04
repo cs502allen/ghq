@@ -25,7 +25,7 @@ export function SelectOrientation(
           className="col-span-2 hover:bg-amber-500  bg-slate-400 -rotate-45"
           onClick={() => {
             // @todo MAKE THIS PLAY NICE FOR BLUE
-            props.onChange(asBlue ? 225 : 315);
+            props.onChange(asBlue ? 135 : 315);
           }}
         >
           ▲
@@ -41,7 +41,7 @@ export function SelectOrientation(
         <div
           className="col-span-2 hover:bg-amber-500  bg-slate-400 rotate-45"
           onClick={() => {
-            props.onChange(asBlue ? 135 : 45);
+            props.onChange(asBlue ? 225 : 45);
           }}
         >
           ▲
@@ -51,7 +51,7 @@ export function SelectOrientation(
         <div
           className="col-span-2 hover:bg-amber-500  bg-slate-400 -rotate-90 "
           onClick={() => {
-            props.onChange(270);
+            props.onChange(asBlue ? 90 :  270);
           }}
         >
           ▲
@@ -60,7 +60,7 @@ export function SelectOrientation(
         <div
           className="col-span-2 hover:bg-amber-500  bg-slate-400 rotate-90"
           onClick={() => {
-            props.onChange(90);
+            props.onChange(asBlue ? 270 : 90);
           }}
         >
           ▲
@@ -70,7 +70,7 @@ export function SelectOrientation(
         <div
           className="col-span-2 hover:bg-amber-500  bg-slate-400 rotate-[-135deg]"
           onClick={() => {
-            props.onChange(asBlue ? 315 : 225);
+            props.onChange(asBlue ? 45 : 225);
           }}
         >
           ▲
@@ -86,7 +86,7 @@ export function SelectOrientation(
         <div
           className="col-span-2 hover:bg-amber-500  bg-slate-400 rotate-[135deg]"
           onClick={() => {
-            props.onChange(asBlue ? 45 : 135);
+            props.onChange(asBlue ? 315 : 135);
           }}
         >
           ▲
