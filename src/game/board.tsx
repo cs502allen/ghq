@@ -361,23 +361,35 @@ export function GHQBoard({
           </div>
         </div>
 
-        <h2
-          className={classNames(
-            "text-center font-semibold text-2xl",
-            ctx.currentPlayer === "0" ? "text-red-500" : "text-blue-500"
-          )}
-        >
-          {ctx.currentPlayer === "0" ? "Red's " : "Blue's"} Turn
-          <div className="text-lg text-gray-600 font-mono">
-            {3 - ctx.numMoves!} remaining move{ctx.numMoves !== 2 ? "s" : ""}{" "}
-            <button
-              onClick={() => moves.Skip()}
-              className="bg-black text-white p-0.5 text-sm px-2"
-            >
-              Skip
-            </button>
-          </div>
-        </h2>
+        {ctx.gameover ? (
+          <h2
+            className={classNames(
+              "text-center font-semibold text-2xl",
+              ctx.gameover.winner === "0" ? "text-red-500" : "text-blue-500"
+            )}
+          >
+            {ctx.gameover.winner === "0" ? "Red " : "Blue"} Won!
+          </h2>
+        ) : (
+          <h2
+            className={classNames(
+              "text-center font-semibold text-2xl",
+              ctx.currentPlayer === "0" ? "text-red-500" : "text-blue-500"
+            )}
+          >
+            {ctx.currentPlayer === "0" ? "Red's " : "Blue's"} Turn
+            <div className="text-lg text-gray-600 font-mono">
+              {3 - ctx.numMoves!} remaining move{ctx.numMoves !== 2 ? "s" : ""}{" "}
+              <button
+                onClick={() => moves.Skip()}
+                className="bg-black text-white p-0.5 text-sm px-2"
+              >
+                Skip
+              </button>
+            </div>
+          </h2>
+        )}
+
         <div className="flex flex-col gap-2 p-4">
           <div className="text-xl font-bold">{G.userIds[1]}</div>
           <div className="items-center justify-center flex">

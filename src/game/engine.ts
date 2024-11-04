@@ -168,7 +168,7 @@ const Skip: Move<GHQState> = ({ G, ctx, events }) => {
 };
 
 const Resign: Move<GHQState> = ({ G, ctx, events }) => {
-  events.endGame();
+  events.endGame({ winner: ctx.currentPlayer === "0" ? "1" : "0" });
 };
 
 const clearBombardedSquares = (G: GHQState, ctx: Ctx) => {

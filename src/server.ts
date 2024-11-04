@@ -224,7 +224,7 @@ async function getActiveMatch(userId: string): Promise<ActiveMatch | null> {
   };
 }
 
-function onGameEnd({ G }: { G: GHQState }): void | GHQState {
+function onGameEnd({ ctx, G }: { ctx: any; G: GHQState }): void | GHQState {
   const matchId = G.matchId;
   for (const userId of Object.values(G.userIds)) {
     supabase
