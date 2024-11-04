@@ -16,16 +16,35 @@ const GameClient = Client({
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const searchParams = useSearchParams();
   const [matchId, setMatchId] = useState<string | null>(null);
-  const [playerId, setPlayerId] = useState<string>("0");
+  const [playerId, setPlayerId] = useState<string | undefined>();
+  const [credentials, setCredentials] = useState<string>("");
+
+  useEffect(() => {
+    if (matchId) {
+      setCredentials(
+        localStorage.getItem(`credentials:${matchId}:${playerId}`) ?? ""
+      );
+    }
+  }, [matchId]);
 
   params.then(({ id }) => setMatchId(id));
 
   useEffect(() => {
-    const playerId = searchParams.get("playerId") ?? "0";
-    setPlayerId(playerId);
+    const playerId = searchParams.get("playerId");
+    if (playerId) {
+      setPlayerId(playerId);
+    }
   }, [searchParams]);
 
   return (
-    <div>{matchId && <GameClient matchID={matchId} playerID={playerId} />}</div>
+    <div>
+      {matchId && (
+        <GameClient
+          matchID={matchId}
+          playerID={playerId}
+          credentials={credentials}
+        />
+      )}
+    </div>
   );
 }

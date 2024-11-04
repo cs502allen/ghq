@@ -63,6 +63,10 @@ function App() {
         if (data.match) {
           setIsMatchmaking(false);
           const playerId = data.match.players["0"] === userId ? "0" : "1";
+          localStorage.setItem(
+            `credentials:${data.match.id}:${playerId}`,
+            data.match.credentials
+          );
           router.push(`/live/${data.match.id}?playerId=${playerId}`);
         }
         console.log(data);

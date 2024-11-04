@@ -41,6 +41,12 @@ export function GHQBoard({
 
   const isPrimaryPlayer = useCallback(
     (playerId: string) => {
+      // If playerID is null, it means we're in spectator mode.
+      // TODO(tyler): ensure they can't click moves on local (master will prevent it anyway)
+      if (playerID === null) {
+        playerID = "0";
+      }
+
       if (G.isOnline) {
         return playerId === playerID;
       }
