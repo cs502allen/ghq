@@ -60,7 +60,12 @@ export function GHQBoard({
     turnStateMachine.provide({
       actions: {
         movePiece: ({ context, event }) => {
-          if ("at" in event) moves.Move(context.selectedPiece!.at, event.at);
+          if ("at" in event)
+            moves.Move(
+              context.selectedPiece!.at,
+              event.at,
+              context.captureEnemyAt
+            );
         },
         changeOrientation: ({ context, event }) => {
           if ("orientation" in event)
@@ -151,9 +156,8 @@ export function GHQBoard({
   }, [state.context]);
 
   const cells = Array.from({ length: rows }).map((_, rowIndex) => {
-
-    const colN = Array.from({ length: columns },  (_, index) => index)
-    const cols =isPrimaryPlayer("0") ? colN : colN.reverse()
+    const colN = Array.from({ length: columns }, (_, index) => index);
+    const cols = isPrimaryPlayer("0") ? colN : colN.reverse();
     return (
       <tr key={rowIndex}>
         {cols.map((colIndex) => {
@@ -175,23 +179,25 @@ export function GHQBoard({
             annotationsForSquare && annotationsForSquare.bombardedBy
               ? annotationsForSquare.bombardedBy
                 ? annotationsForSquare.bombardedBy.BLUE &&
-                annotationsForSquare.bombardedBy.RED
+                  annotationsForSquare.bombardedBy.RED
                   ? "stripe-red-blue"
                   : annotationsForSquare.bombardedBy.BLUE
-                    ? "stripe-blue-transparent"
-                    : annotationsForSquare.bombardedBy.RED
-                      ? "stripe-red-transparent"
-                      : ""
+                  ? "stripe-blue-transparent"
+                  : annotationsForSquare.bombardedBy.RED
+                  ? "stripe-red-transparent"
+                  : ""
                 : ""
               : "";
 
           const selectingOrientation = Boolean(
             square &&
-            Units[square.type].artilleryRange &&
-            annotationsForSquare?.selectedPiece
+              Units[square.type].artilleryRange &&
+              annotationsForSquare?.selectedPiece
           );
 
-          const aiming = Boolean(annotations[`${rowIndex},${colIndex}`]?.showAim);
+          const aiming = Boolean(
+            annotations[`${rowIndex},${colIndex}`]?.showAim
+          );
           const hidePiece = Boolean(
             annotations[`${rowIndex},${colIndex}`]?.hidePiece
           );
@@ -217,8 +223,8 @@ export function GHQBoard({
               key={colIndex}
               className={classNames("relative", bombardmentClass, {
                 ["cursor-pointer"]:
-                annotationsForSquare?.moveTo ||
-                square?.player === (isPrimaryPlayer("0") ? "RED" : "BLUE"),
+                  annotationsForSquare?.moveTo ||
+                  square?.player === (isPrimaryPlayer("0") ? "RED" : "BLUE"),
               })}
               style={{
                 border: "1px solid black",
@@ -255,7 +261,7 @@ export function GHQBoard({
                     style={{
                       transform: square.orientation
                         ? isPrimaryPlayer("1")
-                          ? `rotate(${square.orientation-180}deg)`
+                          ? `rotate(${square.orientation - 180}deg)`
                           : `rotate(${square.orientation}deg)`
                         : `rotate(${add180 ? 180 : 0}deg)`,
                     }}
@@ -318,8 +324,9 @@ export function GHQBoard({
                       transform: state.context.selectedPiece.piece.orientation
                         ? isPrimaryPlayer("1")
                           ? `rotate(${
-                            180 - state.context.selectedPiece.piece.orientation
-                          }deg)`
+                              180 -
+                              state.context.selectedPiece.piece.orientation
+                            }deg)`
                           : `rotate(${state.context.selectedPiece.piece.orientation}deg)`
                         : `rotate(${add180 ? 180 : 0}deg)`,
                     }}
@@ -334,7 +341,7 @@ export function GHQBoard({
           );
         })}
       </tr>
-    )
+    );
   });
 
   return (

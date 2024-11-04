@@ -3,6 +3,7 @@ import { INVALID_MOVE } from "boardgame.io/core";
 
 import { playMoveSound } from "./audio";
 import { clearBombardedSquares } from "@/game/capture-logic";
+import { Blue, Red } from "@/game/tests/test-boards";
 
 export const Units: {
   [key: string]: {
@@ -135,6 +136,11 @@ const Move: Move<GHQState> = (
   const piece = G.board[from[0]][from[1]];
   G.board[from[0]][from[1]] = null;
   G.board[to[0]][to[1]] = piece;
+
+  if (capturePreference) {
+    G.board[capturePreference[0]][capturePreference[1]] = null;
+  }
+
   playMoveSound(); // TODO(tyler): figure out where this should go
 };
 
@@ -186,50 +192,14 @@ export const GHQGame: Game<GHQState> = {
   setup: ({ ctx, ...plugins }, setupData) => {
     return {
       board: [
-        [
-          { type: "HQ", player: "BLUE" },
-          { type: "ARTILLERY", player: "BLUE", orientation: 180 },
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-        ],
-        [
-          { type: "INFANTRY", player: "BLUE" },
-          { type: "INFANTRY", player: "BLUE" },
-          { type: "INFANTRY", player: "BLUE" },
-          null,
-          null,
-          null,
-          null,
-          null,
-        ],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, Blue.ARTILLERY(0), null, null, null, null, null],
+        [null, null, null, Red.INFANTRY, null, null, null, null],
         [null, null, null, null, null, null, null, null],
         [null, null, null, null, null, null, null, null],
         [null, null, null, null, null, null, null, null],
         [null, null, null, null, null, null, null, null],
-        [
-          null,
-          null,
-          null,
-          null,
-          null,
-          { type: "INFANTRY", player: "RED" },
-          { type: "INFANTRY", player: "RED" },
-          { type: "INFANTRY", player: "RED" },
-        ],
-        [
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          { type: "ARTILLERY", player: "RED", orientation: 0 },
-          { type: "HQ", player: "RED" },
-        ],
       ],
       redReserve: {
         INFANTRY: 5,

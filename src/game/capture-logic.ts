@@ -9,6 +9,8 @@ export function captureCandidates(
   const engagedPairs = maximizeEngagement(lastMovedInfantry, board);
   const attacker = board[lastMovedInfantry[0]][lastMovedInfantry[1]];
 
+  console.log(attacker);
+
   if (!attacker) {
     throw new Error("No piece at the last moved infantry position");
   }
