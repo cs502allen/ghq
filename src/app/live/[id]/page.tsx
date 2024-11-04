@@ -1,14 +1,14 @@
 "use client";
 
 import { Client } from "boardgame.io/react";
-import { OnlineGHQGame } from "@/game/engine";
+import { newOnlineGHQGame } from "@/game/engine";
 import { GHQBoard } from "@/game/board";
 import { SocketIO } from "boardgame.io/multiplayer";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 const GameClient = Client({
-  game: OnlineGHQGame,
+  game: newOnlineGHQGame({}),
   board: GHQBoard,
   multiplayer: SocketIO({ server: "localhost:8000" }),
 });

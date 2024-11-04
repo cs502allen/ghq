@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:server": "tsx watch src/server.ts",
+    "dev:server": "source .env && tsx watch src/server.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -12,6 +12,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.46.1",
     "@xstate/react": "^4.1.3",
     "boardgame.io": "^0.50.2",
     "classnames": "^2.5.1",
