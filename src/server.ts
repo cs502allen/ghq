@@ -168,11 +168,3 @@ const createNewMatch = async ({
     return { matchId, player1Credentials, player2Credentials };
   }
 };
-
-(async () => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  const { metadata } = await server.db.fetch("Bor2CHvlw_lKMrnVDCZ-m", {
-    metadata: true,
-  });
-  console.log(metadata);
-})();

@@ -48,7 +48,6 @@ function App() {
   const [userId, setUserId] = useState<string>("");
 
   // TODO(tyler): add clerk auth
-  // TODO(tyler): add ability to spectate games
 
   const checkMatchmaking = useCallback(
     async (userId: string) => {
