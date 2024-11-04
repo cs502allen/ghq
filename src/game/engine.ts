@@ -281,7 +281,7 @@ export const GHQGame: Game<GHQState> = {
     };
   },
   turn: {
-    maxMoves: 3,
+    maxMoves: 500,
     onBegin: ({ G, ctx, events, random, ...plugins }) => {
       clearBombardedSquares(G, ctx);
     },

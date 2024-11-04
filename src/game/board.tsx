@@ -150,187 +150,192 @@ export function GHQBoard({
     return annotate;
   }, [state.context]);
 
-  const cells = Array.from({ length: rows }).map((_, rowIndex) => (
-    <tr key={rowIndex}>
-      {Array.from({ length: columns }).map((_, colIndex) => {
-        const square = G.board[rowIndex][colIndex];
+  const cells = Array.from({ length: rows }).map((_, rowIndex) => {
 
-        const annotationsForSquare = annotations[`${rowIndex},${colIndex}`];
+    const colN = Array.from({ length: columns },  (_, index) => index)
+    const cols =isPrimaryPlayer("0") ? colN : colN.reverse()
+    return (
+      <tr key={rowIndex}>
+        {cols.map((colIndex) => {
+          const square = G.board[rowIndex][colIndex];
 
-        const rotation =
-          square && "orientation" in square
-            ? square && square.orientation
-            : undefined;
+          const annotationsForSquare = annotations[`${rowIndex},${colIndex}`];
 
-        const add180 =
-          square &&
-          ((isPrimaryPlayer("0") && square.player === "BLUE") ||
-            (isPrimaryPlayer("1") && square.player === "RED"));
+          const rotation =
+            square && "orientation" in square
+              ? square && square.orientation
+              : undefined;
 
-        const bombardmentClass =
-          annotationsForSquare && annotationsForSquare.bombardedBy
-            ? annotationsForSquare.bombardedBy
-              ? annotationsForSquare.bombardedBy.BLUE &&
+          const add180 =
+            square &&
+            ((isPrimaryPlayer("0") && square.player === "BLUE") ||
+              (isPrimaryPlayer("1") && square.player === "RED"));
+
+          const bombardmentClass =
+            annotationsForSquare && annotationsForSquare.bombardedBy
+              ? annotationsForSquare.bombardedBy
+                ? annotationsForSquare.bombardedBy.BLUE &&
                 annotationsForSquare.bombardedBy.RED
-                ? "stripe-red-blue"
-                : annotationsForSquare.bombardedBy.BLUE
-                ? "stripe-blue-transparent"
-                : annotationsForSquare.bombardedBy.RED
-                ? "stripe-red-transparent"
+                  ? "stripe-red-blue"
+                  : annotationsForSquare.bombardedBy.BLUE
+                    ? "stripe-blue-transparent"
+                    : annotationsForSquare.bombardedBy.RED
+                      ? "stripe-red-transparent"
+                      : ""
                 : ""
-              : ""
-            : "";
+              : "";
 
-        const selectingOrientation = Boolean(
-          square &&
+          const selectingOrientation = Boolean(
+            square &&
             Units[square.type].artilleryRange &&
             annotationsForSquare?.selectedPiece
-        );
+          );
 
-        const aiming = Boolean(annotations[`${rowIndex},${colIndex}`]?.showAim);
-        const hidePiece = Boolean(
-          annotations[`${rowIndex},${colIndex}`]?.hidePiece
-        );
+          const aiming = Boolean(annotations[`${rowIndex},${colIndex}`]?.showAim);
+          const hidePiece = Boolean(
+            annotations[`${rowIndex},${colIndex}`]?.hidePiece
+          );
 
-        return (
-          <td
-            onClick={() => {
-              if (square) {
-                send({
-                  type: "SELECT_ACTIVE_PIECE",
-                  at: [rowIndex, colIndex],
-                  piece: square,
-                  currentBoard: G.board,
-                });
-              } else {
-                send({
-                  type: "SELECT_SQUARE",
-                  at: [rowIndex, colIndex],
-                  currentBoard: G.board,
-                });
-              }
-            }}
-            key={colIndex}
-            className={classNames("relative", bombardmentClass, {
-              ["cursor-pointer"]:
+          return (
+            <td
+              onClick={() => {
+                if (square) {
+                  send({
+                    type: "SELECT_ACTIVE_PIECE",
+                    at: [rowIndex, colIndex],
+                    piece: square,
+                    currentBoard: G.board,
+                  });
+                } else {
+                  send({
+                    type: "SELECT_SQUARE",
+                    at: [rowIndex, colIndex],
+                    currentBoard: G.board,
+                  });
+                }
+              }}
+              key={colIndex}
+              className={classNames("relative", bombardmentClass, {
+                ["cursor-pointer"]:
                 annotationsForSquare?.moveTo ||
                 square?.player === (isPrimaryPlayer("0") ? "RED" : "BLUE"),
-            })}
-            style={{
-              border: "1px solid black",
-              boxShadow:
-                (annotationsForSquare?.selectedPiece && !hidePiece) || aiming
-                  ? "inset 0 0 8px darkgray"
-                  : "",
-              textAlign: "center",
-              width: "90px",
-              height: "90px",
-            }}
-          >
-            {square && !selectingOrientation && !hidePiece ? (
-              <div
-                className={classNames(
-                  "flex items-center justify-center select-none font-bold text-3xl",
-                  square.player === "RED" ? "text-red-600" : "text-blue-600",
-                  {
-                    // @todo this is really only for infantry. Adjust when we do orientation
-                    // ["rotate-180"]:
-                    //   (isPrimaryPlayer("0") && square.player === "BLUE") ||
-                    //   (isPrimaryPlayer("1") && square.player === "RED"),
-                  }
-                )}
-              >
-                <Image
-                  src={`/${Units[square.type].imagePathPrefix}-${
-                    square.player
-                  }.png`}
-                  width="52"
-                  height="52"
-                  className="select-none"
-                  draggable="false"
-                  style={{
-                    transform: square.orientation
-                      ? isPrimaryPlayer("1")
-                        ? `rotate(${180 - square.orientation}deg)`
-                        : `rotate(${square.orientation}deg)`
-                      : `rotate(${add180 ? 180 : 0}deg)`,
+              })}
+              style={{
+                border: "1px solid black",
+                boxShadow:
+                  (annotationsForSquare?.selectedPiece && !hidePiece) || aiming
+                    ? "inset 0 0 8px darkgray"
+                    : "",
+                textAlign: "center",
+                width: "90px",
+                height: "90px",
+              }}
+            >
+              {square && !selectingOrientation && !hidePiece ? (
+                <div
+                  className={classNames(
+                    "flex items-center justify-center select-none font-bold text-3xl",
+                    square.player === "RED" ? "text-red-600" : "text-blue-600",
+                    {
+                      // @todo this is really only for infantry. Adjust when we do orientation
+                      // ["rotate-180"]:
+                      //   (isPrimaryPlayer("0") && square.player === "BLUE") ||
+                      //   (isPrimaryPlayer("1") && square.player === "RED"),
+                    }
+                  )}
+                >
+                  <Image
+                    src={`/${Units[square.type].imagePathPrefix}-${
+                      square.player
+                    }.png`}
+                    width="52"
+                    height="52"
+                    className="select-none"
+                    draggable="false"
+                    style={{
+                      transform: square.orientation
+                        ? isPrimaryPlayer("1")
+                          ? `rotate(${square.orientation-180}deg)`
+                          : `rotate(${square.orientation}deg)`
+                        : `rotate(${add180 ? 180 : 0}deg)`,
+                    }}
+                    alt={Units[square.type].imagePathPrefix}
+                  />
+                </div>
+              ) : null}
+              {square && selectingOrientation && !hidePiece ? (
+                <SelectOrientation
+                  player={square.player}
+                  onChange={(orientation: Orientation) => {
+                    send({
+                      type: "CHANGE_ORIENTATION",
+                      orientation: orientation,
+                    });
                   }}
-                  alt={Units[square.type].imagePathPrefix}
-                />
-              </div>
-            ) : null}
-            {square && selectingOrientation && !hidePiece ? (
-              <SelectOrientation
-                player={square.player}
-                onChange={(orientation: Orientation) => {
-                  send({
-                    type: "CHANGE_ORIENTATION",
-                    orientation: orientation,
-                  });
-                }}
-              >
-                <Image
-                  src={`/${Units[square.type].imagePathPrefix}-${
-                    square.player
-                  }.png`}
-                  width="35"
-                  height="35"
-                  className="select-none"
-                  draggable="false"
-                  style={{
-                    transform: square.orientation
-                      ? isPrimaryPlayer("1")
-                        ? `rotate(${180 - square.orientation}deg)`
-                        : `rotate(${square.orientation}deg)`
-                      : `rotate(${add180 ? 180 : 0}deg)`,
+                >
+                  <Image
+                    src={`/${Units[square.type].imagePathPrefix}-${
+                      square.player
+                    }.png`}
+                    width="35"
+                    height="35"
+                    className="select-none"
+                    draggable="false"
+                    style={{
+                      transform: square.orientation
+                        ? isPrimaryPlayer("1")
+                          ? `rotate(${180 - square.orientation}deg)`
+                          : `rotate(${square.orientation}deg)`
+                        : `rotate(${add180 ? 180 : 0}deg)`,
+                    }}
+                    alt={Units[square.type].imagePathPrefix}
+                  />
+                </SelectOrientation>
+              ) : null}
+              {annotationsForSquare?.moveTo && !aiming ? (
+                <div className="rounded-full w-8 h-8 m-auto bg-gray-300" />
+              ) : null}
+              {aiming && state.context.selectedPiece ? (
+                <SelectOrientation
+                  player={state.context.player}
+                  onChange={(orientation: Orientation) => {
+                    send({
+                      type: "CHANGE_ORIENTATION",
+                      orientation: orientation,
+                    });
                   }}
-                  alt={Units[square.type].imagePathPrefix}
-                />
-              </SelectOrientation>
-            ) : null}
-            {annotationsForSquare?.moveTo && !aiming ? (
-              <div className="rounded-full w-8 h-8 m-auto bg-gray-300" />
-            ) : null}
-            {aiming && state.context.selectedPiece ? (
-              <SelectOrientation
-                player={state.context.player}
-                onChange={(orientation: Orientation) => {
-                  send({
-                    type: "CHANGE_ORIENTATION",
-                    orientation: orientation,
-                  });
-                }}
-              >
-                <Image
-                  src={`/${
-                    Units[state.context.selectedPiece.piece.type]
-                      .imagePathPrefix
-                  }-${state.context.player}.png`}
-                  width="35"
-                  height="35"
-                  className="select-none"
-                  draggable="false"
-                  style={{
-                    transform: state.context.selectedPiece.piece.orientation
-                      ? isPrimaryPlayer("1")
-                        ? `rotate(${
+                >
+                  <Image
+                    src={`/${
+                      Units[state.context.selectedPiece.piece.type]
+                        .imagePathPrefix
+                    }-${state.context.player}.png`}
+                    width="35"
+                    height="35"
+                    className="select-none"
+                    draggable="false"
+                    style={{
+                      transform: state.context.selectedPiece.piece.orientation
+                        ? isPrimaryPlayer("1")
+                          ? `rotate(${
                             180 - state.context.selectedPiece.piece.orientation
                           }deg)`
-                        : `rotate(${state.context.selectedPiece.piece.orientation}deg)`
-                      : `rotate(${add180 ? 180 : 0}deg)`,
-                  }}
-                  alt={
-                    Units[state.context.selectedPiece.piece.type]
-                      .imagePathPrefix
-                  }
-                />
-              </SelectOrientation>
-            ) : null}
-          </td>
-        );
-      })}
-    </tr>
-  ));
+                          : `rotate(${state.context.selectedPiece.piece.orientation}deg)`
+                        : `rotate(${add180 ? 180 : 0}deg)`,
+                    }}
+                    alt={
+                      Units[state.context.selectedPiece.piece.type]
+                        .imagePathPrefix
+                    }
+                  />
+                </SelectOrientation>
+              ) : null}
+            </td>
+          );
+        })}
+      </tr>
+    )
+  });
 
   return (
     <div className="grid bg-gray-200 absolute w-full h-full grid-cols-7">
