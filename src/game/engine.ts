@@ -1,6 +1,7 @@
 import type { Ctx, FnContext, Game, Move, State } from "boardgame.io";
 import { INVALID_MOVE } from "boardgame.io/core";
 
+import { isAuthorizedToMovePiece } from "./move-logic";
 import { playMoveSound } from "./audio";
 import { clearBombardedSquares } from "@/game/capture-logic";
 
@@ -133,6 +134,10 @@ const Move: Move<GHQState> = (
   capturePreference?: Coordinate
 ) => {
   const piece = G.board[from[0]][from[1]];
+  if (!isAuthorizedToMovePiece(ctx, piece)) {
+    return INVALID_MOVE;
+  }
+
   G.board[from[0]][from[1]] = null;
   G.board[to[0]][to[1]] = piece;
   playMoveSound(); // TODO(tyler): figure out where this should go
@@ -148,6 +153,9 @@ const MoveAndOrient: Move<GHQState> = (
   if (typeof Units[piece.type].artilleryRange === "undefined") {
     return INVALID_MOVE;
   }
+  if (!isAuthorizedToMovePiece(ctx, piece)) {
+    return INVALID_MOVE;
+  }
 
   piece!.orientation = orientation;
   G.board[from[0]][from[1]] = null;
@@ -159,6 +167,10 @@ const ChangeOrientation: Move<GHQState> = (
   orientation: Orientation
 ) => {
   const piece = G.board[on[0]][on[1]];
+  if (!isAuthorizedToMovePiece(ctx, piece)) {
+    return INVALID_MOVE;
+  }
+
   piece!.orientation = orientation;
   G.board[on[0]][on[1]] = piece;
 };
