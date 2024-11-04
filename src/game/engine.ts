@@ -1,8 +1,8 @@
 import type { Ctx, FnContext, Game, Move, State } from "boardgame.io";
 import { INVALID_MOVE } from "boardgame.io/core";
-import { PluginPlayer } from "boardgame.io/plugins";
-import { bombardedSquares } from "./move-logic";
+
 import { playMoveSound } from "./audio";
+import { clearBombardedSquares } from "@/game/capture-logic";
 
 export const Units: {
   [key: string]: {
@@ -169,32 +169,6 @@ const Skip: Move<GHQState> = ({ G, ctx, events }) => {
 
 const Resign: Move<GHQState> = ({ G, ctx, events }) => {
   events.endGame({ winner: ctx.currentPlayer === "0" ? "1" : "0" });
-};
-
-const clearBombardedSquares = (G: GHQState, ctx: Ctx) => {
-  const bombarded = bombardedSquares(G.board);
-
-  G.board.forEach((rows, x) => {
-    rows.forEach((square, y) => {
-      const bombardedSquare = bombarded[`${x},${y}`];
-
-      // If there is nothing here or it's not bombarded, do nothing.
-      if (!square || !bombardedSquare) {
-        return;
-      }
-
-      // If it's our turn, and we bombard the square, and the square is occupied by an enemy piece, remove it.
-      const currentPlayerColor = ctx.currentPlayer === "0" ? "RED" : "BLUE";
-      if (
-        bombardedSquare[currentPlayerColor] &&
-        square.player !== currentPlayerColor
-      ) {
-        G.board[x][y] = null;
-      }
-    });
-  });
-
-  // TODO: add log message for user indicating that a bombarded piece was destroyed
 };
 
 export const GameMoves = {
