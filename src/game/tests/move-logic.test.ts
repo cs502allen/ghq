@@ -2,14 +2,16 @@ import { describe, expect, it } from "@jest/globals";
 import { GHQState } from "@/game/engine";
 import { movesForActivePiece } from "@/game/move-logic";
 import {
+  Blue,
   initialBoardSetup,
   initialBoardSetupWithAnAirborneBack,
   initialBoardSetupWithAnAirborneNotBack,
   initialBoardSetupWithAnArmored,
+  Red,
 } from "@/game/tests/test-boards";
 
 describe("computing allowed moves", () => {
-  it("can compute allowed when surronded on all but one side", () => {
+  it("can compute allowed when surrounded on all but one side", () => {
     // opening. top of the board, artillery right of the HQ
     const moves = movesForActivePiece([0, 1], initialBoardSetup);
     expect(moves).toMatchInlineSnapshot(`
@@ -303,43 +305,83 @@ describe("computing allowed moves", () => {
       ]
     `);
   });
-});
-it("can compute allowed moves for airborne on not on back", () => {
-  // opening. top of the board, middle infantry
-  const moves = movesForActivePiece(
-    [1, 3],
-    initialBoardSetupWithAnAirborneNotBack
-  );
-  expect(moves).toMatchInlineSnapshot(`
-    [
+
+  it("no unit can move to a square under enemy bombardment", () => {
+    // opening. top of the board, artillery right of the HQ
+    const moves = movesForActivePiece(
+      [5, 1],
       [
-        0,
-        2,
-      ],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, Blue.ARTILLERY(180), null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, Red.INFANTRY, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+      ]
+    );
+
+    // under bombardment
+    expect(moves).not.toContainEqual([4, 1]);
+  });
+  it("units can move to a square under friendly bombardment", () => {
+    // opening. top of the board, artillery right of the HQ
+    const moves = movesForActivePiece(
+      [5, 1],
       [
-        0,
-        3,
-      ],
-      [
-        0,
-        4,
-      ],
-      [
-        1,
-        4,
-      ],
-      [
-        2,
-        2,
-      ],
-      [
-        2,
-        3,
-      ],
-      [
-        2,
-        4,
-      ],
-    ]
-  `);
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, Blue.ARTILLERY(180), null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, Blue.INFANTRY, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+      ]
+    );
+
+    // under bombardment
+    expect(moves).not.toContain([4, 1]);
+  });
+
+  it("can compute allowed moves for airborne on not on back", () => {
+    // opening. top of the board, middle infantry
+    const moves = movesForActivePiece(
+      [1, 3],
+      initialBoardSetupWithAnAirborneNotBack
+    );
+    expect(moves).toMatchInlineSnapshot(`
+          [
+            [
+              0,
+              2,
+            ],
+            [
+              0,
+              3,
+            ],
+            [
+              0,
+              4,
+            ],
+            [
+              1,
+              4,
+            ],
+            [
+              2,
+              2,
+            ],
+            [
+              2,
+              3,
+            ],
+            [
+              2,
+              4,
+            ],
+          ]
+      `);
+  });
 });

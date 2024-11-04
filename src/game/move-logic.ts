@@ -8,6 +8,27 @@ export function movesForActivePiece(
 
   if (piece) {
     const player = piece.player;
+
+    const bombardedCoordinates = Object.entries(bombardedSquares(board))
+      .filter(([coordinate, { BLUE, RED }]) => {
+        if (piece.player === "RED" && BLUE) {
+          return true;
+        }
+        if (piece.player === "BLUE" && RED) {
+          return true;
+        }
+      })
+      .map((i) => {
+        const [x, y] = i[0].split(",");
+        return [parseInt(x), parseInt(y)];
+      });
+
+    const filterBombarded = (c: Coordinate[]) =>
+      c.filter(
+        ([x1, y1]) =>
+          !bombardedCoordinates.some(([x2, y2]) => x1 === x2 && y1 === y2)
+      );
+
     const unitType = Units[piece.type];
 
     if (unitType.canParachute) {
@@ -22,12 +43,12 @@ export function movesForActivePiece(
             }
           });
         });
-        return allowedParachutes;
+        return filterBombarded(allowedParachutes);
       } else {
-        return getMoves(coordinate, unitType.mobility, board);
+        return filterBombarded(getMoves(coordinate, unitType.mobility, board));
       }
     } else {
-      return getMoves(coordinate, unitType.mobility, board);
+      return filterBombarded(getMoves(coordinate, unitType.mobility, board));
     }
   } else {
     return [];
@@ -99,7 +120,27 @@ export function spawnPositionsForPlayer(
     }
   });
 
-  return spawnable;
+  const bombardedCoordinates = Object.entries(bombardedSquares(board))
+    .filter(([coordinate, { BLUE, RED }]) => {
+      if (player === "RED" && BLUE) {
+        return true;
+      }
+      if (player === "BLUE" && RED) {
+        return true;
+      }
+    })
+    .map((i) => {
+      const [x, y] = i[0].split(",");
+      return [parseInt(x), parseInt(y)];
+    });
+
+  const filterBombarded = (c: Coordinate[]) =>
+    c.filter(
+      ([x1, y1]) =>
+        !bombardedCoordinates.some(([x2, y2]) => x1 === x2 && y1 === y2)
+    );
+
+  return filterBombarded(spawnable);
 }
 
 // keys will be 'x,y'
