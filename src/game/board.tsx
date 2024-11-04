@@ -14,6 +14,8 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { bombardedSquares } from "@/game/move-logic";
 import Image from "next/image";
 import { SelectOrientation } from "@/game/select-orientation";
+import { PluginState } from "boardgame.io";
+import { HistoryState } from "./move-history-plugin";
 
 const rows = 8;
 const columns = 8;
@@ -151,9 +153,8 @@ export function GHQBoard({
   }, [state.context]);
 
   const cells = Array.from({ length: rows }).map((_, rowIndex) => {
-
-    const colN = Array.from({ length: columns },  (_, index) => index)
-    const cols =isPrimaryPlayer("0") ? colN : colN.reverse()
+    const colN = Array.from({ length: columns }, (_, index) => index);
+    const cols = isPrimaryPlayer("0") ? colN : colN.reverse();
     return (
       <tr key={rowIndex}>
         {cols.map((colIndex) => {
@@ -175,23 +176,25 @@ export function GHQBoard({
             annotationsForSquare && annotationsForSquare.bombardedBy
               ? annotationsForSquare.bombardedBy
                 ? annotationsForSquare.bombardedBy.BLUE &&
-                annotationsForSquare.bombardedBy.RED
+                  annotationsForSquare.bombardedBy.RED
                   ? "stripe-red-blue"
                   : annotationsForSquare.bombardedBy.BLUE
-                    ? "stripe-blue-transparent"
-                    : annotationsForSquare.bombardedBy.RED
-                      ? "stripe-red-transparent"
-                      : ""
+                  ? "stripe-blue-transparent"
+                  : annotationsForSquare.bombardedBy.RED
+                  ? "stripe-red-transparent"
+                  : ""
                 : ""
               : "";
 
           const selectingOrientation = Boolean(
             square &&
-            Units[square.type].artilleryRange &&
-            annotationsForSquare?.selectedPiece
+              Units[square.type].artilleryRange &&
+              annotationsForSquare?.selectedPiece
           );
 
-          const aiming = Boolean(annotations[`${rowIndex},${colIndex}`]?.showAim);
+          const aiming = Boolean(
+            annotations[`${rowIndex},${colIndex}`]?.showAim
+          );
           const hidePiece = Boolean(
             annotations[`${rowIndex},${colIndex}`]?.hidePiece
           );
@@ -217,8 +220,8 @@ export function GHQBoard({
               key={colIndex}
               className={classNames("relative", bombardmentClass, {
                 ["cursor-pointer"]:
-                annotationsForSquare?.moveTo ||
-                square?.player === (isPrimaryPlayer("0") ? "RED" : "BLUE"),
+                  annotationsForSquare?.moveTo ||
+                  square?.player === (isPrimaryPlayer("0") ? "RED" : "BLUE"),
               })}
               style={{
                 border: "1px solid black",
@@ -231,6 +234,11 @@ export function GHQBoard({
                 height: "90px",
               }}
             >
+              <BoardCoordinateLabels
+                isPrimaryPlayer={isPrimaryPlayer}
+                colIndex={colIndex}
+                rowIndex={rowIndex}
+              />
               {square && !selectingOrientation && !hidePiece ? (
                 <div
                   className={classNames(
@@ -255,7 +263,7 @@ export function GHQBoard({
                     style={{
                       transform: square.orientation
                         ? isPrimaryPlayer("1")
-                          ? `rotate(${square.orientation-180}deg)`
+                          ? `rotate(${square.orientation - 180}deg)`
                           : `rotate(${square.orientation}deg)`
                         : `rotate(${add180 ? 180 : 0}deg)`,
                     }}
@@ -318,8 +326,9 @@ export function GHQBoard({
                       transform: state.context.selectedPiece.piece.orientation
                         ? isPrimaryPlayer("1")
                           ? `rotate(${
-                            180 - state.context.selectedPiece.piece.orientation
-                          }deg)`
+                              180 -
+                              state.context.selectedPiece.piece.orientation
+                            }deg)`
                           : `rotate(${state.context.selectedPiece.piece.orientation}deg)`
                         : `rotate(${add180 ? 180 : 0}deg)`,
                     }}
@@ -334,7 +343,7 @@ export function GHQBoard({
           );
         })}
       </tr>
-    )
+    );
   });
 
   return (
@@ -408,6 +417,8 @@ export function GHQBoard({
             />
           </div>
         </div>
+
+        <HistoryLog historyState={plugins.history.data} />
       </div>
     </div>
   );
@@ -454,4 +465,42 @@ function ReserveBank(props: {
   });
 
   return <div className="grid grid-cols-8 text-center">{reserves}</div>;
+}
+
+function BoardCoordinateLabels({
+  isPrimaryPlayer,
+  colIndex,
+  rowIndex,
+}: {
+  isPrimaryPlayer: (playerId: string) => boolean;
+  colIndex: number;
+  rowIndex: number;
+}) {
+  return (
+    <>
+      <div className="absolute top-0 left-1 text-xs font-bold text-gray-400">
+        {isPrimaryPlayer("0") && colIndex === 0 && rowIndex}
+      </div>
+      <div className="absolute top-0 left-1 text-xs font-bold text-gray-400">
+        {isPrimaryPlayer("0") && rowIndex === 0 && colIndex}
+      </div>
+      <div className="absolute bottom-0 right-1 text-xs font-bold text-gray-400">
+        {isPrimaryPlayer("1") && colIndex === 0 && rowIndex}
+      </div>
+      <div className="absolute bottom-0 right-1 text-xs font-bold text-gray-400">
+        {isPrimaryPlayer("1") && rowIndex === 0 && colIndex}
+      </div>
+    </>
+  );
+}
+
+function HistoryLog({ historyState }: { historyState: HistoryState }) {
+  return (
+    <div className="flex flex-col gap-2 p-4 min-h-40">
+      <div className="text-xl font-bold">Activity</div>
+      {historyState.log.slice(-3).map((log) => (
+        <div key={log.message}>{log.message}</div>
+      ))}
+    </div>
+  );
 }
