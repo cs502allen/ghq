@@ -18,7 +18,7 @@ import Image from "next/image";
 import { SelectOrientation } from "@/game/select-orientation";
 import { HistoryState } from "@/game/move-history-plugin";
 import CountdownTimer from "@/game/countdown";
-import { Flag, MoveRight, Percent } from "lucide-react";
+import { Check, Flag, MoveRight, Percent, Undo } from "lucide-react";
 
 const rows = 8;
 const columns = 8;
@@ -452,10 +452,17 @@ export function GHQBoard({
           <h2
             className={classNames(
               "text-center font-semibold text-2xl",
-              ctx.gameover.winner === "RED" ? "text-red-500" : "text-blue-500"
+              ctx.gameover.status === "DRAW" && "text-gray-800",
+              ctx.gameover.status === "WIN" && ctx.gameover.winner === "RED"
+                ? "text-red-500"
+                : "text-blue-500"
             )}
           >
-            {ctx.gameover.winner === "RED" ? "Red " : "Blue"} Won!
+            {ctx.gameover.status === "DRAW" ? (
+              "Draw!"
+            ) : (
+              <>{ctx.gameover.winner === "RED" ? "Red " : "Blue"} Won!</>
+            )}
           </h2>
         ) : (
           <h2
@@ -470,9 +477,13 @@ export function GHQBoard({
             </div>
             <div className="flex gap-1 justify-center items-center">
               <SkipButton skip={() => moves.Skip()} />
-              <DrawButton
-                draw={() => alert("draw coming soon") /* moves.OfferDraw() */}
-              />
+              {G.drawOfferedBy && G.drawOfferedBy !== ctx.currentPlayer ? (
+                <AcceptDrawButton draw={() => moves.AcceptDraw()} />
+              ) : (
+                <OfferDrawButton
+                  draw={(offer: boolean) => moves.OfferDraw(offer)}
+                />
+              )}
               <ResignButton resign={() => moves.Resign()} />
             </div>
           </h2>
@@ -639,14 +650,35 @@ function ResignButton({ resign }: { resign: () => void }) {
   );
 }
 
-function DrawButton({ draw }: { draw: () => void }) {
+function OfferDrawButton({ draw }: { draw: (offer: boolean) => void }) {
+  const [offered, setOffered] = React.useState(false);
+  return (
+    <button
+      onClick={() => {
+        draw(!offered);
+        setOffered(!offered);
+      }}
+      className={classNames(
+        "bg-gray-500 text-white py-1 px-2 text-sm rounded hover:bg-gray-600 flex gap-1 items-center",
+        offered ? "bg-gray-300 hover:bg-gray-400" : ""
+      )}
+    >
+      {offered ? <Undo className="w-4 h-4" /> : <Percent className="w-4 h-4" />}
+      {offered ? "Cancel" : "Draw"}
+    </button>
+  );
+}
+
+function AcceptDrawButton({ draw }: { draw: () => void }) {
   return (
     <button
       onClick={draw}
-      className="bg-gray-500 text-white py-1 px-2 text-sm rounded hover:bg-gray-600 flex gap-1 items-center"
+      className={classNames(
+        "bg-gray-500 text-white py-1 px-2 text-sm rounded hover:bg-gray-600 flex gap-1 items-center"
+      )}
     >
-      <Percent className="w-4 h-4" />
-      Draw
+      <Check className="w-4 h-4" />
+      Accept Draw
     </button>
   );
 }

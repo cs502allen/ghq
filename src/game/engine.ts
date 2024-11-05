@@ -103,6 +103,9 @@ export interface GHQState {
   bonusTime: number;
   startTime: number;
   turnStartTime: number;
+  // draw state
+  drawOfferedBy?: string;
+  drawAcceptedBy?: string;
 }
 
 export interface GameoverState {
@@ -219,6 +222,32 @@ const Resign: Move<GHQState> = ({ G, ctx, events }) => {
   events.endGame(gameover);
 };
 
+const OfferDraw: Move<GHQState> = {
+  noLimit: true,
+  move: ({ G, ctx }, offered: boolean) => {
+    if (offered) {
+      G.drawOfferedBy = ctx.currentPlayer;
+    } else {
+      G.drawOfferedBy = undefined;
+    }
+  },
+};
+
+const AcceptDraw: Move<GHQState> = {
+  noLimit: true,
+  move: ({ G, ctx, events }) => {
+    if (!G.drawOfferedBy || G.drawOfferedBy === ctx.currentPlayer) {
+      return INVALID_MOVE;
+    }
+
+    G.drawAcceptedBy = ctx.currentPlayer;
+    const gameover: GameoverState = {
+      status: "DRAW",
+    };
+    events.endGame(gameover);
+  },
+};
+
 export const GameMoves = {
   Reinforce,
   Move,
@@ -226,6 +255,8 @@ export const GameMoves = {
   MoveAndOrient,
   Skip,
   Resign,
+  OfferDraw,
+  AcceptDraw,
 };
 
 export type GameMoveType = typeof GameMoves;
