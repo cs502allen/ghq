@@ -111,6 +111,7 @@ export interface GHQState {
 export interface GameoverState {
   status: "WIN" | "DRAW";
   winner?: Player;
+  reason: string;
 }
 
 const Reinforce: Move<GHQState> = (
@@ -218,6 +219,7 @@ const Resign: Move<GHQState> = ({ G, ctx, events }) => {
   const gameover: GameoverState = {
     status: "WIN",
     winner: ctx.currentPlayer === "0" ? "BLUE" : "RED",
+    reason: "by resignation",
   };
   events.endGame(gameover);
 };
@@ -243,6 +245,7 @@ const AcceptDraw: Move<GHQState> = {
     G.drawAcceptedBy = ctx.currentPlayer;
     const gameover: GameoverState = {
       status: "DRAW",
+      reason: "draw accepted",
     };
     events.endGame(gameover);
   },

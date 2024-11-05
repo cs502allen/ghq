@@ -449,21 +449,24 @@ export function GHQBoard({
         )}
       >
         {ctx.gameover ? (
-          <h2
-            className={classNames(
-              "text-center font-semibold text-2xl",
-              ctx.gameover.status === "DRAW" && "text-gray-800",
-              ctx.gameover.status === "WIN" && ctx.gameover.winner === "RED"
-                ? "text-red-500"
-                : "text-blue-500"
-            )}
-          >
-            {ctx.gameover.status === "DRAW" ? (
-              "Draw!"
-            ) : (
-              <>{ctx.gameover.winner === "RED" ? "Red " : "Blue"} Won!</>
-            )}
-          </h2>
+          <div className="flex flex-col gap-1 justify-center items-center">
+            <h2
+              className={classNames(
+                "text-center font-semibold text-2xl",
+                ctx.gameover.status === "DRAW" && "text-gray-800",
+                ctx.gameover.status === "WIN" && ctx.gameover.winner === "RED"
+                  ? "text-red-500"
+                  : "text-blue-500"
+              )}
+            >
+              {ctx.gameover.status === "DRAW" ? (
+                "Draw!"
+              ) : (
+                <>{ctx.gameover.winner === "RED" ? "Red " : "Blue"} Won!</>
+              )}
+            </h2>
+            {ctx.gameover.reason && ctx.gameover.reason}
+          </div>
         ) : (
           <h2
             className={classNames(
