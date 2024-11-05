@@ -95,8 +95,13 @@ export const turnStateMachine = createMachine({
       on: {
         SELECT_RESERVE_PIECE: {
           // has a reserve here
-          guard: ({ event }) => {
-            return event.reserve[event.kind] > 0;
+          guard: ({ context, event }) => {
+            const spawnPosition = spawnPositionsForPlayer(
+              event.currentBoard,
+              context.player
+            );
+
+            return event.reserve[event.kind] > 0 && spawnPosition.length > 0;
           },
           actions: assign(({ context, event }) => {
             return {
@@ -168,7 +173,7 @@ export const turnStateMachine = createMachine({
                         event.currentBoard
                       );
                     },
-                    stagedMove: ({event}) => event.at
+                    stagedMove: ({ event }) => event.at,
                   }),
                 ],
                 target: "#turn-machine.selectEnemyToCapture",
@@ -280,12 +285,10 @@ export const turnStateMachine = createMachine({
         {
           guard: ({ context, event }) => {
             const isArtillery =
-              typeof Units[context.selectedPiece!.piece.type]
-                .artilleryRange !== "undefined";
+              typeof Units[context.selectedPiece!.piece.type].artilleryRange !==
+              "undefined";
 
-            return (
-              !isArtillery && (context.allowedCaptures || []).length <= 1
-            );
+            return !isArtillery && (context.allowedCaptures || []).length <= 1;
           },
           actions: [
             assign(({ event, context }) => ({
@@ -318,6 +321,31 @@ export const turnStateMachine = createMachine({
     //move types
     reservePieceSelected: {
       on: {
+        SELECT_RESERVE_PIECE: {
+          // has a reserve here
+          guard: ({ context, event }) => {
+            const spawnPosition = spawnPositionsForPlayer(
+              event.currentBoard,
+              context.player
+            );
+
+            return event.reserve[event.kind] > 0 && spawnPosition.length > 0;
+          },
+          actions: assign(({ context, event }) => {
+            return {
+              // selectedPiece: {
+              //   piece: event.piece,
+              //   at: event.at,
+              // },
+              unitKind: event.kind,
+              allowedMoves: spawnPositionsForPlayer(
+                event.currentBoard,
+                context.player
+              ),
+            };
+          }),
+          target: "reservePieceSelected",
+        },
         SELECT_SQUARE: {
           guard: ({ context, event }) => {
             // must be allowed
