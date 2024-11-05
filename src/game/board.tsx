@@ -6,7 +6,6 @@ import {
   Player,
   ReserveFleet,
   Units,
-  UnitType,
 } from "@/game/engine";
 import { BoardProps } from "boardgame.io/react";
 import { useMachine } from "@xstate/react";
