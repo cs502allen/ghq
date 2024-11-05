@@ -18,7 +18,7 @@ import Image from "next/image";
 import { SelectOrientation } from "@/game/select-orientation";
 import { HistoryState } from "@/game/move-history-plugin";
 import CountdownTimer from "@/game/countdown";
-import { Check, Flag, MoveRight, Percent, Undo } from "lucide-react";
+import { Check, Flag, MoveRight, Percent, Undo, X } from "lucide-react";
 
 const rows = 8;
 const columns = 8;
@@ -639,9 +639,28 @@ function SkipButton({ skip }: { skip: () => void }) {
 }
 
 function ResignButton({ resign }: { resign: () => void }) {
+  const [confirm, setConfirm] = React.useState(false);
+  if (confirm) {
+    return (
+      <div className="flex gap-1">
+        <button
+          onClick={() => setConfirm(false)}
+          className="bg-gray-500 text-white py-1.5 px-2 text-sm rounded hover:bg-gray-400 flex gap-1 items-center"
+        >
+          <Undo className="w-4 h-4" />
+        </button>
+        <button
+          onClick={resign}
+          className="bg-red-500 text-white py-1.5 px-2 text-sm rounded hover:bg-red-600 flex gap-1 items-center"
+        >
+          <Flag className="w-4 h-4" />
+        </button>
+      </div>
+    );
+  }
   return (
     <button
-      onClick={resign}
+      onClick={() => setConfirm(true)}
       className="bg-red-500 text-white py-1 px-2 text-sm rounded hover:bg-red-600 flex gap-1 items-center"
     >
       <Flag className="w-4 h-4" />
