@@ -2,7 +2,7 @@ import type { Ctx, FnContext, Game, Move, State } from "boardgame.io";
 import { INVALID_MOVE } from "boardgame.io/core";
 
 import { isAuthorizedToMovePiece } from "./move-logic";
-import { playMoveSound } from "./audio";
+import { playCaptureSound, playMoveSound } from "./audio";
 import { clearBombardedSquares } from "@/game/capture-logic";
 import { Blue, Red } from "@/game/tests/test-boards";
 import { appendHistory, HistoryPlugin } from "./move-history-plugin";
@@ -141,9 +141,11 @@ const Reinforce: Move<GHQState> = (
       : undefined,
   };
   G.board[to[0]][to[1]] = s;
+
+  playMoveSound(); // TODO(tyler): figure out where this should go
 };
 const Move: Move<GHQState> = (
-  { G, ctx },
+  { G, ctx, ...plugins },
   from: Coordinate,
   to: Coordinate,
   capturePreference?: Coordinate
@@ -156,11 +158,17 @@ const Move: Move<GHQState> = (
   G.board[from[0]][from[1]] = null;
   G.board[to[0]][to[1]] = piece;
 
+  // TODO(tyler): ensure we're authorized to capture this piece
+
   if (capturePreference) {
     G.board[capturePreference[0]][capturePreference[1]] = null;
+    appendHistory(plugins, {
+      message: `Move ${ctx.turn}: Captured piece at (${capturePreference[0]},${capturePreference[1]})`,
+    });
+    playCaptureSound(); // TODO(tyler): figure out where this should go
+  } else {
+    playMoveSound(); // TODO(tyler): figure out where this should go
   }
-
-  playMoveSound(); // TODO(tyler): figure out where this should go
 };
 
 const MoveAndOrient: Move<GHQState> = (
@@ -180,6 +188,8 @@ const MoveAndOrient: Move<GHQState> = (
   piece!.orientation = orientation;
   G.board[from[0]][from[1]] = null;
   G.board[to[0]][to[1]] = piece;
+
+  playMoveSound(); // TODO(tyler): figure out where this should go
 };
 const ChangeOrientation: Move<GHQState> = (
   { G, ctx },
@@ -193,6 +203,8 @@ const ChangeOrientation: Move<GHQState> = (
 
   piece!.orientation = orientation;
   G.board[on[0]][on[1]] = piece;
+
+  playMoveSound(); // TODO(tyler): figure out where this should go
 };
 
 const Skip: Move<GHQState> = ({ G, ctx, events }) => {
