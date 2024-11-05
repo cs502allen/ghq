@@ -13,6 +13,11 @@ export function captureCandidates(
     throw new Error("No piece at the last moved infantry position");
   }
 
+  // If you're not infantry, you're not capturing anything boi
+  if (!isInfantry(attacker)) {
+    return [];
+  }
+
   const engagedInfantry: Record<string, Player> = {};
   for (const pairs of engagedPairs) {
     engagedInfantry[`${pairs.RED[0]},${pairs.RED[1]}`] = "RED";
