@@ -314,6 +314,7 @@ export const GHQGame: Game<GHQState> = {
     onBegin: ({ ctx, G, random, ...plugins }) => {
       const clearedSqures = clearBombardedSquares(G, ctx);
       if (clearedSqures.length > 0) {
+        playCaptureSound(); // TODO(tyler): figure out where this should go
         appendHistory(plugins, {
           message: `Move ${
             ctx.turn
