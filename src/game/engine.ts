@@ -94,6 +94,13 @@ export interface GHQState {
   ];
   redReserve: ReserveFleet;
   blueReserve: ReserveFleet;
+  // time control
+  redElapsed: number;
+  blueElapsed: number;
+  timeControl: number;
+  bonusTime: number;
+  startTime: number;
+  turnStartTime: number;
 }
 
 const Reinforce: Move<GHQState> = (
@@ -199,6 +206,12 @@ export const GHQGame: Game<GHQState> = {
   plugins: [HistoryPlugin],
   setup: ({ ctx, ...plugins }, setupData) => {
     return {
+      startTime: Date.now(),
+      turnStartTime: Date.now(),
+      blueElapsed: 0,
+      redElapsed: 0,
+      bonusTime: 2,
+      timeControl: 10 * 60 * 1000,
       board: [
         [
           { type: "HQ", player: "BLUE" },
@@ -270,7 +283,7 @@ export const GHQGame: Game<GHQState> = {
   },
   turn: {
     maxMoves: 3,
-    onBegin: ({ G, ctx, events, random, ...plugins }) => {
+    onBegin: ({ ctx, G , random, ...plugins}) => {
       const clearedSqures = clearBombardedSquares(G, ctx);
       if (clearedSqures.length > 0) {
         appendHistory(plugins, {
@@ -280,6 +293,15 @@ export const GHQGame: Game<GHQState> = {
             .map(([x, y]) => `(${x},${y})`)
             .join(", ")}`,
         });
+      }
+      G.turnStartTime = Date.now();
+    },
+    onEnd: ({ ctx, G }) => {
+      const elapsed = Date.now() - G.turnStartTime;
+      if (ctx.currentPlayer === "0") {
+        G.redElapsed = G.redElapsed + elapsed;
+      } else {
+        G.blueElapsed = G.blueElapsed + elapsed;
       }
     },
   },

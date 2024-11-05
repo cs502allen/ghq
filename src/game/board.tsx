@@ -14,8 +14,8 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { bombardedSquares } from "@/game/move-logic";
 import Image from "next/image";
 import { SelectOrientation } from "@/game/select-orientation";
-import { PluginState } from "boardgame.io";
-import { HistoryState } from "./move-history-plugin";
+import { HistoryState } from "@/game/move-history-plugin";
+import CountdownTimer from "@/game/countdown";
 
 const rows = 8;
 const columns = 8;
@@ -367,6 +367,13 @@ export function GHQBoard({
       >
         <div className="flex flex-col gap-2 p-4">
           <div className="text-xl font-bold">{G.userIds[0]}</div>
+          <CountdownTimer
+            active={ctx.currentPlayer === "1"}
+            player="BLUE"
+            elapsed={G.blueElapsed}
+            startDate={G.turnStartTime}
+            totalTimeAllowed={G.timeControl}
+          />
           <div className="items-center justify-center flex">
             <ReserveBank
               player="BLUE"
@@ -420,6 +427,13 @@ export function GHQBoard({
               selectReserve={selectReserve}
             />
           </div>
+          <CountdownTimer
+            active={ctx.currentPlayer === "0"}
+            player="RED"
+            elapsed={G.redElapsed}
+            startDate={G.turnStartTime}
+            totalTimeAllowed={G.timeControl}
+          />
         </div>
 
         <HistoryLog historyState={plugins.history.data} />
