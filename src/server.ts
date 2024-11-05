@@ -7,6 +7,7 @@ import { createMatch } from "boardgame.io/src/server/util";
 import { Game as SrcGame } from "boardgame.io/src/types"; // TODO(tyler): tech debt
 import { nanoid } from "nanoid";
 import { createClient } from "@supabase/supabase-js";
+import { PostgresStore } from "bgio-postgres";
 
 const supabase = createClient(
   "https://wjucmtrnmjcaatbtktxo.supabase.co",
@@ -15,12 +16,18 @@ const supabase = createClient(
 
 const ghqGame = newOnlineGHQGame({ onEnd: onGameEnd });
 
+const db = new PostgresStore({
+  database: "postgres",
+  username: "postgres.wjucmtrnmjcaatbtktxo",
+  password: process.env.POSTGRES_PASSWORD,
+  host: "aws-0-us-east-2.pooler.supabase.com",
+  port: 6543,
+});
+
 const server = Server({
   games: [ghqGame],
   origins: [Origins.LOCALHOST],
-  db: new FlatFile({
-    dir: ".data/flatfiledb",
-  }),
+  db,
 });
 
 const queue: Set<string> = new Set<string>();

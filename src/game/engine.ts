@@ -395,11 +395,13 @@ export function newOnlineGHQGame({
     if (numPlayers !== 2) {
       return "Invalid number of players";
     }
-    if (!setupData.players["0"] || !setupData.players["1"]) {
-      return "Missing player IDs";
-    }
-    if (!setupData.matchId) {
-      return "Missing match ID";
+    if (setupData) {
+      if (!setupData.players["0"] || !setupData.players["1"]) {
+        return "Missing player IDs";
+      }
+      if (!setupData.matchId) {
+        return "Missing match ID";
+      }
     }
   };
 
