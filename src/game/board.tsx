@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   GHQState,
+  NonNullSquare,
   Orientation,
   Player,
   ReserveFleet,
   Units,
+  UnitType,
 } from "@/game/engine";
 import { BoardProps } from "boardgame.io/react";
 import { useMachine } from "@xstate/react";
@@ -27,7 +29,9 @@ type Annotations = {
     bombardedBy?: { RED?: true; BLUE?: true };
     selectedPiece?: true;
     showAim?: true;
+    showTarget?: true;
     hidePiece?: true;
+    showProxyPiece?: NonNullSquare;
   };
 };
 
@@ -63,7 +67,11 @@ export function GHQBoard({
     turnStateMachine.provide({
       actions: {
         movePiece: ({ context, event }) => {
-          if ("at" in event) moves.Move(context.selectedPiece!.at, event.at);
+          moves.Move(
+            context.selectedPiece!.at,
+            context.stagedMove!,
+            context.captureEnemyAt
+          );
         },
         changeOrientation: ({ context, event }) => {
           if ("orientation" in event)
@@ -80,7 +88,7 @@ export function GHQBoard({
           if ("orientation" in event) {
             moves.MoveAndOrient(
               context.selectedPiece!.at,
-              context.stagedArtilleryMove,
+              context.stagedMove,
               event.orientation
             );
           }
@@ -139,14 +147,43 @@ export function GHQBoard({
     }
 
     const aiming = state.matches("activePieceSelected.selectOrientation");
-    if (aiming && state.context.stagedArtilleryMove) {
-      const [x, y] = state.context.stagedArtilleryMove;
+    if (aiming && state.context.stagedMove) {
+      const [x, y] = state.context.stagedMove;
       annotate[`${x},${y}`] = { ...annotate[`${x},${y}`], showAim: true };
 
       const [oldX, oldY] = state.context.selectedPiece!.at;
       annotate[`${oldX},${oldY}`] = {
         ...annotate[`${oldX},${oldY}`],
         hidePiece: true,
+      };
+    }
+
+    if (
+      state.matches("selectEnemyToCapture") &&
+      state.context.stagedMove &&
+      (state.context.allowedCaptures || []).length > 1
+    ) {
+      const captures = state.context.allowedCaptures!;
+
+      captures.forEach(([xx, yy]) => {
+        annotate[`${xx},${yy}`] = {
+          ...annotate[`${xx},${yy}`],
+          showTarget: true,
+        };
+      });
+
+      const [oldX, oldY] = state.context.selectedPiece!.at;
+
+      annotate[`${oldX},${oldY}`] = {
+        ...annotate[`${oldX},${oldY}`],
+        hidePiece: true,
+      };
+
+      const [x, y] = state.context.stagedMove!;
+
+      annotate[`${x},${y}`] = {
+        ...annotate[`${x},${y}`],
+        showProxyPiece: state.context.selectedPiece!.piece,
       };
     }
 
@@ -163,10 +200,7 @@ export function GHQBoard({
 
           const annotationsForSquare = annotations[`${rowIndex},${colIndex}`];
 
-          const rotation =
-            square && "orientation" in square
-              ? square && square.orientation
-              : undefined;
+          const showTarget = annotationsForSquare?.showTarget;
 
           const add180 =
             square &&
@@ -203,17 +237,17 @@ export function GHQBoard({
           return (
             <td
               onClick={() => {
-                if (square) {
+                if (state.matches("selectEnemyToCapture") || !square) {
                   send({
-                    type: "SELECT_ACTIVE_PIECE",
+                    type: "SELECT_SQUARE",
                     at: [rowIndex, colIndex],
-                    piece: square,
                     currentBoard: G.board,
                   });
                 } else {
                   send({
-                    type: "SELECT_SQUARE",
+                    type: "SELECT_ACTIVE_PIECE",
                     at: [rowIndex, colIndex],
+                    piece: square,
                     currentBoard: G.board,
                   });
                 }
@@ -227,6 +261,7 @@ export function GHQBoard({
                     annotationsForSquare?.moveTo ||
                     square?.player === (isPrimaryPlayer("0") ? "RED" : "BLUE"),
                 },
+                { ["bg-red-900"]: showTarget },
                 (rowIndex + colIndex) % 2 === 0 ? "bg-gray-300" : "bg-gray-200"
               )}
               style={{
@@ -276,6 +311,50 @@ export function GHQBoard({
                   />
                 </div>
               ) : null}
+
+              {annotationsForSquare?.showProxyPiece ? (
+                <div
+                  className={classNames(
+                    "flex items-center justify-center select-none font-bold text-3xl",
+                    annotationsForSquare?.showProxyPiece.player === "RED"
+                      ? "text-red-600"
+                      : "text-blue-600",
+                    {
+                      // @todo this is really only for infantry. Adjust when we do orientation
+                      // ["rotate-180"]:
+                      //   (isPrimaryPlayer("0") && square.player === "BLUE") ||
+                      //   (isPrimaryPlayer("1") && square.player === "RED"),
+                    }
+                  )}
+                >
+                  <Image
+                    src={`/${
+                      Units[annotationsForSquare?.showProxyPiece.type]
+                        .imagePathPrefix
+                    }-${annotationsForSquare?.showProxyPiece.player}.png`}
+                    width="35"
+                    height="35"
+                    className="select-none"
+                    draggable="false"
+                    style={{
+                      transform: annotationsForSquare?.showProxyPiece
+                        .orientation
+                        ? isPrimaryPlayer("1")
+                          ? `rotate(${
+                              180 -
+                              annotationsForSquare?.showProxyPiece.orientation
+                            }deg)`
+                          : `rotate(${annotationsForSquare?.showProxyPiece.orientation}deg)`
+                        : `rotate(${add180 ? 180 : 0}deg)`,
+                    }}
+                    alt={
+                      Units[annotationsForSquare?.showProxyPiece.type]
+                        .imagePathPrefix
+                    }
+                  />
+                </div>
+              ) : null}
+
               {square && selectingOrientation && !hidePiece ? (
                 <SelectOrientation
                   player={square.player}
@@ -305,9 +384,12 @@ export function GHQBoard({
                   />
                 </SelectOrientation>
               ) : null}
-              {annotationsForSquare?.moveTo && !aiming ? (
+              {annotationsForSquare?.moveTo &&
+              !aiming &&
+              !state.matches("selectEnemyToCapture") ? (
                 <div className="rounded-full w-6 h-6 m-auto bg-green-600/40" />
               ) : null}
+              {showTarget ? <div className="target-square "></div> : null}
               {aiming && state.context.selectedPiece ? (
                 <SelectOrientation
                   player={state.context.player}

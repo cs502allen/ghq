@@ -4,6 +4,7 @@ import { INVALID_MOVE } from "boardgame.io/core";
 import { isAuthorizedToMovePiece } from "./move-logic";
 import { playMoveSound } from "./audio";
 import { clearBombardedSquares } from "@/game/capture-logic";
+import { Blue, Red } from "@/game/tests/test-boards";
 import { appendHistory, HistoryPlugin } from "./move-history-plugin";
 import { getGameoverState } from "./gameover-logic";
 
@@ -154,6 +155,11 @@ const Move: Move<GHQState> = (
 
   G.board[from[0]][from[1]] = null;
   G.board[to[0]][to[1]] = piece;
+
+  if (capturePreference) {
+    G.board[capturePreference[0]][capturePreference[1]] = null;
+  }
+
   playMoveSound(); // TODO(tyler): figure out where this should go
 };
 

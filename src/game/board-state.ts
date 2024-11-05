@@ -12,6 +12,7 @@ import {
   movesForActivePiece,
   spawnPositionsForPlayer,
 } from "@/game/move-logic";
+import { captureCandidates } from "@/game/capture-logic";
 
 /*
 // @todo there's a dead state when you click into a piece you can't move. No way out. Should add guard for allowed pieces > 1 and transition to ready state if failed
@@ -35,7 +36,9 @@ export const turnStateMachine = createMachine({
       // move active piece
       selectedPiece?: { at: Coordinate; piece: NonNullSquare };
       allowedMoves?: Coordinate[];
-      stagedArtilleryMove?: Coordinate;
+      stagedMove?: Coordinate;
+      allowedCaptures?: Coordinate[];
+      captureEnemyAt?: Coordinate;
       // reinforce
       unitKind?: keyof ReserveFleet;
     };
@@ -85,6 +88,9 @@ export const turnStateMachine = createMachine({
         selectedPiece: undefined,
         allowedMoves: undefined,
         unitKind: undefined,
+        captureEnemyAt: undefined,
+        stagedMove: undefined,
+        allowedCaptures: undefined,
       }),
       on: {
         SELECT_RESERVE_PIECE: {
@@ -139,7 +145,6 @@ export const turnStateMachine = createMachine({
           on: {
             SELECT_SQUARE: [
               {
-                // for infantry
                 guard: ({ context, event }) => {
                   const isArtillery =
                     typeof Units[context.selectedPiece!.piece.type]
@@ -155,13 +160,18 @@ export const turnStateMachine = createMachine({
                   );
                 },
                 actions: [
-                  "movePiece",
-                  assign(({ event, context }) => ({
-                    disabledPieces: [...context.disabledPieces, event.at],
-                  })),
+                  assign({
+                    allowedCaptures: ({ event, context }) => {
+                      return getStagedInfantryCaptures(
+                        context.selectedPiece!.at,
+                        event.at,
+                        event.currentBoard
+                      );
+                    },
+                    stagedMove: ({event}) => event.at
+                  }),
                 ],
-
-                target: "#turn-machine.ready",
+                target: "#turn-machine.selectEnemyToCapture",
               },
               {
                 // for artillery
@@ -181,7 +191,7 @@ export const turnStateMachine = createMachine({
                 },
                 actions: [
                   assign(({ event, context }) => ({
-                    stagedArtilleryMove: event.at,
+                    stagedMove: event.at,
                   })),
                 ],
 
@@ -205,7 +215,7 @@ export const turnStateMachine = createMachine({
                 assign(({ event, context }) => ({
                   disabledPieces: [
                     ...context.disabledPieces,
-                    context.stagedArtilleryMove!,
+                    context.stagedMove!,
                   ],
                 })),
               ],
@@ -265,7 +275,46 @@ export const turnStateMachine = createMachine({
         },
       },
     },
+    selectEnemyToCapture: {
+      always: [
+        {
+          guard: ({ context, event }) => {
+            const isArtillery =
+              typeof Units[context.selectedPiece!.piece.type]
+                .artilleryRange !== "undefined";
 
+            return (
+              !isArtillery && (context.allowedCaptures || []).length <= 1
+            );
+          },
+          actions: [
+            assign(({ event, context }) => ({
+              captureEnemyAt: (context.allowedCaptures || [])[0],
+              disabledPieces: [...context.disabledPieces, context.stagedMove!],
+            })),
+            "movePiece",
+          ],
+          target: "#turn-machine.ready",
+        },
+      ],
+      on: {
+        SELECT_SQUARE: {
+          guard: ({ context, event }) => {
+            return (context.allowedCaptures || []).some(([x, y]) => {
+              return event.at[0] === x && event.at[1] === y;
+            });
+          },
+          actions: [
+            assign(({ event, context }) => ({
+              captureEnemyAt: event.at,
+              disabledPieces: [...context.disabledPieces, context.stagedMove!],
+            })),
+            "movePiece",
+          ],
+          target: "#turn-machine.ready",
+        },
+      },
+    },
     //move types
     reservePieceSelected: {
       on: {
@@ -290,3 +339,17 @@ export const turnStateMachine = createMachine({
     },
   },
 });
+
+function getStagedInfantryCaptures(
+  from: Coordinate,
+  to: Coordinate,
+  lastBoard: GHQState["board"]
+) {
+  const clone: GHQState["board"] = JSON.parse(JSON.stringify(lastBoard));
+
+  const piece = clone[from[0]][from[1]];
+  clone[from[0]][from[1]] = null;
+  clone[to[0]][to[1]] = piece;
+
+  return captureCandidates(to, clone);
+}

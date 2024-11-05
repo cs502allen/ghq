@@ -53,7 +53,7 @@ describe("computing allowed captures", () => {
     ];
     expect(captureCandidates([4, 1], board)).toEqual([]);
   });
-  it.only("allows capturing artillery", () => {
+  it("allows capturing artillery", () => {
     const board: GHQState["board"] = [
       [null, null, null, null, null, null, null, null],
       [null, null, RART, null, null, null, null, null],
