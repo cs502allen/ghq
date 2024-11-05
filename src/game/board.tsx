@@ -617,11 +617,13 @@ function BoardCoordinateLabels({
 
 function HistoryLog({ historyState }: { historyState: HistoryState }) {
   return (
-    <div className="flex flex-col gap-2 p-4 min-h-40">
+    <div className="flex flex-col gap-1 p-4 min-h-32">
       <div className="text-xl font-bold">Activity</div>
-      {historyState.log.slice(-3).map((log) => (
-        <div key={log.message}>{log.message}</div>
-      ))}
+      <div className="max-h-32 overflow-y-auto border p-1">
+        {historyState.log.map((log) => (
+          <div key={log.message}>{log.message}</div>
+        ))}
+      </div>
     </div>
   );
 }
