@@ -357,6 +357,7 @@ export function GHQBoard({
 
               {square && selectingOrientation && !hidePiece ? (
                 <SelectOrientation
+                  initialOrientation={square.orientation!}
                   player={square.player}
                   onChange={(orientation: Orientation) => {
                     send({
@@ -392,6 +393,9 @@ export function GHQBoard({
               {showTarget ? <div className="target-square "></div> : null}
               {aiming && state.context.selectedPiece ? (
                 <SelectOrientation
+                  initialOrientation={
+                    state.context.selectedPiece!.piece!.orientation!
+                  }
                   player={state.context.player}
                   onChange={(orientation: Orientation) => {
                     send({
