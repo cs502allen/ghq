@@ -6,11 +6,12 @@ import { GHQBoard } from "@/game/board";
 import { SocketIO } from "boardgame.io/multiplayer";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { API_URL } from "../config";
 
 const GameClient = Client({
   game: newOnlineGHQGame({}),
   board: GHQBoard,
-  multiplayer: SocketIO({ server: "localhost:8000" }),
+  multiplayer: SocketIO({ server: API_URL }),
 });
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "./Button";
 import MatchmakingModal from "./MatchmakingModal";
 import { useCallback, useEffect, useState } from "react";
+import { API_URL } from "./config";
 
 interface Game {
   id: string;
@@ -53,7 +54,7 @@ function App() {
     async (userId: string) => {
       try {
         const response = await fetch(
-          `http://localhost:8000/matchmaking?userId=${userId}`,
+          `${API_URL}/matchmaking?userId=${userId}`,
           {
             method: "POST",
           }
@@ -101,13 +102,13 @@ function App() {
 
   async function cancelMatchmaking() {
     setIsMatchmaking(false);
-    fetch(`http://localhost:8000/matchmaking?userId=${userId}`, {
+    fetch(`${API_URL}/matchmaking?userId=${userId}`, {
       method: "DELETE",
     });
   }
 
   useEffect(() => {
-    fetch("http://localhost:8000/matches")
+    fetch(`${API_URL}/matches`)
       .then((res) => res.json())
       .then((res) => {
         const games = res.matches.map((match: any) => ({
