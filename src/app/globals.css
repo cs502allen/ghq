@@ -63,13 +63,23 @@ body {
   );
 }
 
+.target-square {
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  pointer-events: none; /* Ensures the overlay doesn't interfere with clicks */
+
+}
 .target-square::after {
   content: '⌖'; /* The Unicode character */
   position: absolute;
-  top: 50%;
+  top: -45%;
   left: 50%;
+  font-weight: bolder;
   transform: translate(-50%, -50%);
-  font-size: 40px; /* Adjust the size of the ⌖ character */
-  color: #000; /* Color of the Unicode character */
+  font-size: 30px; /* Adjust the size of the ⌖ character */
+  color: #da5f73; /* Color of the Unicode character */
+  cursor: pointer;
   pointer-events: none; /* Ensures the overlay doesn't interfere with clicks */
 }
