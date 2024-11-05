@@ -196,7 +196,7 @@ const Skip: Move<GHQState> = ({ G, ctx, events }) => {
 const Resign: Move<GHQState> = ({ G, ctx, events }) => {
   const gameover: GameoverState = {
     status: "WIN",
-    winner: ctx.currentPlayer === "0" ? "RED" : "BLUE",
+    winner: ctx.currentPlayer === "0" ? "BLUE" : "RED",
   };
   events.endGame(gameover);
 };

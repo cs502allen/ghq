@@ -16,6 +16,7 @@ import Image from "next/image";
 import { SelectOrientation } from "@/game/select-orientation";
 import { HistoryState } from "@/game/move-history-plugin";
 import CountdownTimer from "@/game/countdown";
+import { Flag, MoveRight, Percent } from "lucide-react";
 
 const rows = 8;
 const columns = 8;
@@ -358,34 +359,13 @@ export function GHQBoard({
           <tbody>{isPrimaryPlayer("0") ? cells : cells.reverse()}</tbody>
         </table>
       </div>
+
       <div
         className={classNames(
           "col-span-2 bg-white pt-10 flex flex-col justify-between",
-          isPrimaryPlayer("0") ? "bg-red-50" : "bg-blue-50",
-          { ["flex-col-reverse"]: isPrimaryPlayer("1") }
+          isPrimaryPlayer("0") ? "bg-red-50" : "bg-blue-50"
         )}
       >
-        <div className="flex flex-col gap-2 p-4">
-          <div className="text-xl font-bold">{G.userIds[0]}</div>
-          <CountdownTimer
-            active={ctx.currentPlayer === "1"}
-            player="BLUE"
-            elapsed={G.blueElapsed}
-            startDate={G.turnStartTime}
-            totalTimeAllowed={G.timeControl}
-          />
-          <div className="items-center justify-center flex">
-            <ReserveBank
-              player="BLUE"
-              reserve={G.blueReserve}
-              selectable={
-                isPrimaryPlayer("1") && !state.matches("activePieceSelected")
-              }
-              selectReserve={selectReserve}
-            />
-          </div>
-        </div>
-
         {ctx.gameover ? (
           <h2
             className={classNames(
@@ -403,37 +383,67 @@ export function GHQBoard({
             )}
           >
             {ctx.currentPlayer === "0" ? "Red's " : "Blue's"} Turn
-            <div className="text-lg text-gray-600 font-mono">
+            <div className="text-lg text-gray-600 font-mono flex gap-1 justify-center items-center">
               {3 - ctx.numMoves!} remaining move{ctx.numMoves !== 2 ? "s" : ""}{" "}
-              <button
-                onClick={() => moves.Skip()}
-                className="bg-black text-white p-0.5 text-sm px-2"
-              >
-                Skip
-              </button>
+            </div>
+            <div className="flex gap-1 justify-center items-center">
+              <SkipButton skip={() => moves.Skip()} />
+              <DrawButton
+                draw={() => alert("draw coming soon") /* moves.OfferDraw() */}
+              />
+              <ResignButton resign={() => moves.Resign()} />
             </div>
           </h2>
         )}
 
-        <div className="flex flex-col gap-2 p-4">
-          <div className="text-xl font-bold">{G.userIds[1]}</div>
-          <div className="items-center justify-center flex">
-            <ReserveBank
-              player="RED"
-              reserve={G.redReserve}
-              selectable={
-                isPrimaryPlayer("0") && !state.matches("activePieceSelected")
-              }
-              selectReserve={selectReserve}
+        <div
+          className={classNames(
+            "col-span-2 bg-white pt-10 flex flex-col justify-between",
+            isPrimaryPlayer("0") ? "bg-red-50" : "bg-blue-50",
+            { ["flex-col-reverse"]: isPrimaryPlayer("1") }
+          )}
+        >
+          <div className="flex flex-col gap-2 p-4">
+            <div className="text-xl font-bold">{G.userIds[0]}</div>
+            <CountdownTimer
+              active={ctx.currentPlayer === "1"}
+              player="BLUE"
+              elapsed={G.blueElapsed}
+              startDate={G.turnStartTime}
+              totalTimeAllowed={G.timeControl}
             />
+            <div className="items-center justify-center flex">
+              <ReserveBank
+                player="BLUE"
+                reserve={G.blueReserve}
+                selectable={
+                  isPrimaryPlayer("1") && !state.matches("activePieceSelected")
+                }
+                selectReserve={selectReserve}
+              />
+            </div>
           </div>
-          <CountdownTimer
-            active={ctx.currentPlayer === "0"}
-            player="RED"
-            elapsed={G.redElapsed}
-            startDate={G.turnStartTime}
-            totalTimeAllowed={G.timeControl}
-          />
+
+          <div className="flex flex-col gap-2 p-4">
+            <div className="text-xl font-bold">{G.userIds[1]}</div>
+            <CountdownTimer
+              active={ctx.currentPlayer === "0"}
+              player="RED"
+              elapsed={G.redElapsed}
+              startDate={G.turnStartTime}
+              totalTimeAllowed={G.timeControl}
+            />
+            <div className="items-center justify-center flex">
+              <ReserveBank
+                player="RED"
+                reserve={G.redReserve}
+                selectable={
+                  isPrimaryPlayer("0") && !state.matches("activePieceSelected")
+                }
+                selectReserve={selectReserve}
+              />
+            </div>
+          </div>
         </div>
 
         <HistoryLog historyState={plugins.history.data} />
@@ -520,5 +530,41 @@ function HistoryLog({ historyState }: { historyState: HistoryState }) {
         <div key={log.message}>{log.message}</div>
       ))}
     </div>
+  );
+}
+
+function SkipButton({ skip }: { skip: () => void }) {
+  return (
+    <button
+      onClick={skip}
+      className="bg-black text-white py-1 px-2 text-sm rounded hover:bg-gray-800 flex gap-1 items-center"
+    >
+      <MoveRight className="w-4 h-4" />
+      Skip
+    </button>
+  );
+}
+
+function ResignButton({ resign }: { resign: () => void }) {
+  return (
+    <button
+      onClick={resign}
+      className="bg-red-500 text-white py-1 px-2 text-sm rounded hover:bg-red-600 flex gap-1 items-center"
+    >
+      <Flag className="w-4 h-4" />
+      Resign
+    </button>
+  );
+}
+
+function DrawButton({ draw }: { draw: () => void }) {
+  return (
+    <button
+      onClick={draw}
+      className="bg-gray-500 text-white py-1 px-2 text-sm rounded hover:bg-gray-600 flex gap-1 items-center"
+    >
+      <Percent className="w-4 h-4" />
+      Draw
+    </button>
   );
 }
