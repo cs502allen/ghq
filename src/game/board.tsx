@@ -509,6 +509,9 @@ export function GHQBoard({
               <ReserveBank
                 player="BLUE"
                 reserve={G.blueReserve}
+                selectedKind={
+                  isPrimaryPlayer("1") ? state.context.unitKind : undefined
+                }
                 selectable={
                   isPrimaryPlayer("1") && !state.matches("activePieceSelected")
                 }
@@ -529,6 +532,9 @@ export function GHQBoard({
             <div className="items-center justify-center flex">
               <ReserveBank
                 player="RED"
+                selectedKind={
+                  isPrimaryPlayer("0") ? state.context.unitKind : undefined
+                }
                 reserve={G.redReserve}
                 selectable={
                   isPrimaryPlayer("0") && !state.matches("activePieceSelected")
@@ -549,6 +555,7 @@ function ReserveBank(props: {
   player: Player;
   reserve: ReserveFleet;
   selectable: boolean;
+  selectedKind?: keyof ReserveFleet;
   selectReserve: (kind: keyof ReserveFleet) => void;
 }) {
   const kinds = [
@@ -562,30 +569,33 @@ function ReserveBank(props: {
 
   const reserves = kinds.flatMap((kind) => {
     const count = props.reserve[kind as keyof ReserveFleet];
-
-    return Array.from({ length: count }, (_, index) => (
+    if (count === 0) return null;
+    return (
       <div
         onClick={() => {
           props.selectReserve(kind);
         }}
-        key={`${kind}-${index++}`}
-        className={[
-          "flex items-end justify-end col-span-1 select-none font-bold text-3xl p-1",
+        key={kind}
+        className={classNames(
+          "col-span-1 select-none flex font-bold text-xl p-1 flex-col items-center cursor-pointer ",
           props.player === "RED" ? "text-red-600" : "text-blue-600",
           { ["cursor-pointer"]: props.selectable },
-        ].join(" ")}
+          { ["hover:bg-gray-100 "]: props.selectedKind !== kind },
+          { ["bg-gray-200 "]: props.selectedKind === kind }
+        )}
       >
         <Image
           src={`/${Units[kind].imagePathPrefix}-${props.player}.png`}
-          width="64"
-          height="64"
+          width="30"
+          height="30"
           alt={Units[kind].imagePathPrefix}
         />
+        <div>{count}</div>
       </div>
-    ));
+    );
   });
 
-  return <div className="grid grid-cols-8 text-center">{reserves}</div>;
+  return <div className="grid flex-1 grid-cols-6">{reserves}</div>;
 }
 
 function BoardCoordinateLabels({
