@@ -1,3 +1,4 @@
+require("dotenv").config();
 import { Server, Origins, FlatFile } from "boardgame.io/server";
 import { GHQState, newOnlineGHQGame } from "./game/engine";
 import { StorageAPI } from "boardgame.io";
