@@ -452,7 +452,7 @@ export function GHQBoard({
           <h2
             className={classNames(
               "text-center font-semibold text-2xl",
-              "text-gray-800",
+              ctx.gameover.status === "DRAW" && "text-gray-800",
               ctx.gameover.status === "WIN" && ctx.gameover.winner === "RED"
                 ? "text-red-500"
                 : "text-blue-500"
@@ -669,7 +669,7 @@ function OfferDrawButton({ draw }: { draw: (offer: boolean) => void }) {
   );
 }
 
-function AcceptDrawButton({ draw }: { draw: (offer: boolean) => void }) {
+function AcceptDrawButton({ draw }: { draw: () => void }) {
   return (
     <button
       onClick={draw}
