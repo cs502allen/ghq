@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",                // Suitable for modern Node.js versions
+    "module": "CommonJS",              // CommonJS modules for Node.js
+    "lib": ["ESNext"],                 // Include latest ECMAScript features
+    "outDir": "./dist",                // Output directory for compiled files
+    "rootDir": "./src",                // Root directory of input files
+    "strict": true,                    // Enable strict type-checking options
+    "esModuleInterop": true,           // Enable compatibility with CommonJS modules
+    "resolveJsonModule": true,         // Allow importing JSON files
+    "isolatedModules": false,          // Set to false since we're compiling whole project
+    "noEmit": false,                   // Allow emitting compiled files
+    "incremental": true,               // Enable incremental compilation
+    "allowJs": false,                  // Since we're using TypeScript for server code
+    "skipLibCheck": true,              // Skip type checking of declaration files
+    "forceConsistentCasingInFileNames": true // Ensure consistent casing in file names
+  },
+  "include": ["src/server.ts"],         // Include only the server entry file
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    ".next",
+    "out",
+    "dist"
+  ]
+}
