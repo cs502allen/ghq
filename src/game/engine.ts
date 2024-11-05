@@ -1,9 +1,12 @@
 import type { Ctx, FnContext, Game, Move, State } from "boardgame.io";
 import { INVALID_MOVE } from "boardgame.io/core";
 
+import { isAuthorizedToMovePiece } from "./move-logic";
 import { playMoveSound } from "./audio";
 import { clearBombardedSquares } from "@/game/capture-logic";
 import { Blue, Red } from "@/game/tests/test-boards";
+import { appendHistory, HistoryPlugin } from "./move-history-plugin";
+import { getGameoverState } from "./gameover-logic";
 
 export const Units: {
   [key: string]: {
@@ -93,6 +96,18 @@ export interface GHQState {
   ];
   redReserve: ReserveFleet;
   blueReserve: ReserveFleet;
+  // time control
+  redElapsed: number;
+  blueElapsed: number;
+  timeControl: number;
+  bonusTime: number;
+  startTime: number;
+  turnStartTime: number;
+}
+
+export interface GameoverState {
+  status: "WIN" | "DRAW";
+  winner?: Player;
 }
 
 const Reinforce: Move<GHQState> = (
@@ -134,6 +149,10 @@ const Move: Move<GHQState> = (
   capturePreference?: Coordinate
 ) => {
   const piece = G.board[from[0]][from[1]];
+  if (!isAuthorizedToMovePiece(ctx, piece)) {
+    return INVALID_MOVE;
+  }
+
   G.board[from[0]][from[1]] = null;
   G.board[to[0]][to[1]] = piece;
 
@@ -154,6 +173,9 @@ const MoveAndOrient: Move<GHQState> = (
   if (typeof Units[piece.type].artilleryRange === "undefined") {
     return INVALID_MOVE;
   }
+  if (!isAuthorizedToMovePiece(ctx, piece)) {
+    return INVALID_MOVE;
+  }
 
   piece!.orientation = orientation;
   G.board[from[0]][from[1]] = null;
@@ -165,6 +187,10 @@ const ChangeOrientation: Move<GHQState> = (
   orientation: Orientation
 ) => {
   const piece = G.board[on[0]][on[1]];
+  if (!isAuthorizedToMovePiece(ctx, piece)) {
+    return INVALID_MOVE;
+  }
+
   piece!.orientation = orientation;
   G.board[on[0]][on[1]] = piece;
 };
@@ -174,7 +200,11 @@ const Skip: Move<GHQState> = ({ G, ctx, events }) => {
 };
 
 const Resign: Move<GHQState> = ({ G, ctx, events }) => {
-  events.endGame({ winner: ctx.currentPlayer === "0" ? "1" : "0" });
+  const gameover: GameoverState = {
+    status: "WIN",
+    winner: ctx.currentPlayer === "0" ? "RED" : "BLUE",
+  };
+  events.endGame(gameover);
 };
 
 export const GameMoves = {
@@ -189,8 +219,15 @@ export const GameMoves = {
 export type GameMoveType = typeof GameMoves;
 
 export const GHQGame: Game<GHQState> = {
+  plugins: [HistoryPlugin],
   setup: ({ ctx, ...plugins }, setupData) => {
     return {
+      startTime: Date.now(),
+      turnStartTime: Date.now(),
+      blueElapsed: 0,
+      redElapsed: 0,
+      bonusTime: 2,
+      timeControl: 10 * 60 * 1000,
       board: [
         [
           { type: "HQ", player: "BLUE" },
@@ -262,9 +299,30 @@ export const GHQGame: Game<GHQState> = {
   },
   turn: {
     maxMoves: 3,
-    onBegin: ({ G, ctx, events, random, ...plugins }) => {
-      clearBombardedSquares(G, ctx);
+    onBegin: ({ ctx, G, random, ...plugins }) => {
+      const clearedSqures = clearBombardedSquares(G, ctx);
+      if (clearedSqures.length > 0) {
+        appendHistory(plugins, {
+          message: `Move ${
+            ctx.turn
+          }: Artillery destroyed pieces at ${clearedSqures
+            .map(([x, y]) => `(${x},${y})`)
+            .join(", ")}`,
+        });
+      }
+      G.turnStartTime = Date.now();
     },
+    onEnd: ({ ctx, G }) => {
+      const elapsed = Date.now() - G.turnStartTime;
+      if (ctx.currentPlayer === "0") {
+        G.redElapsed = G.redElapsed + elapsed;
+      } else {
+        G.blueElapsed = G.blueElapsed + elapsed;
+      }
+    },
+  },
+  endIf: ({ G }) => {
+    return getGameoverState(G);
   },
   minPlayers: 2,
   maxPlayers: 2,

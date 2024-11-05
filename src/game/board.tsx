@@ -16,6 +16,8 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { bombardedSquares } from "@/game/move-logic";
 import Image from "next/image";
 import { SelectOrientation } from "@/game/select-orientation";
+import { HistoryState } from "@/game/move-history-plugin";
+import CountdownTimer from "@/game/countdown";
 
 const rows = 8;
 const columns = 8;
@@ -258,10 +260,10 @@ export function GHQBoard({
                     annotationsForSquare?.moveTo ||
                     square?.player === (isPrimaryPlayer("0") ? "RED" : "BLUE"),
                 },
-                { ["bg-red-900"]: showTarget }
+                { ["bg-red-900"]: showTarget },
+                (rowIndex + colIndex) % 2 === 0 ? "bg-gray-300" : "bg-gray-200"
               )}
               style={{
-                border: "1px solid black",
                 boxShadow:
                   (annotationsForSquare?.selectedPiece && !hidePiece) || aiming
                     ? "inset 0 0 8px darkgray"
@@ -271,6 +273,11 @@ export function GHQBoard({
                 height: "90px",
               }}
             >
+              <BoardCoordinateLabels
+                isPrimaryPlayer={isPrimaryPlayer}
+                colIndex={colIndex}
+                rowIndex={rowIndex}
+              />
               {square && !selectingOrientation && !hidePiece ? (
                 <div
                   className={classNames(
@@ -379,7 +386,7 @@ export function GHQBoard({
               {annotationsForSquare?.moveTo &&
               !aiming &&
               !state.matches("selectEnemyToCapture") ? (
-                <div className="rounded-full w-8 h-8 m-auto bg-gray-300" />
+                <div className="rounded-full w-6 h-6 m-auto bg-green-600/40" />
               ) : null}
               {showTarget ? <div className="target-square "></div> : null}
               {aiming && state.context.selectedPiece ? (
@@ -426,7 +433,7 @@ export function GHQBoard({
   });
 
   return (
-    <div className="grid bg-gray-200 absolute w-full h-full grid-cols-7">
+    <div className="grid bg-gray-100 absolute w-full h-full grid-cols-7">
       <div className="col-span-5 border-r-2 border-gray-100 flex items-center justify-center">
         <table ref={divRef} style={{ borderCollapse: "collapse" }}>
           {/*flip board*/}
@@ -442,6 +449,13 @@ export function GHQBoard({
       >
         <div className="flex flex-col gap-2 p-4">
           <div className="text-xl font-bold">{G.userIds[0]}</div>
+          <CountdownTimer
+            active={ctx.currentPlayer === "1"}
+            player="BLUE"
+            elapsed={G.blueElapsed}
+            startDate={G.turnStartTime}
+            totalTimeAllowed={G.timeControl}
+          />
           <div className="items-center justify-center flex">
             <ReserveBank
               player="BLUE"
@@ -458,10 +472,10 @@ export function GHQBoard({
           <h2
             className={classNames(
               "text-center font-semibold text-2xl",
-              ctx.gameover.winner === "0" ? "text-red-500" : "text-blue-500"
+              ctx.gameover.winner === "RED" ? "text-red-500" : "text-blue-500"
             )}
           >
-            {ctx.gameover.winner === "0" ? "Red " : "Blue"} Won!
+            {ctx.gameover.winner === "RED" ? "Red " : "Blue"} Won!
           </h2>
         ) : (
           <h2
@@ -495,7 +509,16 @@ export function GHQBoard({
               selectReserve={selectReserve}
             />
           </div>
+          <CountdownTimer
+            active={ctx.currentPlayer === "0"}
+            player="RED"
+            elapsed={G.redElapsed}
+            startDate={G.turnStartTime}
+            totalTimeAllowed={G.timeControl}
+          />
         </div>
+
+        <HistoryLog historyState={plugins.history.data} />
       </div>
     </div>
   );
@@ -542,4 +565,42 @@ function ReserveBank(props: {
   });
 
   return <div className="grid grid-cols-8 text-center">{reserves}</div>;
+}
+
+function BoardCoordinateLabels({
+  isPrimaryPlayer,
+  colIndex,
+  rowIndex,
+}: {
+  isPrimaryPlayer: (playerId: string) => boolean;
+  colIndex: number;
+  rowIndex: number;
+}) {
+  return (
+    <>
+      <div className="absolute top-0 left-1 text-xs font-bold text-gray-400">
+        {isPrimaryPlayer("0") && colIndex === 0 && rowIndex}
+      </div>
+      <div className="absolute top-0 left-1 text-xs font-bold text-gray-400">
+        {isPrimaryPlayer("0") && rowIndex === 0 && colIndex}
+      </div>
+      <div className="absolute bottom-0 right-1 text-xs font-bold text-gray-400">
+        {isPrimaryPlayer("1") && colIndex === 0 && rowIndex}
+      </div>
+      <div className="absolute bottom-0 right-1 text-xs font-bold text-gray-400">
+        {isPrimaryPlayer("1") && rowIndex === 0 && colIndex}
+      </div>
+    </>
+  );
+}
+
+function HistoryLog({ historyState }: { historyState: HistoryState }) {
+  return (
+    <div className="flex flex-col gap-2 p-4 min-h-40">
+      <div className="text-xl font-bold">Activity</div>
+      {historyState.log.slice(-3).map((log) => (
+        <div key={log.message}>{log.message}</div>
+      ))}
+    </div>
+  );
 }
