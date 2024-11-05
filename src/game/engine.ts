@@ -5,6 +5,7 @@ import { isAuthorizedToMovePiece } from "./move-logic";
 import { playMoveSound } from "./audio";
 import { clearBombardedSquares } from "@/game/capture-logic";
 import { appendHistory, HistoryPlugin } from "./move-history-plugin";
+import { getGameoverState } from "./gameover-logic";
 
 export const Units: {
   [key: string]: {
@@ -103,6 +104,11 @@ export interface GHQState {
   turnStartTime: number;
 }
 
+export interface GameoverState {
+  status: "WIN" | "DRAW";
+  winner?: Player;
+}
+
 const Reinforce: Move<GHQState> = (
   { G, ctx },
   unitType: keyof ReserveFleet,
@@ -188,7 +194,11 @@ const Skip: Move<GHQState> = ({ G, ctx, events }) => {
 };
 
 const Resign: Move<GHQState> = ({ G, ctx, events }) => {
-  events.endGame({ winner: ctx.currentPlayer === "0" ? "1" : "0" });
+  const gameover: GameoverState = {
+    status: "WIN",
+    winner: ctx.currentPlayer === "0" ? "RED" : "BLUE",
+  };
+  events.endGame(gameover);
 };
 
 export const GameMoves = {
@@ -304,6 +314,9 @@ export const GHQGame: Game<GHQState> = {
         G.blueElapsed = G.blueElapsed + elapsed;
       }
     },
+  },
+  endIf: ({ G }) => {
+    return getGameoverState(G.board);
   },
   minPlayers: 2,
   maxPlayers: 2,
