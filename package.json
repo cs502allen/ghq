@@ -4,9 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:server": "source .env && tsx watch src/server.ts",
+    "dev:server": "tsx watch src/server.ts",
     "build": "next build",
-    "build:server": "npx tsc -p tsconfig.server.json",
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
