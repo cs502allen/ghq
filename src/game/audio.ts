@@ -5,3 +5,11 @@ export function playMoveSound() {
     audio.play();
   }
 }
+
+export function playCaptureSound() {
+  if (typeof window !== "undefined") {
+    const audio = new Audio("/capture-piece.mp3");
+    audio.volume = 0.2;
+    audio.play();
+  }
+}
