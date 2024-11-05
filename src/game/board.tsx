@@ -297,7 +297,11 @@ export function GHQBoard({
                     }.png`}
                     width="52"
                     height="52"
-                    className="select-none"
+                    className={classNames("select-none", {
+                      ["opacity-50"]:
+                        (isPrimaryPlayer("0") && square.player === "BLUE") ||
+                        (isPrimaryPlayer("1") && square.player === "RED"),
+                    })}
                     draggable="false"
                     style={{
                       transform: square.orientation
@@ -447,63 +451,19 @@ export function GHQBoard({
 
       <div
         className={classNames(
-          "col-span-2 bg-white pt-10 flex flex-col justify-between",
+          "col-span-2  bg-white flex flex-col justify-between",
           isPrimaryPlayer("0") ? "bg-red-50" : "bg-blue-50"
         )}
       >
-        {ctx.gameover ? (
-          <div className="flex flex-col gap-1 justify-center items-center">
-            <h2
-              className={classNames(
-                "text-center font-semibold text-2xl",
-                ctx.gameover.status === "DRAW" && "text-gray-800",
-                ctx.gameover.status === "WIN" && ctx.gameover.winner === "RED"
-                  ? "text-red-500"
-                  : "text-blue-500"
-              )}
-            >
-              {ctx.gameover.status === "DRAW" ? (
-                "Draw!"
-              ) : (
-                <>{ctx.gameover.winner === "RED" ? "Red " : "Blue"} Won!</>
-              )}
-            </h2>
-            {ctx.gameover.reason && ctx.gameover.reason}
-          </div>
-        ) : (
-          <h2
-            className={classNames(
-              "text-center font-semibold text-2xl",
-              ctx.currentPlayer === "0" ? "text-red-500" : "text-blue-500"
-            )}
-          >
-            {ctx.currentPlayer === "0" ? "Red's " : "Blue's"} Turn
-            <div className="text-lg text-gray-600 font-mono flex gap-1 justify-center items-center">
-              {3 - ctx.numMoves!} remaining move{ctx.numMoves !== 2 ? "s" : ""}{" "}
-            </div>
-            <div className="flex gap-1 justify-center items-center">
-              <SkipButton skip={() => moves.Skip()} />
-              {G.drawOfferedBy && G.drawOfferedBy !== ctx.currentPlayer ? (
-                <AcceptDrawButton draw={() => moves.AcceptDraw()} />
-              ) : (
-                <OfferDrawButton
-                  draw={(offer: boolean) => moves.OfferDraw(offer)}
-                />
-              )}
-              <ResignButton resign={() => moves.Resign()} />
-            </div>
-          </h2>
-        )}
-
         <div
           className={classNames(
-            "col-span-2 bg-white pt-10 flex flex-col justify-between",
+            "col-span-2 h-full pt-10 flex flex-col justify-between",
             isPrimaryPlayer("0") ? "bg-red-50" : "bg-blue-50",
             { ["flex-col-reverse"]: isPrimaryPlayer("1") }
           )}
         >
-          <div className="flex flex-col gap-2 p-4">
-            <div className="text-xl font-bold">{G.userIds[0]}</div>
+          <div className="flex flex-col gap-2 p-4 ">
+            <div className="text-xl font-bold">{G.userIds[1]}</div>
             <CountdownTimer
               active={ctx.currentPlayer === "1"}
               player="BLUE"
@@ -526,8 +486,53 @@ export function GHQBoard({
             </div>
           </div>
 
+          {ctx.gameover ? (
+            <div className="flex flex-col items-center justify-center gap-1 justify-center items-center">
+              <h2
+                className={classNames(
+                  "text-center font-semibold text-2xl",
+                  ctx.gameover.status === "DRAW" && "text-gray-800",
+                  ctx.gameover.status === "WIN" && ctx.gameover.winner === "RED"
+                    ? "text-red-500"
+                    : "text-blue-500"
+                )}
+              >
+                {ctx.gameover.status === "DRAW" ? (
+                  "Draw!"
+                ) : (
+                  <>{ctx.gameover.winner === "RED" ? "Red " : "Blue"} Won!</>
+                )}
+              </h2>
+              {ctx.gameover.reason && ctx.gameover.reason}
+            </div>
+          ) : (
+            <div
+              className={classNames(
+                "text-center font-semibold flex items-center flex-col justify-center text-2xl flex-1",
+                ctx.currentPlayer === "0" ? "text-red-500" : "text-blue-500"
+              )}
+            >
+              {ctx.currentPlayer === "0" ? "Red's " : "Blue's"} Turn
+              <div className="text-lg text-gray-600 font-mono flex gap-1 justify-center items-center">
+                {3 - ctx.numMoves!} remaining move
+                {ctx.numMoves !== 2 ? "s" : ""}{" "}
+              </div>
+              <div className="flex gap-1 justify-center items-center">
+                <SkipButton skip={() => moves.Skip()} />
+                {G.drawOfferedBy && G.drawOfferedBy !== ctx.currentPlayer ? (
+                  <AcceptDrawButton draw={() => moves.AcceptDraw()} />
+                ) : (
+                  <OfferDrawButton
+                    draw={(offer: boolean) => moves.OfferDraw(offer)}
+                  />
+                )}
+                <ResignButton resign={() => moves.Resign()} />
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-col gap-2 p-4">
-            <div className="text-xl font-bold">{G.userIds[1]}</div>
+            <div className="text-xl font-bold">{G.userIds[0]}</div>
             <CountdownTimer
               active={ctx.currentPlayer === "0"}
               player="RED"
