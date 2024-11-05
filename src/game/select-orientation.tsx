@@ -21,15 +21,29 @@ export function SelectOrientation(
   );
 
   useEffect(() => {
-    const orientations: Orientation[] = [0, 45, 90, 135, 180, 225, 270, 315];
+    const orientations: Orientation[] = [
+      180, 225, 270, 315, 0, 45, 90, 135, 180, 225, 270, 315,
+    ];
 
     const getClosestOrientation = (angle: number): Orientation => {
-      return orientations.reduce((prev, curr) =>
-        Math.abs(curr - angle) < Math.abs(prev - angle) ? curr : prev
-      ) as Orientation;
-    };
+      return orientations.reduce((prev, curr) => {
+        const prevDiff = Math.min(
+          Math.abs(prev - angle),
+          Math.abs(prev - angle + 360),
+          Math.abs(prev - angle - 360)
+        );
+        const currDiff = Math.min(
+          Math.abs(curr - angle),
+          Math.abs(curr - angle + 360),
+          Math.abs(curr - angle - 360)
+        );
 
-    const orientation = getClosestOrientation(angle as number);
+        return currDiff < prevDiff ? curr : prev;
+      }) as Orientation;
+    };
+    const orientation = getClosestOrientation((angle as number) - 45 / 2);
+
+    // console.log(orientation);
 
     if (asBlue) {
       if (orientation === 0) setStagedOrientation(180);
@@ -39,10 +53,13 @@ export function SelectOrientation(
       else if (orientation === 180) setStagedOrientation(0);
       else if (orientation === 225) setStagedOrientation(45);
       else if (orientation === 270) setStagedOrientation(90);
+      else if (orientation === 315) setStagedOrientation(135);
     } else {
       setStagedOrientation(orientation);
     }
-  }, [angle]);
+  }, [angle, asBlue]);
+
+  // console.log(stagedOrientation);
 
   useAnyClick(
     useCallback(() => {
@@ -117,7 +134,9 @@ export function SelectOrientation(
         <div
           className="col-span-3"
           style={{
-            transform: `rotate(${stagedOrientation + (asBlue ? -90 : 0)}deg)`,
+            transform: `rotate(${
+              (stagedOrientation + (asBlue ? -180 : 0) + 360) % 360
+            }deg)`,
           }}
         >
           {props.children}
