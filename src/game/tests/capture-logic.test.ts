@@ -4,6 +4,8 @@ import { Blue, Red } from "@/game/tests/test-boards";
 import { captureCandidates } from "@/game/capture-logic";
 
 const BINF = Blue.INFANTRY;
+const BAIR = Blue.AIRBORNE;
+const BARM = Blue.ARMORED_INF;
 const RINF = Red.INFANTRY;
 const RART = Red.ARTILLERY(0);
 const R_HQ = Red.HQ;
@@ -70,5 +72,57 @@ describe("computing allowed captures", () => {
         [1, 2],
       ])
     );
+  });
+  it("paratrooper can capture", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, BAIR, null, null, null, null, null, null],
+      [null, RINF, BINF, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+    ];
+    expect(captureCandidates([2, 1], board)).toEqual([[3, 1]]);
+  });
+  it("armored infantry can capture", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, BARM, null, null, null, null, null, null],
+      [null, RINF, BINF, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+    ];
+    expect(captureCandidates([2, 1], board)).toEqual([[3, 1]]);
+  });
+  it("can capture hq with 2 attackers", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, BARM, null, null, null, null, null, null],
+      [null, R_HQ, BINF, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+    ];
+    expect(captureCandidates([2, 1], board)).toEqual([[3, 1]]);
+  });
+  it("can't capture hq with 1 attacker", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, BINF, null, null, null, null, null, null],
+      [null, R_HQ, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+    ];
+    expect(captureCandidates([2, 1], board)).toEqual([]);
   });
 });

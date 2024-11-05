@@ -4,13 +4,14 @@ import {GHQState, Orientation, Player, Square} from "@/game/engine";
 
 const shorthands = (player: Player) => {
   return {
-     HQ:{ type: "HQ", player: player } as Square,
-     AIRBORNE: { type: "AIRBORNE_INFANTRY", player: player } as Square,
-     INFANTRY: { type: "INFANTRY", player: player } as Square,
-     ARTILLERY: (orientation: Orientation) => ({ type: "ARTILLERY", player: player, orientation }) as Square,
-  }
-}
-
+    HQ: { type: "HQ", player: player } as Square,
+    AIRBORNE: { type: "AIRBORNE_INFANTRY", player: player } as Square,
+    INFANTRY: { type: "INFANTRY", player: player } as Square,
+    ARMORED_INF: { type: "ARMORED_INFANTRY", player: player } as Square,
+    ARTILLERY: (orientation: Orientation) =>
+      ({ type: "ARTILLERY", player: player, orientation } as Square),
+  };
+};
 
 export const Blue = shorthands("BLUE")
 export const Red = shorthands("RED")
