@@ -35,6 +35,7 @@ describe.only("gameover", () => {
     expect(getGameoverState({ board } as GHQState)).toEqual({
       status: "WIN",
       winner: "BLUE",
+      reason: "by HQ capture",
     });
   });
 
@@ -44,7 +45,11 @@ describe.only("gameover", () => {
       blueElapsed: 101,
       timeControl: 100,
     } as GHQState;
-    expect(getGameoverState(G)).toEqual({ status: "WIN", winner: "RED" });
+    expect(getGameoverState(G)).toEqual({
+      status: "WIN",
+      winner: "RED",
+      reason: "on time",
+    });
   });
 
   it("blue wins when red runs out of time", () => {
@@ -53,6 +58,10 @@ describe.only("gameover", () => {
       blueElapsed: 0,
       timeControl: 100,
     } as GHQState;
-    expect(getGameoverState(G)).toEqual({ status: "WIN", winner: "BLUE" });
+    expect(getGameoverState(G)).toEqual({
+      status: "WIN",
+      winner: "BLUE",
+      reason: "on time",
+    });
   });
 });

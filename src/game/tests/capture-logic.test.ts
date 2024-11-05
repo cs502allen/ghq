@@ -5,10 +5,12 @@ import { captureCandidates } from "@/game/capture-logic";
 
 const BINF = Blue.INFANTRY;
 const BAIR = Blue.AIRBORNE;
+const RAIR = Red.AIRBORNE;
 const BARM = Blue.ARMORED_INF;
 const RINF = Red.INFANTRY;
 const RART = Red.ARTILLERY(0);
 const R_HQ = Red.HQ;
+const B_HQ = Blue.HQ;
 
 describe("computing allowed captures", () => {
   it("captures one piece when two on cardinal sides", () => {
@@ -124,5 +126,31 @@ describe("computing allowed captures", () => {
       [null, null, null, null, null, null, null, null],
     ];
     expect(captureCandidates([2, 1], board)).toEqual([]);
+  });
+  it("can capture artillery while next to an hq, which doesn't defend", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, RART, null],
+      [null, null, null, null, null, null, BAIR, R_HQ],
+    ];
+    expect(captureCandidates([7, 6], board)).toEqual([[6, 6]]);
+  });
+  it("weird edge case", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, BINF, BINF],
+      [null, null, null, null, null, null, null, RAIR],
+      [null, null, null, null, null, null, null, B_HQ],
+    ];
+    expect(captureCandidates([5, 7], board)).toEqual([]);
   });
 });
