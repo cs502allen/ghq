@@ -13,7 +13,6 @@ import { turnStateMachine } from "@/game/board-state";
 import classNames from "classnames";
 import { useHotkeys } from "react-hotkeys-hook";
 import { bombardedSquares } from "@/game/move-logic";
-import Image from "next/image";
 import { SelectOrientation } from "@/game/select-orientation";
 import { HistoryState } from "@/game/move-history-plugin";
 import CountdownTimer from "@/game/countdown";
@@ -291,7 +290,7 @@ export function GHQBoard({
                     }
                   )}
                 >
-                  <Image
+                  <img
                     src={`/${Units[square.type].imagePathPrefix}-${
                       square.player
                     }.png`}
@@ -330,7 +329,7 @@ export function GHQBoard({
                     }
                   )}
                 >
-                  <Image
+                  <img
                     src={`/${
                       Units[annotationsForSquare?.showProxyPiece.type]
                         .imagePathPrefix
@@ -369,7 +368,7 @@ export function GHQBoard({
                     });
                   }}
                 >
-                  <Image
+                  <img
                     src={`/${Units[square.type].imagePathPrefix}-${
                       square.player
                     }.png`}
@@ -407,7 +406,7 @@ export function GHQBoard({
                     });
                   }}
                 >
-                  <Image
+                  <img
                     src={`/${
                       Units[state.context.selectedPiece.piece.type]
                         .imagePathPrefix
@@ -595,7 +594,7 @@ function ReserveBank(props: {
           { ["bg-gray-200 "]: props.selectedKind === kind }
         )}
       >
-        <Image
+        <img
           src={`/${Units[kind].imagePathPrefix}-${props.player}.png`}
           width="30"
           height="30"
