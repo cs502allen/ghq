@@ -24,6 +24,7 @@ type Annotations = {
     bombardedBy?: { RED?: true; BLUE?: true };
     selectedPiece?: true;
     showAim?: true;
+    showTarget?: true;
     hidePiece?: true;
   };
 };
@@ -60,10 +61,9 @@ export function GHQBoard({
     turnStateMachine.provide({
       actions: {
         movePiece: ({ context, event }) => {
-          if ("at" in event)
             moves.Move(
               context.selectedPiece!.at,
-              event.at,
+              context.stagedMove!,
               context.captureEnemyAt
             );
         },
@@ -82,7 +82,7 @@ export function GHQBoard({
           if ("orientation" in event) {
             moves.MoveAndOrient(
               context.selectedPiece!.at,
-              context.stagedArtilleryMove,
+              context.stagedMove,
               event.orientation
             );
           }
@@ -90,6 +90,8 @@ export function GHQBoard({
       },
     })
   );
+
+  console.log(JSON.stringify(state.value))
 
   useHotkeys("escape", () => send({ type: "DESELECT" }), [send]);
   useHotkeys("left", () => undo(), [undo]);
@@ -141,9 +143,25 @@ export function GHQBoard({
     }
 
     const aiming = state.matches("activePieceSelected.selectOrientation");
-    if (aiming && state.context.stagedArtilleryMove) {
-      const [x, y] = state.context.stagedArtilleryMove;
+    if (aiming && state.context.stagedMove) {
+      const [x, y] = state.context.stagedMove;
       annotate[`${x},${y}`] = { ...annotate[`${x},${y}`], showAim: true };
+
+      const [oldX, oldY] = state.context.selectedPiece!.at;
+      annotate[`${oldX},${oldY}`] = {
+        ...annotate[`${oldX},${oldY}`],
+        hidePiece: true,
+      };
+    }
+
+    if (state.matches("selectEnemyToCapture") && state.context.stagedMove && (state.context.allowedCaptures || []).length > 1) {
+      const [x, y] = state.context.stagedMove;
+      const captures = state.context.allowedCaptures!
+
+      captures.forEach(([xx, yy]) => {
+        annotate[`${xx},${yy}`] = { ...annotate[`${xx},${yy}`], showTarget: true };
+      })
+
 
       const [oldX, oldY] = state.context.selectedPiece!.at;
       annotate[`${oldX},${oldY}`] = {
@@ -205,17 +223,17 @@ export function GHQBoard({
           return (
             <td
               onClick={() => {
-                if (square) {
+                if (state.matches('selectEnemyToCapture') || !square) {
+                  send({
+                    type: "SELECT_SQUARE",
+                    at: [rowIndex, colIndex],
+                    currentBoard: G.board,
+                  })
+                } else {
                   send({
                     type: "SELECT_ACTIVE_PIECE",
                     at: [rowIndex, colIndex],
                     piece: square,
-                    currentBoard: G.board,
-                  });
-                } else {
-                  send({
-                    type: "SELECT_SQUARE",
-                    at: [rowIndex, colIndex],
                     currentBoard: G.board,
                   });
                 }

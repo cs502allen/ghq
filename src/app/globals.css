@@ -62,3 +62,14 @@ body {
       /* Wider transparent stripe width */
   );
 }
+
+.target-square::after {
+  content: '⌖'; /* The Unicode character */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 40px; /* Adjust the size of the ⌖ character */
+  color: #000; /* Color of the Unicode character */
+  pointer-events: none; /* Ensures the overlay doesn't interfere with clicks */
+}

@@ -36,7 +36,7 @@ export const turnStateMachine = createMachine({
       // move active piece
       selectedPiece?: { at: Coordinate; piece: NonNullSquare };
       allowedMoves?: Coordinate[];
-      stagedArtilleryMove?: Coordinate;
+      stagedMove?: Coordinate;
       allowedCaptures?: Coordinate[];
       captureEnemyAt?: Coordinate;
       // reinforce
@@ -89,7 +89,7 @@ export const turnStateMachine = createMachine({
         allowedMoves: undefined,
         unitKind: undefined,
         captureEnemyAt: undefined,
-        stagedArtilleryMove: undefined,
+        stagedMove: undefined,
         allowedCaptures: undefined,
       }),
       on: {
@@ -168,9 +168,10 @@ export const turnStateMachine = createMachine({
                         event.currentBoard
                       );
                     },
+                    stagedMove: ({event}) => event.at
                   }),
                 ],
-                target: "selectEnemyToCapture",
+                target: "#turn-machine.selectEnemyToCapture",
               },
               {
                 // for artillery
@@ -190,52 +191,13 @@ export const turnStateMachine = createMachine({
                 },
                 actions: [
                   assign(({ event, context }) => ({
-                    stagedArtilleryMove: event.at,
+                    stagedMove: event.at,
                   })),
                 ],
 
                 target: "selectOrientation",
               },
             ],
-          },
-        },
-        selectEnemyToCapture: {
-          always: [
-            {
-              guard: ({ context, event }) => {
-                const isArtillery =
-                  typeof Units[context.selectedPiece!.piece.type]
-                    .artilleryRange !== "undefined";
-
-                return (
-                  !isArtillery && (context.allowedCaptures || []).length <= 1
-                );
-              },
-              actions: [
-                assign(({ event, context }) => ({
-                  captureEnemyAt: (context.allowedCaptures || [])[0],
-                  disabledPieces: [...context.disabledPieces, event.at],
-                })),
-                "movePiece",
-              ],
-              target: ["#turn-machine.ready"],
-            },
-          ],
-          on: {
-            SELECT_SQUARE: {
-              guard: ({ context, event }) => {
-                return (context.allowedCaptures || []).some(([x, y]) => {
-                  return event.at[0] === x && event.at[1] === y;
-                });
-              },
-              actions: [
-                assign(({ event, context }) => ({
-                  captureEnemyAt: event.at,
-                  disabledPieces: [...context.disabledPieces, event.at],
-                })),
-                "movePiece",
-              ],
-            },
           },
         },
         selectOrientation: {
@@ -253,7 +215,7 @@ export const turnStateMachine = createMachine({
                 assign(({ event, context }) => ({
                   disabledPieces: [
                     ...context.disabledPieces,
-                    context.stagedArtilleryMove!,
+                    context.stagedMove!,
                   ],
                 })),
               ],
@@ -313,7 +275,46 @@ export const turnStateMachine = createMachine({
         },
       },
     },
+    selectEnemyToCapture: {
+      always: [
+        {
+          guard: ({ context, event }) => {
+            const isArtillery =
+              typeof Units[context.selectedPiece!.piece.type]
+                .artilleryRange !== "undefined";
 
+            return (
+              !isArtillery && (context.allowedCaptures || []).length <= 1
+            );
+          },
+          actions: [
+            assign(({ event, context }) => ({
+              captureEnemyAt: (context.allowedCaptures || [])[0],
+              disabledPieces: [...context.disabledPieces, context.stagedMove!],
+            })),
+            "movePiece",
+          ],
+          target: "#turn-machine.ready",
+        },
+      ],
+      on: {
+        SELECT_SQUARE: {
+          guard: ({ context, event }) => {
+            return (context.allowedCaptures || []).some(([x, y]) => {
+              return event.at[0] === x && event.at[1] === y;
+            });
+          },
+          actions: [
+            assign(({ event, context }) => ({
+              captureEnemyAt: event.at,
+              disabledPieces: [...context.disabledPieces, context.stagedMove!],
+            })),
+            "movePiece",
+          ],
+          target: "#turn-machine.ready",
+        },
+      },
+    },
     //move types
     reservePieceSelected: {
       on: {

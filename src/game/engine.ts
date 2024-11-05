@@ -194,7 +194,7 @@ export const GHQGame: Game<GHQState> = {
       board: [
         [null, null, null, null, null, null, null, null],
         [null, null, null, null, null, null, null, null],
-        [null, null, Blue.ARTILLERY(0), null, null, null, null, null],
+        [null, null, Blue.ARTILLERY(0), null, Blue.ARTILLERY(0), null, null, null],
         [null, null, null, Red.INFANTRY, null, null, null, null],
         [null, null, null, null, null, null, null, null],
         [null, null, null, null, null, null, null, null],
