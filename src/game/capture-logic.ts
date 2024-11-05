@@ -9,8 +9,6 @@ export function captureCandidates(
   const engagedPairs = maximizeEngagement(lastMovedInfantry, board);
   const attacker = board[lastMovedInfantry[0]][lastMovedInfantry[1]];
 
-  console.log(attacker);
-
   if (!attacker) {
     throw new Error("No piece at the last moved infantry position");
   }
@@ -45,7 +43,7 @@ export function captureCandidates(
     if (
       piece &&
       piece.player !== attacker.player &&
-      piece.type === "INFANTRY" &&
+      (Units[piece.type].canCapture || piece.type === "HQ") &&
       !engagedInfantry[`${coord[0]},${coord[1]}`]
     ) {
       return [];
@@ -58,7 +56,7 @@ export function captureCandidates(
     return (
       piece &&
       (engagedInfantry[`${coord[0]},${coord[1]}`] ||
-        piece.type !== "INFANTRY") &&
+        !Units[piece.type].canCapture) &&
       piece.player !== attacker.player
     );
   });
@@ -96,8 +94,8 @@ function maximizeEngagement(
         continue;
       }
 
-      // Only infantry can be engaged
-      if (unit.type !== "INFANTRY") {
+      // Only units that can capture can be engaged
+      if (!Units[unit.type].canCapture && unit.type !== "HQ") {
         continue;
       }
 
