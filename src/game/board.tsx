@@ -390,10 +390,10 @@ export function GHQBoard({
           <h2
             className={classNames(
               "text-center font-semibold text-2xl",
-              ctx.gameover.winner === "0" ? "text-red-500" : "text-blue-500"
+              ctx.gameover.winner === "RED" ? "text-red-500" : "text-blue-500"
             )}
           >
-            {ctx.gameover.winner === "0" ? "Red " : "Blue"} Won!
+            {ctx.gameover.winner === "RED" ? "Red " : "Blue"} Won!
           </h2>
         ) : (
           <h2
