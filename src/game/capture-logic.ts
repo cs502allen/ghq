@@ -1,4 +1,4 @@
-import { Coordinate, GHQState, Player, Units } from "@/game/engine";
+import { Coordinate, GHQState, Player, Square, Units } from "@/game/engine";
 import type { Ctx } from "boardgame.io";
 import { bombardedSquares } from "@/game/move-logic";
 
@@ -13,6 +13,11 @@ export function captureCandidates(
     throw new Error("No piece at the last moved infantry position");
   }
 
+  // If you're not infantry, you're not capturing anything boi
+  if (!isInfantry(attacker)) {
+    return [];
+  }
+
   const engagedInfantry: Record<string, Player> = {};
   for (const pairs of engagedPairs) {
     engagedInfantry[`${pairs.RED[0]},${pairs.RED[1]}`] = "RED";
@@ -20,7 +25,63 @@ export function captureCandidates(
   }
 
   // Find the adjacent pieces to the last moved infantry
-  const attackerAdjacentPieces: Coordinate[] = [];
+  const attackerAdjacentPieces = getAdjacentPieces(board, lastMovedInfantry);
+
+  // Find out if the opponent has any unengaged infantry near us, if so we need to engage with it
+  for (const coord of attackerAdjacentPieces) {
+    const piece = board[coord[0]][coord[1]];
+    if (
+      isEnemyPiece({ piece, attacker }) &&
+      isInfantry(piece) &&
+      !isAlreadyEngaged(engagedInfantry, coord)
+    ) {
+      return [];
+    }
+  }
+
+  // Find capturable pieces
+  const attackablePieces = attackerAdjacentPieces.filter((coord) => {
+    const piece = board[coord[0]][coord[1]];
+
+    // It must be an enemy piece
+    if (!isEnemyPiece({ piece, attacker })) {
+      return false;
+    }
+
+    // If it is already engaged, it's capturable
+    if (isAlreadyEngaged(engagedInfantry, coord)) {
+      return true;
+    }
+
+    // If it's non-infantry and non-HQ, it's capturable
+    if (!isInfantry(piece) && !isHQ(piece)) {
+      return true;
+    }
+
+    // If it's capturable HQ, it's capturable
+    if (
+      isCapturableHQ({
+        board,
+        engagedInfantry,
+        lastMovedInfantry,
+        coord,
+        attacker,
+      })
+    ) {
+      return true;
+    }
+
+    return false;
+  });
+
+  return attackablePieces;
+}
+
+function getAdjacentPieces(
+  board: GHQState["board"],
+  coord: Coordinate
+): Coordinate[] {
+  const adjacentPieces: Coordinate[] = [];
   const directions = [
     [-1, 0], // Up
     [1, 0], // Down
@@ -29,39 +90,15 @@ export function captureCandidates(
   ];
 
   for (const [dx, dy] of directions) {
-    const x = lastMovedInfantry[0] + dx;
-    const y = lastMovedInfantry[1] + dy;
+    const x = coord[0] + dx;
+    const y = coord[1] + dy;
 
     if (x >= 0 && x < board.length && y >= 0 && y < board[0].length) {
-      attackerAdjacentPieces.push([x, y]);
+      adjacentPieces.push([x, y]);
     }
   }
 
-  // Find out if the opponent has any unengaged infantry near us, if so we need to engage with it
-  for (const coord of attackerAdjacentPieces) {
-    const piece = board[coord[0]][coord[1]];
-    if (
-      piece &&
-      piece.player !== attacker.player &&
-      (Units[piece.type].canCapture || piece.type === "HQ") &&
-      !engagedInfantry[`${coord[0]},${coord[1]}`]
-    ) {
-      return [];
-    }
-  }
-
-  // Filter for only already-engaged infantry of the opponent or non-infantry pieces
-  const attackablePieces = attackerAdjacentPieces.filter((coord) => {
-    const piece = board[coord[0]][coord[1]];
-    return (
-      piece &&
-      (engagedInfantry[`${coord[0]},${coord[1]}`] ||
-        !Units[piece.type].canCapture) &&
-      piece.player !== attacker.player
-    );
-  });
-
-  return attackablePieces;
+  return adjacentPieces;
 }
 
 function maximizeEngagement(
@@ -95,7 +132,7 @@ function maximizeEngagement(
       }
 
       // Only units that can capture can be engaged
-      if (!Units[unit.type].canCapture && unit.type !== "HQ") {
+      if (!Units[unit.type].canCapture) {
         continue;
       }
 
@@ -137,7 +174,9 @@ function maximizeEngagement(
           continue;
         }
         const idx1 = piece1Index[`${x1},${y1}`];
-        adjList[i].push(idx1);
+        if (idx1 !== undefined) {
+          adjList[i].push(idx1);
+        }
       }
     }
   }
@@ -212,4 +251,68 @@ export function clearBombardedSquares(G: GHQState, ctx: Ctx): Coordinate[] {
   });
 
   return clearedSquares;
+}
+
+function isEnemyPiece({
+  piece,
+  attacker,
+}: {
+  piece: Square;
+  attacker: Square;
+}): boolean {
+  return !!piece && !!attacker && piece.player !== attacker.player;
+}
+
+function isAlreadyEngaged(
+  engagedInfantry: Record<string, Player>,
+  coord: Coordinate
+): boolean {
+  return !!engagedInfantry[`${coord[0]},${coord[1]}`];
+}
+
+function isInfantry(square?: Square): boolean {
+  return !!square && Units[square.type].canCapture;
+}
+
+function isHQ(square?: Square): boolean {
+  return !!square && square.type === "HQ";
+}
+
+function isCapturableHQ({
+  board,
+  engagedInfantry,
+  lastMovedInfantry,
+  coord,
+  attacker,
+}: {
+  board: GHQState["board"];
+  engagedInfantry: Record<string, Player>;
+  lastMovedInfantry: Coordinate;
+  coord: Coordinate;
+  attacker: Square;
+}): boolean {
+  if (!attacker) {
+    return false;
+  }
+
+  const hqAdjacentCoords = getAdjacentPieces(board, coord);
+  for (const hqAttackerCoord of hqAdjacentCoords) {
+    if (
+      hqAttackerCoord[0] === lastMovedInfantry[0] &&
+      hqAttackerCoord[1] === lastMovedInfantry[1]
+    ) {
+      continue;
+    }
+
+    const hqAttacker = board[hqAttackerCoord[0]][hqAttackerCoord[1]];
+    if (
+      hqAttacker &&
+      hqAttacker.player === attacker.player &&
+      !engagedInfantry[`${hqAttackerCoord[0]},${hqAttackerCoord[1]}`]
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 }
