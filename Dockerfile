@@ -15,7 +15,7 @@ COPY . .
 
 
 # Expose the port the app runs on
-EXPOSE 8080
+EXPOSE 8000
 
 # Command to run the development server
 CMD ["npm", "run", "dev:server"]
