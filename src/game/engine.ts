@@ -293,7 +293,7 @@ export const GHQGame: Game<GHQState> = {
   },
   turn: {
     maxMoves: 3,
-    onBegin: ({ ctx, G , random, ...plugins}) => {
+    onBegin: ({ ctx, G, random, ...plugins }) => {
       const clearedSqures = clearBombardedSquares(G, ctx);
       if (clearedSqures.length > 0) {
         appendHistory(plugins, {
@@ -316,7 +316,7 @@ export const GHQGame: Game<GHQState> = {
     },
   },
   endIf: ({ G }) => {
-    return getGameoverState(G.board);
+    return getGameoverState(G);
   },
   minPlayers: 2,
   maxPlayers: 2,

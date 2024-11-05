@@ -18,8 +18,9 @@ describe.only("gameover", () => {
       [null, null, null, null, null, null, null, null],
       [null, null, null, null, null, null, null, B_HQ],
     ];
-    expect(getGameoverState(board)).toBeUndefined();
+    expect(getGameoverState({ board } as GHQState)).toBeUndefined();
   });
+
   it("is gameover when an hq is missing", () => {
     const board: GHQState["board"] = [
       [null, null, null, null, null, null, null, null],
@@ -31,6 +32,27 @@ describe.only("gameover", () => {
       [null, null, null, null, null, null, null, null],
       [null, null, null, null, null, null, null, B_HQ],
     ];
-    expect(getGameoverState(board)).toEqual({ status: "WIN", winner: "BLUE" });
+    expect(getGameoverState({ board } as GHQState)).toEqual({
+      status: "WIN",
+      winner: "BLUE",
+    });
+  });
+
+  it("red wins when blue runs out of time", () => {
+    const G: GHQState = {
+      redElapsed: 0,
+      blueElapsed: 101,
+      timeControl: 100,
+    } as GHQState;
+    expect(getGameoverState(G)).toEqual({ status: "WIN", winner: "RED" });
+  });
+
+  it("blue wins when red runs out of time", () => {
+    const G: GHQState = {
+      redElapsed: 101,
+      blueElapsed: 0,
+      timeControl: 100,
+    } as GHQState;
+    expect(getGameoverState(G)).toEqual({ status: "WIN", winner: "BLUE" });
   });
 });
