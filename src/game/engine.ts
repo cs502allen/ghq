@@ -217,6 +217,7 @@ const ChangeOrientation: Move<GHQState> = (
 
   piece!.orientation = orientation;
   G.board[on[0]][on[1]] = piece;
+  G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(on);
 
   playMoveSound(); // TODO(tyler): figure out where this should go
 };
