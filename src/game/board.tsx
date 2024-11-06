@@ -19,7 +19,6 @@ import CountdownTimer from "@/game/countdown";
 import { Check, Flag, MoveRight, Percent, Undo, X } from "lucide-react";
 import { colIndexToFile, rowIndexToRank } from "./notation";
 import { calculateElo } from "./elo";
-import GameOverModal from "./GameOverModal";
 import { PlayOnlineButton } from "@/app/live/PlayOnlineButton";
 
 const rows = 8;
@@ -483,7 +482,7 @@ export function GHQBoard({
           <div className="flex flex-col gap-2 p-4 ">
             <div className="text-xl flex gap-1">
               <div className="font-bold">{G.userIds[1]}</div>
-              <div>({G.elos[1]})</div>
+              <div>({G.elos?.[1] ?? 0})</div>
             </div>
             <CountdownTimer
               active={ctx.currentPlayer === "0" && !ctx.gameover}
@@ -556,7 +555,7 @@ export function GHQBoard({
           <div className="flex flex-col gap-2 p-4">
             <div className="text-xl flex gap-1">
               <div className="font-bold">{G.userIds[0]}</div>
-              <div>({G.elos[0]})</div>
+              <div>({G.elos?.[0] ?? 0})</div>
             </div>
             <CountdownTimer
               active={ctx.currentPlayer === "0" && !ctx.gameover}
