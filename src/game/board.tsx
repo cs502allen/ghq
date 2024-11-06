@@ -291,9 +291,9 @@ export function GHQBoard({
                   )}
                 >
                   <img
-                    src={`/${Units[square.type].imagePathPrefix}-${
-                      square.player
-                    }.png`}
+                    src={`/${
+                      Units[square.type].imagePathPrefix
+                    }-${square.player.toLowerCase()}.png`}
                     width="52"
                     height="52"
                     className={classNames("select-none", {
@@ -369,9 +369,9 @@ export function GHQBoard({
                   }}
                 >
                   <img
-                    src={`/${Units[square.type].imagePathPrefix}-${
-                      square.player
-                    }.png`}
+                    src={`/${
+                      Units[square.type].imagePathPrefix
+                    }-${square.player.toLowerCase()}.png`}
                     width="35"
                     height="35"
                     className="select-none"
