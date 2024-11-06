@@ -19,6 +19,8 @@ import CountdownTimer from "@/game/countdown";
 import { Check, Flag, MoveRight, Percent, Undo, X } from "lucide-react";
 import { colIndexToFile, rowIndexToRank } from "./notation";
 import { calculateElo } from "./elo";
+import GameOverModal from "./GameOverModal";
+import { PlayOnlineButton } from "@/app/live/PlayOnlineButton";
 
 const rows = 8;
 const columns = 8;
@@ -523,6 +525,7 @@ export function GHQBoard({
                 )}
               </h2>
               {ctx.gameover.reason && ctx.gameover.reason}
+              <PlayOnlineButton />
             </div>
           ) : (
             <div

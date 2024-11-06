@@ -31,7 +31,8 @@ const server = Server({
   db,
 });
 
-const queue: Set<string> = new Set<string>();
+const QUEUE_STALE_MS = 10_000;
+const queue: Map<string, number> = new Map();
 
 server.router.post("/matchmaking", async (ctx) => {
   const url = new URL(ctx.request.url, `http://${ctx.request.headers.host}`);
@@ -47,18 +48,19 @@ server.router.post("/matchmaking", async (ctx) => {
     return;
   }
 
-  if (!queue.has(userId)) {
+  // If user isn't in the queue, or they are but we haven't heard from them in a while (stale), add them to the queue.
+  const now = Date.now();
+  const queuedUser = queue.get(userId);
+  if (!queuedUser || queuedUser < now - QUEUE_STALE_MS) {
     console.log("Adding user to queue", userId);
-    queue.add(userId);
+    queue.set(userId, now);
     console.log("Users in queue", queue);
   }
-
-  // TODO(tyler): mark users as stale in queue every 5 seconds, have them have to constantly refresh to stay in queue
 
   // TODO(tyler): more complex matchmaking logic
 
   if (queue.size >= 2) {
-    const [player0, player1] = queue.values();
+    const [player0, player1] = queue.keys();
     queue.delete(player0);
     queue.delete(player1);
     console.log("Creating match with players", player0, player1);

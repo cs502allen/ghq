@@ -2,9 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "./Button";
-import MatchmakingModal from "./MatchmakingModal";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { API_URL } from "./config";
+import { PlayOnlineButton } from "./PlayOnlineButton";
 
 interface Game {
   id: string;
@@ -44,7 +44,6 @@ function TextInput({
 
 function App() {
   const router = useRouter();
-  const [isMatchmaking, setIsMatchmaking] = useState(false);
   const [games, setGames] = useState<Game[]>([]);
   const [userId, setUserId] = useState<string>(
     (typeof localStorage !== "undefined" && localStorage.getItem("userId")) ||
@@ -52,63 +51,6 @@ function App() {
   );
 
   // TODO(tyler): add clerk auth
-
-  const checkMatchmaking = useCallback(
-    async (userId: string) => {
-      try {
-        const response = await fetch(
-          `${API_URL}/matchmaking?userId=${userId}`,
-          {
-            method: "POST",
-          }
-        );
-        const data = await response.json();
-        if (data.match) {
-          setIsMatchmaking(false);
-          const playerId = data.match.playerId;
-          localStorage.setItem(
-            `credentials:${data.match.id}:${playerId}`,
-            data.match.credentials
-          );
-          router.push(`/live/${data.match.id}?playerId=${playerId}`);
-        }
-      } catch (error) {
-        console.error("Error polling matchmaking API:", error);
-      }
-    },
-    [router]
-  );
-
-  async function playOnline() {
-    if (!userId) {
-      alert("User ID is required");
-      return;
-    }
-
-    setIsMatchmaking(true);
-  }
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    if (isMatchmaking) {
-      checkMatchmaking(userId);
-      interval = setInterval(() => checkMatchmaking(userId), 2000); // Poll every 2 seconds
-    }
-
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [isMatchmaking, userId, checkMatchmaking]);
-
-  async function cancelMatchmaking() {
-    setIsMatchmaking(false);
-    fetch(`${API_URL}/matchmaking?userId=${userId}`, {
-      method: "DELETE",
-    });
-  }
 
   useEffect(() => {
     fetch(`${API_URL}/matches`)
@@ -137,13 +79,9 @@ function App() {
       <div className="text-4xl font-bold text-emerald-800">GHQ</div>
       <TextInput userId={userId} setUserId={setUserId} />
       <div className="flex gap-2">
-        <Button onClick={playOnline} loadingText="Searching...">
-          🌎 Play online
-        </Button>
+        <PlayOnlineButton />
         <Button onClick={playLocal}>👨‍💻 Play local</Button>
       </div>
-
-      {isMatchmaking && <MatchmakingModal onCancel={cancelMatchmaking} />}
 
       <div className="text-2xl mt-2">Live games</div>
 
