@@ -259,7 +259,7 @@ export function GHQBoard({
               }}
               key={colIndex}
               className={classNames(
-                lastTurnMoves.has(`${rowIndex},${colIndex}`) && "bg-yellow-50",
+                // lastTurnMoves.has(`${rowIndex},${colIndex}`) && "bg-yellow-50",
                 "relative",
                 bombardmentClass,
                 {
@@ -280,6 +280,12 @@ export function GHQBoard({
                 height: "90px",
               }}
             >
+              {lastTurnMoves.has(`${rowIndex},${colIndex}`) ? (
+                <div
+                  className="absolute w-full h-full bg-yellow-300 top-0"
+                  style={{ pointerEvents: "none", opacity: 0.3 }}
+                ></div>
+              ) : null}
               <BoardCoordinateLabels
                 isPrimaryPlayer={isPrimaryPlayer}
                 colIndex={colIndex}
