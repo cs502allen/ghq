@@ -24,12 +24,6 @@ export function movesForActivePiece(
         return [parseInt(x), parseInt(y)];
       });
 
-    const filterBombarded = (c: Coordinate[]) =>
-      c.filter(
-        ([x1, y1]) =>
-          !bombardedCoordinates.some(([x2, y2]) => x1 === x2 && y1 === y2)
-      );
-
     const unitType = Units[piece.type];
 
     if (unitType.canParachute) {
@@ -38,18 +32,21 @@ export function movesForActivePiece(
       if (coordinate[0] === 0 || coordinate[0] === 7) {
         const allowedParachutes: Coordinate[] = [];
         board.forEach((rank, x) => {
-          rank.forEach((file, y) => {
-            if (!file) {
+          rank.forEach((square, y) => {
+            if (
+              !square &&
+              !bombardedCoordinates.some(([x1, y1]) => x === x1 && y === y1)
+            ) {
               allowedParachutes.push([x, y]);
             }
           });
         });
-        return filterBombarded(allowedParachutes);
+        return allowedParachutes;
       } else {
-        return filterBombarded(getMoves(coordinate, unitType.mobility, board));
+        return getMoves(coordinate, unitType.mobility, player, board);
       }
     } else {
-      return filterBombarded(getMoves(coordinate, unitType.mobility, board));
+      return getMoves(coordinate, unitType.mobility, player, board);
     }
   } else {
     return [];
@@ -59,9 +56,24 @@ export function movesForActivePiece(
 function getMoves(
   coordinate: Coordinate,
   mobility: 1 | 2,
+  player: Player,
   board: GHQState["board"]
 ) {
   const allowedMoves: Coordinate[] = [];
+
+  const bombardedCoordinates = Object.entries(bombardedSquares(board))
+    .filter(([coordinate, { BLUE, RED }]) => {
+      if (player === "RED" && BLUE) {
+        return true;
+      }
+      if (player === "BLUE" && RED) {
+        return true;
+      }
+    })
+    .map((i) => {
+      const [x, y] = i[0].split(",");
+      return [parseInt(x), parseInt(y)];
+    });
 
   const directions = [
     [-1, -1],
@@ -74,6 +86,7 @@ function getMoves(
     [1, 1],
   ];
 
+  // @todo right now this isn't written in such a way that would allow 3, 4 or arbitrary mobility.
   for (const [dx, dy] of directions) {
     const newX = coordinate[0] + dx;
     const newY = coordinate[1] + dy;
@@ -82,8 +95,13 @@ function getMoves(
     if (newX >= 0 && newX < 8 && newY >= 0 && newY < 8) {
       const piece = board[newX][newY];
       // must not be occupied by a piece
-      // @todo must not be under bombardment
-      if (!piece) {
+      // must not be under bombardment
+      if (
+        !piece &&
+        !bombardedCoordinates.some(
+          (coordinates) => coordinates[0] === newX && coordinates[1] === newY
+        )
+      ) {
         allowedMoves.push([newX, newY]);
 
         // if mobility is 2 we can keep going this direction
@@ -94,8 +112,14 @@ function getMoves(
           if (newX2 >= 0 && newX2 < 8 && newY2 >= 0 && newY2 < 8) {
             const piece2 = board[newX2][newY2];
             // must not be occupied by a piece
-            // @todo must not be under bombardment
-            if (!piece2) {
+            // must not be under bombardment
+            if (
+              !piece2 &&
+              !bombardedCoordinates.some(
+                (coordinates) =>
+                  coordinates[0] === newX2 && coordinates[1] === newY2
+              )
+            ) {
               allowedMoves.push([newX2, newY2]);
             }
           }
