@@ -313,8 +313,9 @@ export function GHQBoard({
                     height="52"
                     className={classNames("select-none", {
                       ["opacity-50"]:
-                        (isPrimaryPlayer("0") && square.player === "BLUE") ||
-                        (isPrimaryPlayer("1") && square.player === "RED"),
+                        (ctx.currentPlayer === "0" &&
+                          square.player === "BLUE") ||
+                        (ctx.currentPlayer === "1" && square.player === "RED"),
                     })}
                     draggable="false"
                     style={{
