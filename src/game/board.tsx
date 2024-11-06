@@ -595,7 +595,9 @@ function ReserveBank(props: {
         )}
       >
         <img
-          src={`/${Units[kind].imagePathPrefix}-${props.player}.png`}
+          src={`/${
+            Units[kind].imagePathPrefix
+          }-${props.player.toLowerCase()}.png`}
           width="30"
           height="30"
           alt={Units[kind].imagePathPrefix}
