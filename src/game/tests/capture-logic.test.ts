@@ -166,4 +166,17 @@ describe("computing allowed captures", () => {
     ];
     expect(captureCandidates([7, 7], board)).toEqual([]);
   });
+  it("hq isn't capturable by artillery and infantry", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, RART],
+      [null, null, null, null, null, null, RINF, B_HQ],
+    ];
+    expect(captureCandidates([7, 6], board)).toEqual([]);
+  });
 });

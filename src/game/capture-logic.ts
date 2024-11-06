@@ -308,7 +308,8 @@ function isCapturableHQ({
     if (
       hqAttacker &&
       hqAttacker.player === attacker.player &&
-      !engagedInfantry[`${hqAttackerCoord[0]},${hqAttackerCoord[1]}`]
+      isInfantry(hqAttacker) &&
+      !isAlreadyEngaged(engagedInfantry, hqAttackerCoord)
     ) {
       return true;
     }
