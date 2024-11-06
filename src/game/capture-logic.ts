@@ -6,7 +6,7 @@ export function captureCandidates(
   lastMovedInfantry: Coordinate,
   board: GHQState["board"]
 ): Coordinate[] {
-  const engagedPairs = maximizeEngagement(lastMovedInfantry, board);
+  const engagedPairs = maximizeEngagement(board, lastMovedInfantry);
   const attacker = board[lastMovedInfantry[0]][lastMovedInfantry[1]];
 
   if (!attacker) {
@@ -24,20 +24,14 @@ export function captureCandidates(
     engagedInfantry[`${pairs.BLUE[0]},${pairs.BLUE[1]}`] = "BLUE";
   }
 
+  // If moving here could result in more engaged pairs, then we can't capture anything.
+  const potentiallyEngagedPairs = maximizeEngagement(board, null);
+  if (potentiallyEngagedPairs.length > engagedPairs.length) {
+    return [];
+  }
+
   // Find the adjacent pieces to the last moved infantry
   const attackerAdjacentPieces = getAdjacentPieces(board, lastMovedInfantry);
-
-  // Find out if the opponent has any unengaged infantry near us, if so we need to engage with it
-  for (const coord of attackerAdjacentPieces) {
-    const piece = board[coord[0]][coord[1]];
-    if (
-      isEnemyPiece({ piece, attacker }) &&
-      isInfantry(piece) &&
-      !isAlreadyEngaged(engagedInfantry, coord)
-    ) {
-      return [];
-    }
-  }
 
   // Find capturable pieces
   const attackablePieces = attackerAdjacentPieces.filter((coord) => {
@@ -102,8 +96,8 @@ function getAdjacentPieces(
 }
 
 function maximizeEngagement(
-  excludeCoordinate: Coordinate,
-  board: GHQState["board"]
+  board: GHQState["board"],
+  excludeCoordinate: Coordinate | null
 ): Record<Player, Coordinate>[] {
   const N = 8; // Size of the board
 
@@ -122,7 +116,11 @@ function maximizeEngagement(
   for (let i = 0; i < N; i++) {
     for (let j = 0; j < N; j++) {
       // Skip the last moved piece, we want to calculate engagement as if they weren't there
-      if (excludeCoordinate[0] === i && excludeCoordinate[1] === j) {
+      if (
+        excludeCoordinate &&
+        excludeCoordinate[0] === i &&
+        excludeCoordinate[1] === j
+      ) {
         continue;
       }
 
@@ -170,7 +168,11 @@ function maximizeEngagement(
         y1 < N &&
         board[x1]?.[y1]?.player === "BLUE"
       ) {
-        if (excludeCoordinate[0] === x1 && excludeCoordinate[1] === y1) {
+        if (
+          excludeCoordinate &&
+          excludeCoordinate[0] === x1 &&
+          excludeCoordinate[1] === y1
+        ) {
           continue;
         }
         const idx1 = piece1Index[`${x1},${y1}`];
