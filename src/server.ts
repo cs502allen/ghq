@@ -1,6 +1,6 @@
 require("dotenv").config();
 import { Server, Origins, FlatFile } from "boardgame.io/server";
-import { GHQState, newOnlineGHQGame } from "./game/engine";
+import { GameoverState, GHQState, newOnlineGHQGame } from "./game/engine";
 import { StorageAPI } from "boardgame.io";
 import Koa from "koa";
 import { createMatch } from "boardgame.io/src/server/util";
@@ -8,6 +8,7 @@ import { Game as SrcGame } from "boardgame.io/src/types"; // TODO(tyler): tech d
 import { nanoid } from "nanoid";
 import { createClient } from "@supabase/supabase-js";
 import { PostgresStore } from "bgio-postgres";
+import { calculateElo } from "./game/elo";
 
 const supabase = createClient(
   "https://wjucmtrnmjcaatbtktxo.supabase.co",
@@ -39,8 +40,6 @@ server.router.post("/matchmaking", async (ctx) => {
     throw new Error("userId is required");
   }
 
-  // TODO(tyler): create `users` table row with 1000 elo if it doesn't exist
-
   // If user is already in a match, return the match id
   const activeMatch = await getActiveMatch(userId);
   if (activeMatch) {
@@ -64,6 +63,9 @@ server.router.post("/matchmaking", async (ctx) => {
     queue.delete(player1);
     console.log("Creating match with players", player0, player1);
 
+    const user0 = await getOrCreateUser(player0);
+    const user1 = await getOrCreateUser(player1);
+
     const newMatch = await createNewMatch({
       ctx,
       db: server.db,
@@ -75,6 +77,10 @@ server.router.post("/matchmaking", async (ctx) => {
           "0": player0,
           "1": player1,
         },
+        elos: {
+          "0": user0.elo,
+          "1": user1.elo,
+        },
       },
       unlisted: false,
       game: ghqGame as SrcGame,
@@ -83,11 +89,10 @@ server.router.post("/matchmaking", async (ctx) => {
       return;
     }
     const { matchId, player0Creds, player1Creds } = newMatch;
-    // TODO(tyler): create `matches` table row
     await createActiveMatches({
       matchId,
-      player0,
-      player1,
+      user0,
+      user1,
       player0Creds,
       player1Creds,
     });
@@ -183,32 +188,43 @@ const createNewMatch = async ({
 
 async function createActiveMatches({
   matchId,
-  player0,
-  player1,
+  user0,
+  user1,
   player0Creds,
   player1Creds,
 }: {
   matchId: string;
-  player0: string;
-  player1: string;
+  user0: User;
+  user1: User;
   player0Creds: string;
   player1Creds: string;
 }): Promise<void> {
   const { error } = await supabase.from("active_user_matches").insert([
     {
-      user_id: player0,
+      user_id: user0.id,
       match_id: matchId,
       player_id: "0",
       credentials: player0Creds,
     },
     {
-      user_id: player1,
+      user_id: user1.id,
       match_id: matchId,
       player_id: "1",
       credentials: player1Creds,
     },
   ]);
   if (error) throw error;
+
+  const { error: matchError } = await supabase.from("matches").insert([
+    {
+      id: matchId,
+      player0_id: user0.id,
+      player1_id: user1.id,
+      player0_elo: user0.elo,
+      player1_elo: user1.elo,
+    },
+  ]);
+  if (matchError) throw matchError;
 }
 
 interface ActiveMatch {
@@ -251,6 +267,98 @@ function onGameEnd({ ctx, G }: { ctx: any; G: GHQState }): void | GHQState {
       });
   }
 
-  // TODO(tyler): update `matches` table with game result
-  // TODO(tyler): update `users` table with elo changes
+  const { status, winner } = ctx.gameover as GameoverState;
+  const player0Id = G.userIds["0"];
+  const player1Id = G.userIds["1"];
+  const winnerId = winner === "RED" ? player0Id : player1Id;
+
+  // Update match with winner and status
+  supabase
+    .from("matches")
+    .update({ winner_id: winnerId, status })
+    .eq("id", matchId)
+    .then(({ error }) => {
+      if (error) {
+        console.log({
+          message: "Error updating matches table",
+          matchId,
+          winnerId,
+          status,
+          error,
+        });
+      }
+    });
+
+  // Update user elos
+
+  const player0Elo = calculateElo(
+    G.elos["0"],
+    G.elos["1"],
+    status === "DRAW" ? 0.5 : winner === "RED" ? 1 : 0
+  );
+
+  supabase
+    .from("users")
+    .update({ elo: player0Elo })
+    .eq("id", player0Id)
+    .then(({ error }) => {
+      if (error) {
+        console.log({
+          message: "Error updating winner's elo",
+          winnerId,
+          error,
+        });
+      }
+    });
+
+  const player1Elo = calculateElo(
+    G.elos["1"],
+    G.elos["0"],
+    status === "DRAW" ? 0.5 : winner === "BLUE" ? 1 : 0
+  );
+
+  supabase
+    .from("users")
+    .update({ elo: player1Elo })
+    .eq("id", player1Id)
+    .then(({ error }) => {
+      if (error) {
+        console.log({
+          message: "Error updating loser's elo",
+          player1Id,
+          error,
+        });
+      }
+    });
+}
+
+interface User {
+  id: string;
+  elo: number;
+}
+
+async function getOrCreateUser(userId: string): Promise<User> {
+  const { data: user, error: userError } = await supabase
+    .from("users")
+    .select("id, elo")
+    .eq("id", userId)
+    .single();
+
+  if (user) {
+    return user;
+  }
+
+  if (userError && userError.code === "PGRST116") {
+    const newUser = { id: userId, elo: 1000 };
+    const { error: insertError } = await supabase
+      .from("users")
+      .insert([newUser]);
+
+    if (insertError) throw insertError;
+    return newUser;
+  } else if (userError) {
+    throw userError;
+  }
+
+  throw new Error("Unexpected error");
 }

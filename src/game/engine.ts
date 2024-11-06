@@ -85,6 +85,10 @@ export interface GHQState {
     "0": string;
     "1": string;
   };
+  elos: {
+    "0": number;
+    "1": number;
+  };
   board: [
     [Square, Square, Square, Square, Square, Square, Square, Square],
     [Square, Square, Square, Square, Square, Square, Square, Square],
@@ -353,6 +357,10 @@ export const GHQGame: Game<GHQState> = {
       userIds: {
         "0": setupData?.players?.["0"] || "Player 1",
         "1": setupData?.players?.["1"] || "Player 2",
+      },
+      elos: {
+        "0": setupData?.elos?.["0"] || 1000,
+        "1": setupData?.elos?.["1"] || 1000,
       },
       matchId: setupData?.matchId || "",
       lastTurnMoves: {
