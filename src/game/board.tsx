@@ -485,7 +485,7 @@ export function GHQBoard({
               <div>({G.elos?.[1] ?? 0})</div>
             </div>
             <CountdownTimer
-              active={ctx.currentPlayer === "0" && !ctx.gameover}
+              active={ctx.currentPlayer === "1" && !ctx.gameover}
               player="BLUE"
               elapsed={G.blueElapsed}
               startDate={G.turnStartTime}
