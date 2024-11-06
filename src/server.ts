@@ -26,7 +26,7 @@ const db = new PostgresStore({
 
 const server = Server({
   games: [ghqGame],
-  origins: [Origins.LOCALHOST],
+  origins: [Origins.LOCALHOST, "https://playghq.com"],
   db,
 });
 
