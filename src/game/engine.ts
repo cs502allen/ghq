@@ -282,7 +282,7 @@ export const GHQGame: Game<GHQState> = {
       turnStartTime: Date.now(),
       blueElapsed: 0,
       redElapsed: 0,
-      bonusTime: 2,
+      bonusTime: 5 * 1000,
       timeControl: 10 * 60 * 1000,
       board: [
         [
@@ -378,9 +378,9 @@ export const GHQGame: Game<GHQState> = {
     onEnd: ({ ctx, G }) => {
       const elapsed = Date.now() - G.turnStartTime;
       if (ctx.currentPlayer === "0") {
-        G.redElapsed = G.redElapsed + elapsed;
+        G.redElapsed = G.redElapsed + elapsed - G.bonusTime;
       } else {
-        G.blueElapsed = G.blueElapsed + elapsed;
+        G.blueElapsed = G.blueElapsed + elapsed - G.bonusTime;
       }
     },
   },
