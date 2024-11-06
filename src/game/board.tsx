@@ -410,7 +410,7 @@ export function GHQBoard({
                     src={`/${
                       Units[state.context.selectedPiece.piece.type]
                         .imagePathPrefix
-                    }-${state.context.player}.png`}
+                    }-${state.context.player.toLowerCase()}.png`}
                     width="35"
                     height="35"
                     className="select-none"
