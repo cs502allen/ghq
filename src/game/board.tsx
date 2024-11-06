@@ -188,6 +188,13 @@ export function GHQBoard({
     return annotate;
   }, [state.context]);
 
+  const lastTurnMoves = new Set<string>();
+  for (const [key, value] of Object.entries(G.lastTurnMoves ?? {})) {
+    for (const move of value) {
+      lastTurnMoves.add(`${move[0]},${move[1]}`);
+    }
+  }
+
   const cells = Array.from({ length: rows }).map((_, rowIndex) => {
     const colN = Array.from({ length: columns }, (_, index) => index);
     const cols = isPrimaryPlayer("0") ? colN : colN.reverse();
@@ -252,6 +259,7 @@ export function GHQBoard({
               }}
               key={colIndex}
               className={classNames(
+                lastTurnMoves.has(`${rowIndex},${colIndex}`) && "bg-yellow-50",
                 "relative",
                 bombardmentClass,
                 {

@@ -106,6 +106,11 @@ export interface GHQState {
   // draw state
   drawOfferedBy?: string;
   drawAcceptedBy?: string;
+  // displaying moves from most recent turn
+  lastTurnMoves: {
+    "0": Coordinate[];
+    "1": Coordinate[];
+  };
 }
 
 export interface GameoverState {
@@ -146,6 +151,8 @@ const Reinforce: Move<GHQState> = (
   };
   G.board[to[0]][to[1]] = s;
 
+  G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
+
   playMoveSound(); // TODO(tyler): figure out where this should go
 };
 const Move: Move<GHQState> = (
@@ -161,6 +168,8 @@ const Move: Move<GHQState> = (
 
   G.board[from[0]][from[1]] = null;
   G.board[to[0]][to[1]] = piece;
+
+  G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
 
   // TODO(tyler): ensure we're authorized to capture this piece
 
@@ -192,6 +201,7 @@ const MoveAndOrient: Move<GHQState> = (
   piece!.orientation = orientation;
   G.board[from[0]][from[1]] = null;
   G.board[to[0]][to[1]] = piece;
+  G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
 
   playMoveSound(); // TODO(tyler): figure out where this should go
 };
@@ -341,6 +351,10 @@ export const GHQGame: Game<GHQState> = {
         "1": setupData?.players?.["1"] || "Player 2",
       },
       matchId: setupData?.matchId || "",
+      lastTurnMoves: {
+        "0": [],
+        "1": [],
+      },
     };
   },
   turn: {
@@ -358,6 +372,8 @@ export const GHQGame: Game<GHQState> = {
         });
       }
       G.turnStartTime = Date.now();
+
+      G.lastTurnMoves[ctx.currentPlayer as "0" | "1"] = [];
     },
     onEnd: ({ ctx, G }) => {
       const elapsed = Date.now() - G.turnStartTime;

@@ -12,6 +12,7 @@ const GameClient = Client({
   game: newOnlineGHQGame({}),
   board: GHQBoard,
   multiplayer: SocketIO({ server: API_URL }),
+  debug: false,
 });
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
