@@ -55,7 +55,8 @@ const CountdownTimer = ({
     <div className="text-center flex justify-center items-center pb-10">
       <div
         className={classNames(
-          "bg-black rounded-xl px-4 text-2xl font-mono",
+          active ? "bg-gray-900" : "bg-gray-500",
+          "rounded-xl px-4 text-2xl font-mono",
           player === "BLUE" ? "text-blue-300" : "text-red-300"
         )}
       >
