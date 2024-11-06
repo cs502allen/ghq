@@ -17,6 +17,7 @@ import { SelectOrientation } from "@/game/select-orientation";
 import { HistoryState } from "@/game/move-history-plugin";
 import CountdownTimer from "@/game/countdown";
 import { Check, Flag, MoveRight, Percent, Undo, X } from "lucide-react";
+import { colIndexToFile, rowIndexToRank } from "./notation";
 
 const rows = 8;
 const columns = 8;
@@ -635,17 +636,17 @@ function BoardCoordinateLabels({
 }) {
   return (
     <>
-      <div className="absolute top-0 left-1 text-xs font-bold text-gray-400">
-        {isPrimaryPlayer("0") && colIndex === 0 && rowIndex}
+      <div className="absolute top-0 left-1 text-sm font-bold text-gray-400">
+        {isPrimaryPlayer("0") && colIndex === 0 && rowIndexToRank(rowIndex)}
       </div>
-      <div className="absolute top-0 left-1 text-xs font-bold text-gray-400">
-        {isPrimaryPlayer("0") && rowIndex === 0 && colIndex}
+      <div className="absolute bottom-0 left-1 text-sm font-bold text-gray-400">
+        {isPrimaryPlayer("0") && rowIndex === 7 && colIndexToFile(colIndex)}
       </div>
-      <div className="absolute bottom-0 right-1 text-xs font-bold text-gray-400">
-        {isPrimaryPlayer("1") && colIndex === 0 && rowIndex}
+      <div className="absolute top-0 left-1 text-sm font-bold text-gray-400">
+        {isPrimaryPlayer("1") && colIndex === 7 && rowIndexToRank(rowIndex)}
       </div>
-      <div className="absolute bottom-0 right-1 text-xs font-bold text-gray-400">
-        {isPrimaryPlayer("1") && rowIndex === 0 && colIndex}
+      <div className="absolute bottom-0 left-1 text-sm font-bold text-gray-400">
+        {isPrimaryPlayer("1") && rowIndex === 0 && colIndexToFile(colIndex)}
       </div>
     </>
   );

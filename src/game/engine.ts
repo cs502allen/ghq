@@ -7,6 +7,7 @@ import { clearBombardedSquares } from "@/game/capture-logic";
 import { Blue, Red } from "@/game/tests/test-boards";
 import { appendHistory, HistoryPlugin } from "./move-history-plugin";
 import { getGameoverState } from "./gameover-logic";
+import { coordinateToAlgebraic } from "./notation";
 
 export const Units: {
   [key: string]: {
@@ -176,7 +177,9 @@ const Move: Move<GHQState> = (
   if (capturePreference) {
     G.board[capturePreference[0]][capturePreference[1]] = null;
     appendHistory(plugins, {
-      message: `Move ${ctx.turn}: Captured piece at (${capturePreference[0]},${capturePreference[1]})`,
+      message: `Move ${ctx.turn}: ${
+        piece?.player?.toLowerCase() ?? "Player"
+      } captured piece at ${coordinateToAlgebraic(capturePreference)}`,
     });
     playCaptureSound(); // TODO(tyler): figure out where this should go
   } else {
@@ -368,7 +371,7 @@ export const GHQGame: Game<GHQState> = {
           message: `Move ${
             ctx.turn
           }: Artillery destroyed pieces at ${clearedSqures
-            .map(([x, y]) => `(${x},${y})`)
+            .map((coord) => coordinateToAlgebraic(coord))
             .join(", ")}`,
         });
       }
