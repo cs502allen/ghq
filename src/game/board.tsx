@@ -189,7 +189,7 @@ export function GHQBoard({
     }
 
     return annotate;
-  }, [state.context]);
+  }, [state.context, G.board]);
 
   const lastTurnMoves = new Set<string>();
   for (const [key, value] of Object.entries(G.lastTurnMoves ?? {})) {
