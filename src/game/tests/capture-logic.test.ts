@@ -179,4 +179,17 @@ describe("computing allowed captures", () => {
     ];
     expect(captureCandidates([7, 6], board)).toEqual([]);
   });
+  it("capture scenario from issue #58 should be supported", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [RINF, BAIR, null, null, null, null, null, null],
+      [null, RINF, BARM, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+    ];
+    expect(captureCandidates([1, 0], board)).toEqual([]);
+  });
 });
