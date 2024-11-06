@@ -457,7 +457,7 @@ export function GHQBoard({
         <div
           className={classNames(
             "col-span-2 h-full pt-10 flex flex-col justify-between",
-            isPrimaryPlayer("0") ? "bg-red-50" : "bg-blue-50",
+            ctx.currentPlayer === "0" ? "bg-red-50" : "bg-blue-50",
             { ["flex-col-reverse"]: isPrimaryPlayer("1") }
           )}
         >
