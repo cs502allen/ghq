@@ -351,7 +351,7 @@ export function GHQBoard({
                     src={`/${
                       Units[annotationsForSquare?.showProxyPiece.type]
                         .imagePathPrefix
-                    }-${annotationsForSquare?.showProxyPiece.player}.png`}
+                    }-${annotationsForSquare?.showProxyPiece.player.toLowerCase()}.png`}
                     width="35"
                     height="35"
                     className="select-none"
