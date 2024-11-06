@@ -9,10 +9,6 @@ import { API_URL } from "./config";
 export function PlayOnlineButton() {
   const router = useRouter();
   const [isMatchmaking, setIsMatchmaking] = useState(false);
-  const [userId] = useState<string>(
-    (typeof localStorage !== "undefined" && localStorage.getItem("userId")) ||
-      ""
-  );
 
   const checkMatchmaking = useCallback(
     async (userId: string) => {
@@ -25,13 +21,13 @@ export function PlayOnlineButton() {
         );
         const data = await response.json();
         if (data.match) {
-          setIsMatchmaking(false);
           const playerId = data.match.playerId;
           localStorage.setItem(
             `credentials:${data.match.id}:${playerId}`,
             data.match.credentials
           );
           router.push(`/live/${data.match.id}?playerId=${playerId}`);
+          setIsMatchmaking(false);
         }
       } catch (error) {
         console.error("Error polling matchmaking API:", error);
@@ -41,6 +37,7 @@ export function PlayOnlineButton() {
   );
 
   async function playOnline() {
+    const userId = localStorage.getItem("userId");
     if (!userId) {
       alert("User ID is required");
       return;
@@ -50,6 +47,11 @@ export function PlayOnlineButton() {
   }
 
   useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      return;
+    }
+
     let interval: NodeJS.Timeout;
 
     if (isMatchmaking) {
@@ -62,18 +64,19 @@ export function PlayOnlineButton() {
         clearInterval(interval);
       }
     };
-  }, [isMatchmaking, userId, checkMatchmaking]);
+  }, [isMatchmaking, checkMatchmaking]);
 
   async function cancelMatchmaking() {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      return;
+    }
+
     setIsMatchmaking(false);
     fetch(`${API_URL}/matchmaking?userId=${userId}`, {
       method: "DELETE",
     });
   }
-
-  useEffect(() => {
-    localStorage.setItem("userId", userId);
-  }, [userId]);
 
   return (
     <>
