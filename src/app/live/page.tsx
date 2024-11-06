@@ -46,7 +46,10 @@ function App() {
   const router = useRouter();
   const [isMatchmaking, setIsMatchmaking] = useState(false);
   const [games, setGames] = useState<Game[]>([]);
-  const [userId, setUserId] = useState<string>("");
+  const [userId, setUserId] = useState<string>(
+    (typeof localStorage !== "undefined" && localStorage.getItem("userId")) ||
+      ""
+  );
 
   // TODO(tyler): add clerk auth
 
@@ -120,6 +123,10 @@ function App() {
         setGames(games);
       });
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("userId", userId);
+  }, [userId]);
 
   async function playLocal() {
     router.push("/");
