@@ -155,7 +155,7 @@ const Reinforce: Move<GHQState> = (
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
 };
 const Move: Move<GHQState> = (
-  { G, ctx, ...plugins },
+  { G, ctx, log, ...plugins },
   from: Coordinate,
   to: Coordinate,
   capturePreference?: Coordinate
@@ -174,17 +174,14 @@ const Move: Move<GHQState> = (
 
   if (capturePreference) {
     G.board[capturePreference[0]][capturePreference[1]] = null;
-    appendHistory(plugins, {
-      message: `Move ${ctx.turn}: ${
-        piece?.player?.toLowerCase() ?? "Player"
-      } captured piece at ${coordinateToAlgebraic(capturePreference)}`,
-    });
     G.lastTurnCaptures[ctx.currentPlayer as "0" | "1"].push(capturePreference);
   }
+
+  log.setMetadata({ pieceType: piece?.type, capturePreference });
 };
 
 const MoveAndOrient: Move<GHQState> = (
-  { G, ctx },
+  { G, ctx, log },
   from: Coordinate,
   to: Coordinate,
   orientation?: Orientation
@@ -201,9 +198,10 @@ const MoveAndOrient: Move<GHQState> = (
   G.board[from[0]][from[1]] = null;
   G.board[to[0]][to[1]] = piece;
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
+  log.setMetadata({ pieceType: piece?.type });
 };
 const ChangeOrientation: Move<GHQState> = (
-  { G, ctx },
+  { G, ctx, log },
   on: Coordinate,
   orientation: Orientation
 ) => {
@@ -215,6 +213,7 @@ const ChangeOrientation: Move<GHQState> = (
   piece!.orientation = orientation;
   G.board[on[0]][on[1]] = piece;
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(on);
+  log.setMetadata({ pieceType: piece?.type });
 };
 
 const Skip: Move<GHQState> = ({ G, ctx, events }) => {
@@ -372,10 +371,14 @@ export const GHQGame: Game<GHQState> = {
         G.lastTurnCaptures[ctx.currentPlayer as "0" | "1"].push(
           ...clearedSqures
         );
+
+        const player = ctx.currentPlayer === "0" ? "Red" : "Blue";
         appendHistory(plugins, {
-          message: `Move ${
-            ctx.turn
-          }: Artillery destroyed pieces at ${clearedSqures
+          isCapture: true,
+          turn: ctx.turn,
+          message: `[${ctx.turn}]: ${player} artillery destroyed piece${
+            clearedSqures.length > 1 ? "s" : ""
+          } at ${clearedSqures
             .map((coord) => coordinateToAlgebraic(coord))
             .join(", ")}`,
         });

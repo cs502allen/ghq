@@ -58,6 +58,7 @@ server.router.post("/matchmaking", async (ctx) => {
   }
 
   // TODO(tyler): more complex matchmaking logic
+  // TODO(tyler): clean up stale live games
 
   if (queue.size >= 2) {
     const [player0, player1] = queue.keys();

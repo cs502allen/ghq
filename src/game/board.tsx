@@ -14,12 +14,12 @@ import classNames from "classnames";
 import { useHotkeys } from "react-hotkeys-hook";
 import { bombardedSquares } from "@/game/move-logic";
 import { SelectOrientation } from "@/game/select-orientation";
-import { HistoryState } from "@/game/move-history-plugin";
 import CountdownTimer from "@/game/countdown";
-import { Check, Flag, MoveRight, Percent, Undo, X } from "lucide-react";
+import { Check, Flag, MoveRight, Percent, Undo } from "lucide-react";
 import { colIndexToFile, rowIndexToRank } from "./notation";
 import { PlayOnlineButton } from "@/app/live/PlayOnlineButton";
 import { SoundPlayer } from "./SoundPlayer";
+import { HistoryLog } from "./HistoryLog";
 
 const rows = 8;
 const columns = 8;
@@ -44,6 +44,7 @@ export function GHQBoard({
   undo,
   redo,
   plugins,
+  log,
 }: BoardProps<GHQState>) {
   const divRef = useRef(null); // Create a ref
 
@@ -580,7 +581,7 @@ export function GHQBoard({
           </div>
         </div>
 
-        <HistoryLog historyState={plugins.history.data} />
+        <HistoryLog systemMessages={plugins.history.data} log={log} />
       </div>
     </div>
   );
@@ -659,19 +660,6 @@ function BoardCoordinateLabels({
         {isPrimaryPlayer("1") && rowIndex === 0 && colIndexToFile(colIndex)}
       </div>
     </>
-  );
-}
-
-function HistoryLog({ historyState }: { historyState: HistoryState }) {
-  return (
-    <div className="flex flex-col gap-1 p-4 min-h-32">
-      <div className="text-xl font-bold">Activity</div>
-      <div className="max-h-32 overflow-y-auto border p-1">
-        {historyState.log.map((log) => (
-          <div key={log.message}>{log.message}</div>
-        ))}
-      </div>
-    </div>
   );
 }
 
