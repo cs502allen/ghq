@@ -72,8 +72,7 @@ export function HistoryLog({
   }, [playerMessages]);
 
   return (
-    <div className="flex flex-col gap-1 p-4 min-h-32">
-      <div className="text-xl font-bold">Activity</div>
+    <div className="flex flex-col gap-1 p-2 min-h-32">
       <div
         id="history-log-list"
         className="max-h-32 overflow-y-auto border p-1"
