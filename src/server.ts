@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 import { Server, Origins, FlatFile } from "boardgame.io/server";
 import { GameoverState, GHQState, newOnlineGHQGame } from "./game/engine";
 import { StorageAPI } from "boardgame.io";
@@ -9,6 +10,8 @@ import { nanoid } from "nanoid";
 import { createClient } from "@supabase/supabase-js";
 import { PostgresStore } from "bgio-postgres";
 import { calculateElo } from "./game/elo";
+import cors from "@koa/cors";
+import { authMiddleware } from "./server/auth";
 
 const supabase = createClient(
   "https://wjucmtrnmjcaatbtktxo.supabase.co",
@@ -31,12 +34,14 @@ const server = Server({
   db,
 });
 
+server.app.use(cors({ credentials: true }));
+server.app.use(authMiddleware);
+
 const QUEUE_STALE_MS = 10_000;
 const queue: Map<string, number> = new Map();
 
 server.router.post("/matchmaking", async (ctx) => {
-  const url = new URL(ctx.request.url, `http://${ctx.request.headers.host}`);
-  const userId = url.searchParams.get("userId"); // TODO(tyler): get this from auth later
+  const userId = ctx.state.auth.userId;
   if (!userId) {
     throw new Error("userId is required");
   }
@@ -108,8 +113,7 @@ server.router.post("/matchmaking", async (ctx) => {
 });
 
 server.router.delete("/matchmaking", (ctx) => {
-  const url = new URL(ctx.request.url, `http://${ctx.request.headers.host}`);
-  const userId = url.searchParams.get("userId"); // TODO(tyler): get this from auth later
+  const userId = ctx.state.auth.userId;
   if (!userId) {
     throw new Error("userId is required");
   }
