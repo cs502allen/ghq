@@ -1,10 +1,8 @@
-import type { Ctx, FnContext, Game, Move, State } from "boardgame.io";
+import type { FnContext, Game, Move } from "boardgame.io";
 import { INVALID_MOVE } from "boardgame.io/core";
 
 import { isAuthorizedToMovePiece } from "./move-logic";
-import { playCaptureSound, playMoveSound } from "./audio";
 import { clearBombardedSquares } from "@/game/capture-logic";
-import { Blue, Red } from "@/game/tests/test-boards";
 import { appendHistory, HistoryPlugin } from "./move-history-plugin";
 import { getGameoverState } from "./gameover-logic";
 import { coordinateToAlgebraic } from "./notation";
@@ -112,10 +110,8 @@ export interface GHQState {
   drawOfferedBy?: string;
   drawAcceptedBy?: string;
   // displaying moves from most recent turn
-  lastTurnMoves: {
-    "0": Coordinate[];
-    "1": Coordinate[];
-  };
+  lastTurnMoves: Record<"0" | "1", Coordinate[]>;
+  lastTurnCaptures: Record<"0" | "1", Coordinate[]>;
 }
 
 export interface GameoverState {
@@ -157,8 +153,6 @@ const Reinforce: Move<GHQState> = (
   G.board[to[0]][to[1]] = s;
 
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
-
-  playMoveSound(); // TODO(tyler): figure out where this should go
 };
 const Move: Move<GHQState> = (
   { G, ctx, ...plugins },
@@ -185,9 +179,7 @@ const Move: Move<GHQState> = (
         piece?.player?.toLowerCase() ?? "Player"
       } captured piece at ${coordinateToAlgebraic(capturePreference)}`,
     });
-    playCaptureSound(); // TODO(tyler): figure out where this should go
-  } else {
-    playMoveSound(); // TODO(tyler): figure out where this should go
+    G.lastTurnCaptures[ctx.currentPlayer as "0" | "1"].push(capturePreference);
   }
 };
 
@@ -209,8 +201,6 @@ const MoveAndOrient: Move<GHQState> = (
   G.board[from[0]][from[1]] = null;
   G.board[to[0]][to[1]] = piece;
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
-
-  playMoveSound(); // TODO(tyler): figure out where this should go
 };
 const ChangeOrientation: Move<GHQState> = (
   { G, ctx },
@@ -225,8 +215,6 @@ const ChangeOrientation: Move<GHQState> = (
   piece!.orientation = orientation;
   G.board[on[0]][on[1]] = piece;
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(on);
-
-  playMoveSound(); // TODO(tyler): figure out where this should go
 };
 
 const Skip: Move<GHQState> = ({ G, ctx, events }) => {
@@ -367,14 +355,23 @@ export const GHQGame: Game<GHQState> = {
         "0": [],
         "1": [],
       },
+      lastTurnCaptures: {
+        "0": [],
+        "1": [],
+      },
     };
   },
   turn: {
     maxMoves: 3,
     onBegin: ({ ctx, G, random, ...plugins }) => {
+      G.lastTurnMoves[ctx.currentPlayer as "0" | "1"] = [];
+      G.lastTurnCaptures[ctx.currentPlayer as "0" | "1"] = [];
+
       const clearedSqures = clearBombardedSquares(G, ctx);
       if (clearedSqures.length > 0) {
-        playCaptureSound(); // TODO(tyler): figure out where this should go
+        G.lastTurnCaptures[ctx.currentPlayer as "0" | "1"].push(
+          ...clearedSqures
+        );
         appendHistory(plugins, {
           message: `Move ${
             ctx.turn
@@ -384,8 +381,6 @@ export const GHQGame: Game<GHQState> = {
         });
       }
       G.turnStartTime = Date.now();
-
-      G.lastTurnMoves[ctx.currentPlayer as "0" | "1"] = [];
     },
     onEnd: ({ ctx, G }) => {
       const elapsed = Date.now() - G.turnStartTime;

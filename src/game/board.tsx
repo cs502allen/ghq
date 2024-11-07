@@ -18,8 +18,8 @@ import { HistoryState } from "@/game/move-history-plugin";
 import CountdownTimer from "@/game/countdown";
 import { Check, Flag, MoveRight, Percent, Undo, X } from "lucide-react";
 import { colIndexToFile, rowIndexToRank } from "./notation";
-import { calculateElo } from "./elo";
 import { PlayOnlineButton } from "@/app/live/PlayOnlineButton";
+import { SoundPlayer } from "./SoundPlayer";
 
 const rows = 8;
 const columns = 8;
@@ -262,7 +262,6 @@ export function GHQBoard({
               }}
               key={colIndex}
               className={classNames(
-                // lastTurnMoves.has(`${rowIndex},${colIndex}`) && "bg-yellow-50",
                 "relative",
                 bombardmentClass,
                 {
@@ -459,6 +458,7 @@ export function GHQBoard({
 
   return (
     <div className="grid bg-gray-100 absolute w-full h-full grid-cols-7">
+      <SoundPlayer ctx={ctx} G={G} />
       <div className="col-span-5 border-r-2 border-gray-100 flex items-center justify-center">
         <table ref={divRef} style={{ borderCollapse: "collapse" }}>
           {/*flip board*/}
