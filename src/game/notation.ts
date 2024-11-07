@@ -19,3 +19,14 @@ export function coordinateToAlgebraic([x, y]: [number, number]): string {
 
   return `${file}${rank}`;
 }
+
+export function degreesToCardinal(degrees: number): string {
+  if (degrees < 0 || degrees >= 360) {
+    throw new Error("Degrees out of bounds");
+  }
+
+  const cardinals = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+  const index = Math.round(degrees / 45) % 8;
+
+  return cardinals[index];
+}

@@ -7,6 +7,8 @@ export interface HistoryState {
 
 export interface HistoryItem {
   message: string;
+  turn: number;
+  isCapture: boolean;
 }
 
 export const HistoryPlugin: Plugin = {
