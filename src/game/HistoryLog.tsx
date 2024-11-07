@@ -51,9 +51,7 @@ export function HistoryLog({
           orientation
         )}`;
       } else if (type === "Skip") {
-        description = "skipped";
-      } else {
-        console.log(type, args);
+        description = "skipped the remainder of their turn";
       }
       return {
         turn: entry.turn,

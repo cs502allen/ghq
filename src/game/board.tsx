@@ -48,8 +48,6 @@ export function GHQBoard({
 }: BoardProps<GHQState>) {
   const divRef = useRef(null); // Create a ref
 
-  console.log(log);
-
   const isPrimaryPlayer = useCallback(
     (playerId: string) => {
       // If playerID is null, it means we're in spectator mode.
