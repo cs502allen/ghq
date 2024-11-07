@@ -110,6 +110,13 @@ export function GHQBoard({
     });
   }, [isPrimaryPlayer]);
 
+  const [rightClicked, setRightClicked] = React.useState<Set<string>>(
+    new Set()
+  );
+  useEffect(() => {
+    setRightClicked(new Set());
+  }, [G.board]);
+
   const selectReserve = useCallback(
     (kind: keyof ReserveFleet) => {
       send({
@@ -261,6 +268,19 @@ export function GHQBoard({
                   });
                 }
               }}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                setRightClicked((prev) => {
+                  const newSet = new Set(prev);
+                  const key = `${rowIndex},${colIndex}`;
+                  if (newSet.has(key)) {
+                    newSet.delete(key);
+                  } else {
+                    newSet.add(key);
+                  }
+                  return newSet;
+                });
+              }}
               key={colIndex}
               className={classNames(
                 "relative",
@@ -271,6 +291,11 @@ export function GHQBoard({
                     square?.player === (isPrimaryPlayer("0") ? "RED" : "BLUE"),
                 },
                 { ["bg-red-900"]: showTarget },
+                {
+                  ["bg-green-600/40"]: rightClicked.has(
+                    `${rowIndex},${colIndex}`
+                  ),
+                },
                 (rowIndex + colIndex) % 2 === 0 ? "bg-gray-300" : "bg-gray-200"
               )}
               style={{
