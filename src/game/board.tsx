@@ -100,8 +100,22 @@ export function GHQBoard({
   );
 
   useHotkeys("escape", () => send({ type: "DESELECT" }), [send]);
-  useHotkeys("left", () => undo(), [undo]);
-  useHotkeys("right", () => redo(), [redo]);
+  useHotkeys(
+    "left",
+    (e) => {
+      e.preventDefault();
+      undo();
+    },
+    [undo]
+  );
+  useHotkeys(
+    "right",
+    (e) => {
+      e.preventDefault();
+      redo();
+    },
+    [redo]
+  );
 
   useEffect(() => {
     send({
