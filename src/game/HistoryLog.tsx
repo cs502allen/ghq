@@ -4,6 +4,7 @@ import { BoardProps } from "boardgame.io/react";
 import { HistoryState } from "@/game/move-history-plugin";
 import { coordinateToAlgebraic, degreesToCardinal } from "./notation";
 import classNames from "classnames";
+import { LogEntry } from "boardgame.io";
 
 export function HistoryLog({
   systemMessages,
@@ -12,7 +13,22 @@ export function HistoryLog({
   systemMessages: HistoryState;
   log: BoardProps<GHQState>["log"];
 }) {
-  const playerMessages = log
+  const filteredLog: LogEntry[] = [];
+
+  const undoneMoves: LogEntry[] = [];
+  for (const entry of log) {
+    if (entry.action.type === "UNDO") {
+      const lastMove = filteredLog.pop();
+      lastMove && undoneMoves.push(lastMove);
+    } else if (entry.action.type === "REDO") {
+      const lastUndoneMove = undoneMoves.pop();
+      lastUndoneMove && filteredLog.push(lastUndoneMove);
+    } else {
+      filteredLog.push(entry);
+    }
+  }
+
+  const playerMessages = filteredLog
     .filter((entry) => entry.action.type === "MAKE_MOVE")
     .map((entry) => {
       const { playerID, type, args } = entry.action.payload;
