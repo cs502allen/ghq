@@ -80,6 +80,12 @@ export function HistoryLog({
     (a, b) => a.turn - b.turn
   );
 
+  // TODO(tyler): figure out why duplicate messages are coming through
+  const deduplicatedMessages = combinedMessages.filter(
+    (msg, index, self) =>
+      index === self.findIndex((m) => m.message === msg.message)
+  );
+
   React.useEffect(() => {
     const messagesDiv = document.querySelector("#history-log-list");
     if (messagesDiv) {
@@ -93,7 +99,7 @@ export function HistoryLog({
         id="history-log-list"
         className="max-h-32 overflow-y-auto border p-1"
       >
-        {combinedMessages.map((msg) => (
+        {deduplicatedMessages.map((msg) => (
           <div
             key={msg.message}
             className={classNames(msg.isCapture && "text-red-600")}
