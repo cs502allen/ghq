@@ -34,8 +34,8 @@ function App() {
       setGames(
         data?.matches?.map((match: any) => ({
           id: match.id,
-          player1: match.state.G.userIds["0"],
-          player2: match.state.G.userIds["1"],
+          player1: match.usernames[0],
+          player2: match.usernames[1],
           status: `Turn ${match.state.ctx.turn}`,
         })) ?? []
       );
@@ -63,7 +63,7 @@ function App() {
           <a
             key={game.id}
             href={`/live/${game.id}`}
-            className="max-w-sm py-2 px-3 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md"
+            className="py-2 px-3 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md"
           >
             <div className="text-xl font-bold tracking-tight text-gray-900">
               {game.player1} vs {game.player2}

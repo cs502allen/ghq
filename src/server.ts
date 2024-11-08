@@ -11,7 +11,7 @@ import { createClient } from "@supabase/supabase-js";
 import { PostgresStore } from "bgio-postgres";
 import { calculateElo } from "./game/elo";
 import cors from "@koa/cors";
-import { authMiddleware } from "./server/auth";
+import { authMiddleware, clerkClient } from "./server/auth";
 
 const supabase = createClient(
   "https://wjucmtrnmjcaatbtktxo.supabase.co",
@@ -131,9 +131,37 @@ server.router.get("/matches", async (ctx) => {
   const matches = await Promise.all(
     allLiveMatches.slice(0, 10).map(async (matchId) => {
       const res = await server.db.fetch(matchId, { state: true });
-      return { ...res, id: matchId };
+      return { ...res, id: matchId, usernames: [] as string[] };
     })
   );
+
+  const userIds = matches.flatMap((match) => [
+    match.state.G.userIds["0"],
+    match.state.G.userIds["1"],
+  ]);
+
+  const { data: users, error } = await supabase
+    .from("users")
+    .select("id, username")
+    .in("id", userIds);
+
+  if (error) {
+    console.log({
+      message: "Error fetching users for matches",
+      error,
+    });
+  }
+
+  if (users) {
+    const userMap = new Map(users.map((user) => [user.id, user.username]));
+
+    for (const match of matches) {
+      match.usernames = [
+        userMap.get(match.state.G.userIds["0"]),
+        userMap.get(match.state.G.userIds["1"]),
+      ];
+    }
+  }
 
   ctx.body = JSON.stringify({ matches });
 });
@@ -342,12 +370,15 @@ function onGameEnd({ ctx, G }: { ctx: any; G: GHQState }): void | GHQState {
 interface User {
   id: string;
   elo: number;
+  username: string;
 }
 
 async function getOrCreateUser(userId: string): Promise<User> {
+  const clerkUser = await clerkClient.users.getUser(userId);
+
   const { data: user, error: userError } = await supabase
     .from("users")
-    .select("id, elo")
+    .select("id, username, elo")
     .eq("id", userId)
     .single();
 
@@ -356,7 +387,11 @@ async function getOrCreateUser(userId: string): Promise<User> {
   }
 
   if (userError && userError.code === "PGRST116") {
-    const newUser = { id: userId, elo: 1000 };
+    const newUser = {
+      id: userId,
+      elo: 1000,
+      username: `${clerkUser.firstName} ${clerkUser.lastName}`,
+    };
     const { error: insertError } = await supabase
       .from("users")
       .insert([newUser]);
