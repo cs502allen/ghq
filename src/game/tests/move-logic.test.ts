@@ -252,10 +252,6 @@ describe("computing allowed moves", () => {
         ],
         [
           5,
-          6,
-        ],
-        [
-          5,
           7,
         ],
         [
