@@ -5,6 +5,7 @@ import {
   Blue,
   initialBoardSetup,
   initialBoardSetupWithAnAirborneBack,
+  initialBoardSetupWithAnAirborneEnemyBack,
   initialBoardSetupWithAnAirborneNotBack,
   initialBoardSetupWithAnArmored,
   Red,
@@ -376,6 +377,30 @@ describe("computing allowed moves", () => {
             [
               2,
               4,
+            ],
+          ]
+      `);
+  });
+
+  it("can compute allowed moves for airborne on enemy back", () => {
+    // opening. top of the board, middle infantry
+    const moves = movesForActivePiece(
+      [7, 0],
+      initialBoardSetupWithAnAirborneEnemyBack
+    );
+    expect(moves).toMatchInlineSnapshot(`
+          [
+            [
+              6,
+              0,
+            ],
+            [
+              6,
+              1,
+            ],
+            [
+              7,
+              1,
             ],
           ]
       `);

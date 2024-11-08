@@ -1,6 +1,4 @@
-import {GHQState, Orientation, Player, Square} from "@/game/engine";
-
-
+import { GHQState, Orientation, Player, Square } from "@/game/engine";
 
 const shorthands = (player: Player) => {
   return {
@@ -13,54 +11,18 @@ const shorthands = (player: Player) => {
   };
 };
 
-export const Blue = shorthands("BLUE")
-export const Red = shorthands("RED")
+export const Blue = shorthands("BLUE");
+export const Red = shorthands("RED");
 
 export const initialBoardSetup: GHQState["board"] = [
-  [
-    Blue.HQ,
-    Blue.ARTILLERY(180),
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-  ],
-  [
-    Blue.INFANTRY,
-    Blue.INFANTRY,
-    Blue.INFANTRY,
-    null,
-    null,
-    null,
-    null,
-    null,
-  ],
+  [Blue.HQ, Blue.ARTILLERY(180), null, null, null, null, null, null],
+  [Blue.INFANTRY, Blue.INFANTRY, Blue.INFANTRY, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-    Red.INFANTRY,
-    Red.INFANTRY,
-    Red.INFANTRY,
-  ],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    Red.ARTILLERY(0),
-    Red.HQ,
-  ],
+  [null, null, null, null, null, Red.INFANTRY, Red.INFANTRY, Red.INFANTRY],
+  [null, null, null, null, null, null, Red.ARTILLERY(0), Red.HQ],
 ];
 
 export const initialBoardSetupWithAnArmored: GHQState["board"] = [
@@ -74,100 +36,39 @@ export const initialBoardSetupWithAnArmored: GHQState["board"] = [
     null,
     { type: "ARMORED_INFANTRY", player: "BLUE", orientation: 180 },
   ],
-  [
-    Blue.INFANTRY,
-    Blue.INFANTRY,
-    Blue.INFANTRY,
-    null,
-    null,
-    null,
-    null,
-    null,
-  ],
+  [Blue.INFANTRY, Blue.INFANTRY, Blue.INFANTRY, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-    Red.INFANTRY,
-    Red.INFANTRY,
-    Red.INFANTRY,
-  ],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    Red.ARTILLERY(0),
-    Red.HQ,
-  ],
+  [null, null, null, null, null, Red.INFANTRY, Red.INFANTRY, Red.INFANTRY],
+  [null, null, null, null, null, null, Red.ARTILLERY(0), Red.HQ],
 ];
 
 export const initialBoardSetupWithAnAirborneBack: GHQState["board"] = [
-  [
-    Blue.HQ,
-    Blue.ARTILLERY(180),
-    null,
-    null,
-    null,
-    null,
-    null,
-    Blue.AIRBORNE,
-  ],
-  [
-    Blue.INFANTRY,
-    Blue.INFANTRY,
-    Blue.INFANTRY,
-    null,
-    null,
-    null,
-    null,
-    null,
-  ],
+  [Blue.HQ, Blue.ARTILLERY(180), null, null, null, null, null, Blue.AIRBORNE],
+  [Blue.INFANTRY, Blue.INFANTRY, Blue.INFANTRY, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-    Red.INFANTRY,
-    Red.INFANTRY,
-    Red.INFANTRY,
-  ],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    Red.ARTILLERY(0),
-    Red.HQ,
-  ],
+  [null, null, null, null, null, Red.INFANTRY, Red.INFANTRY, Red.INFANTRY],
+  [null, null, null, null, null, null, Red.ARTILLERY(0), Red.HQ],
+];
+
+export const initialBoardSetupWithAnAirborneEnemyBack: GHQState["board"] = [
+  [Blue.HQ, Blue.ARTILLERY(180), null, null, null, null, null, null],
+  [Blue.INFANTRY, Blue.INFANTRY, Blue.INFANTRY, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, Red.INFANTRY, Red.INFANTRY, Red.INFANTRY],
+  [Blue.AIRBORNE, null, null, null, null, null, Red.ARTILLERY(0), Red.HQ],
 ];
 
 export const initialBoardSetupWithAnAirborneNotBack: GHQState["board"] = [
-  [
-    Blue.HQ,
-    Blue.ARTILLERY(180),
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-  ],
+  [Blue.HQ, Blue.ARTILLERY(180), null, null, null, null, null, null],
   [
     Blue.INFANTRY,
     Blue.INFANTRY,
@@ -182,42 +83,15 @@ export const initialBoardSetupWithAnAirborneNotBack: GHQState["board"] = [
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-    Red.INFANTRY,
-    Red.INFANTRY,
-    Red.INFANTRY,
-  ],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    Red.ARTILLERY(0),
-    Red.HQ,
-  ],
+  [null, null, null, null, null, Red.INFANTRY, Red.INFANTRY, Red.INFANTRY],
+  [null, null, null, null, null, null, Red.ARTILLERY(0), Red.HQ],
 ];
 
 export const artillaryFaceOff: GHQState["board"] = [
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
-  [
-    null,
-    Red.ARTILLERY(90),
-    null,
-    Blue.ARTILLERY(270),
-    null,
-    null,
-    null,
-    null,
-  ],
+  [null, Red.ARTILLERY(90), null, Blue.ARTILLERY(270), null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
