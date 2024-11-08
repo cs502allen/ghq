@@ -27,9 +27,9 @@ export function movesForActivePiece(
     const unitType = Units[piece.type];
 
     if (unitType.canParachute) {
-      // on back
-      // @todo right now this allows parachuting when on either back rank. Once we figure out how we want to pass color state around we'll change this
-      if (coordinate[0] === 0 || coordinate[0] === 7) {
+      const isOnBackRank =
+        player === "RED" ? coordinate[0] === 7 : coordinate[0] === 0;
+      if (isOnBackRank) {
         const allowedParachutes: Coordinate[] = [];
         board.forEach((rank, x) => {
           rank.forEach((square, y) => {
