@@ -5,58 +5,53 @@ import { Button } from "./Button";
 import MatchmakingModal from "./MatchmakingModal";
 import { useCallback, useEffect, useState } from "react";
 import { API_URL } from "./config";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { ghqFetch } from "@/lib/api";
+
+interface MatchmakingData {
+  match: {
+    id: string;
+    playerId: string;
+    credentials: string;
+  };
+}
 
 export function PlayOnlineButton() {
   const router = useRouter();
   const [isMatchmaking, setIsMatchmaking] = useState(false);
+  const { getToken } = useAuth();
 
-  const checkMatchmaking = useCallback(
-    async (userId: string) => {
-      try {
-        const response = await fetch(
-          `${API_URL}/matchmaking?userId=${userId}`,
-          {
-            method: "POST",
-          }
+  const checkMatchmaking = useCallback(async () => {
+    try {
+      const data = await ghqFetch<MatchmakingData>({
+        url: `${API_URL}/matchmaking`,
+        getToken,
+        method: "POST",
+      });
+      if (data.match) {
+        const playerId = data.match.playerId;
+        localStorage.setItem(
+          `credentials:${data.match.id}:${playerId}`,
+          data.match.credentials
         );
-        const data = await response.json();
-        if (data.match) {
-          const playerId = data.match.playerId;
-          localStorage.setItem(
-            `credentials:${data.match.id}:${playerId}`,
-            data.match.credentials
-          );
-          router.push(`/live/${data.match.id}?playerId=${playerId}`);
-          setIsMatchmaking(false);
-        }
-      } catch (error) {
-        console.error("Error polling matchmaking API:", error);
+        router.push(`/live/${data.match.id}?playerId=${playerId}`);
+        setIsMatchmaking(false);
       }
-    },
-    [router]
-  );
+    } catch (error) {
+      console.error("Error polling matchmaking API:", error);
+    }
+  }, [router]);
 
   async function playOnline() {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
-      alert("User ID is required");
-      return;
-    }
-
     setIsMatchmaking(true);
   }
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
-      return;
-    }
-
     let interval: NodeJS.Timeout;
 
     if (isMatchmaking) {
-      checkMatchmaking(userId);
-      interval = setInterval(() => checkMatchmaking(userId), 2000); // Poll every 2 seconds
+      checkMatchmaking();
+      interval = setInterval(() => checkMatchmaking(), 2000); // Poll every 2 seconds
     }
 
     return () => {
@@ -67,15 +62,8 @@ export function PlayOnlineButton() {
   }, [isMatchmaking, checkMatchmaking]);
 
   async function cancelMatchmaking() {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
-      return;
-    }
-
     setIsMatchmaking(false);
-    fetch(`${API_URL}/matchmaking?userId=${userId}`, {
-      method: "DELETE",
-    });
+    ghqFetch({ url: `${API_URL}/matchmaking`, getToken, method: "DELETE" });
   }
 
   return (
