@@ -7,6 +7,7 @@ import { PlayOnlineButton } from "./PlayOnlineButton";
 import { ghqFetch } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
+import { Learn } from "@/components/Learn";
 
 interface Game {
   id: string;
@@ -57,6 +58,9 @@ function App() {
         <PlayOnlineButton />
         <Button onClick={playLocal}>👨‍💻 Play local</Button>
       </div>
+
+      <Learn />
+
       <div className="text-2xl mt-2">Live games</div>
       <div className="flex flex-col gap-2">
         {games.map((game: Game) => (
