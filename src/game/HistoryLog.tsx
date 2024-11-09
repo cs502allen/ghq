@@ -74,7 +74,7 @@ export function HistoryLog({
       }
       return {
         turn: entry.turn,
-        message: `[${entry.turn}] ${player} ${description}`,
+        message: `${player} ${description}`,
         isCapture,
       };
     });
@@ -92,7 +92,7 @@ export function HistoryLog({
         return {
           turn,
           isCapture,
-          message: `[${turn}]: ${player} artillery destroyed piece${
+          message: `${player} artillery destroyed piece${
             clearedSquares.length > 1 ? "s" : ""
           } at ${clearedSquares
             .map((coord) => coordinateToAlgebraic(coord))
@@ -122,16 +122,18 @@ export function HistoryLog({
   }, [playerMessages]);
 
   return (
-    <div className="flex flex-col gap-1 p-2 min-h-32">
+    <div className="flex flex-col gap-1 p-2 h-[800px]">
+      <div className="font-bold text-lg">Activity</div>
       <div
         id="history-log-list"
-        className="max-h-32 overflow-y-auto border p-1"
+        className="overflow-y-auto border p-1 h-[600px]"
       >
         {deduplicatedMessages.map((msg) => (
           <div
             key={msg.message}
             className={classNames(msg.isCapture && "text-red-600")}
           >
+            <span className="text-gray-500">{msg.turn} </span>
             {msg.message}
           </div>
         ))}

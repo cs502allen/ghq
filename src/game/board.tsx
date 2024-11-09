@@ -517,9 +517,12 @@ export function GHQBoard({
   });
 
   return (
-    <div className="grid bg-gray-100 absolute w-full h-full grid-cols-7">
+    <div className="grid bg-gray-100 absolute w-full h-[calc(100%-40px)] grid-cols-8">
       <SoundPlayer ctx={ctx} G={G} />
-      <div className="col-span-5 border-r-2 border-gray-100 flex items-center justify-center">
+      <div className={classNames("col-span-2 bg-white")}>
+        <HistoryLog systemMessages={plugins.history.data} log={log} />
+      </div>
+      <div className="col-span-4 border-r-2 border-gray-100 flex items-center justify-center">
         <table ref={divRef} style={{ borderCollapse: "collapse" }}>
           {/*flip board*/}
           <tbody>{isPrimaryPlayer("0") ? cells : cells.reverse()}</tbody>
@@ -670,8 +673,6 @@ export function GHQBoard({
             </div>
           </div>
         </div>
-
-        <HistoryLog systemMessages={plugins.history.data} log={log} />
       </div>
     </div>
   );
