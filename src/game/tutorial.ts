@@ -10,6 +10,7 @@ const B: Record<string, Square> = {
   AR: { type: "ARTILLERY", player: "BLUE", orientation: 180 },
   AA: { type: "ARMORED_ARTILLERY", player: "BLUE", orientation: 180 },
   HA: { type: "HEAVY_ARTILLERY", player: "BLUE", orientation: 180 },
+  H1: { type: "HEAVY_ARTILLERY", player: "BLUE", orientation: 135 },
 };
 
 const R: Record<string, Square> = {
@@ -120,6 +121,26 @@ export const boards: Record<string, GHQState["board"]> = {
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, R.HQ],
+  ],
+  "Puzzle: capture an artillery": [
+    [B.HQ, null, null, B.H1, null, B.AR, null, null],
+    [B.IN, B.IN, null, null, null, B.IN, null, null],
+    [null, null, B.IN, B.AR, null, B.IN, null, null],
+    [null, null, B.AI, null, B.IN, null, R.IN, null],
+    [null, null, R.IN, null, R.AI, R.IN, null, null],
+    [null, null, null, R.AA, null, null, null, null],
+    [null, null, null, null, null, R.IN, R.IN, R.IN],
+    [null, null, null, null, null, null, null, R.HQ],
+  ],
+  "Puzzle: capture two infantry": [
+    [B.HQ, null, null, null, B.IN, null, null, null],
+    [null, null, null, B.IN, R.IN, null, null, null],
+    [null, null, B.IN, R.IN, null, R.IN, null, null],
+    [null, B.IN, R.IN, null, null, null, null, null],
+    [B.IN, R.IN, null, null, null, null, null, null],
+    [R.IN, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, R.HQ],
   ],
