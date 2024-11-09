@@ -5,7 +5,6 @@ import { isAuthorizedToMovePiece } from "./move-logic";
 import { clearBombardedSquares } from "@/game/capture-logic";
 import { appendHistory, HistoryPlugin } from "./move-history-plugin";
 import { getGameoverState } from "./gameover-logic";
-import { coordinateToAlgebraic } from "./notation";
 
 export const Units: {
   [key: string]: {
@@ -368,25 +367,22 @@ export const GHQGame: Game<GHQState> = {
   },
   turn: {
     maxMoves: 3,
-    onBegin: ({ ctx, G, random, ...plugins }) => {
+    onBegin: ({ ctx, G, random, log, ...plugins }) => {
       G.lastTurnMoves[ctx.currentPlayer as "0" | "1"] = [];
       G.lastTurnCaptures[ctx.currentPlayer as "0" | "1"] = [];
 
-      const clearedSqures = clearBombardedSquares(G, ctx);
-      if (clearedSqures.length > 0) {
+      const captured = clearBombardedSquares(G, ctx);
+      if (captured.length > 0) {
+        const clearedSquares = captured.map(({ coordinate }) => coordinate);
         G.lastTurnCaptures[ctx.currentPlayer as "0" | "1"].push(
-          ...clearedSqures
+          ...clearedSquares
         );
 
-        const player = ctx.currentPlayer === "0" ? "Red" : "Blue";
         appendHistory(plugins, {
           isCapture: true,
           turn: ctx.turn,
-          message: `[${ctx.turn}]: ${player} artillery destroyed piece${
-            clearedSqures.length > 1 ? "s" : ""
-          } at ${clearedSqures
-            .map((coord) => coordinateToAlgebraic(coord))
-            .join(", ")}`,
+          playerId: ctx.currentPlayer,
+          captured: JSON.parse(JSON.stringify(captured)), // deep copy for boardgame.io engine reasons
         });
       }
       G.turnStartTime = Date.now();

@@ -79,7 +79,32 @@ export function HistoryLog({
       };
     });
 
-  const combinedMessages = [...systemMessages.log, ...playerMessages].sort(
+  const systemCaptureMessages = systemMessages.log.map(
+    ({ turn, isCapture, playerId, captured, message }) => {
+      if (message) {
+        return { turn, message, isCapture };
+      }
+
+      if (isCapture && captured) {
+        const player = playerId === "0" ? "Red" : "Blue";
+        const clearedSquares = captured.map(({ coordinate }) => coordinate);
+
+        return {
+          turn,
+          isCapture,
+          message: `[${turn}]: ${player} artillery destroyed piece${
+            clearedSquares.length > 1 ? "s" : ""
+          } at ${clearedSquares
+            .map((coord) => coordinateToAlgebraic(coord))
+            .join(", ")}`,
+        };
+      }
+
+      return { turn, isCapture, message: "" };
+    }
+  );
+
+  const combinedMessages = [...systemCaptureMessages, ...playerMessages].sort(
     (a, b) => a.turn - b.turn
   );
 

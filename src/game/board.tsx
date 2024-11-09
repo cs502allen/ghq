@@ -20,6 +20,7 @@ import { colIndexToFile, rowIndexToRank } from "./notation";
 import { PlayOnlineButton } from "@/app/live/PlayOnlineButton";
 import { SoundPlayer } from "./SoundPlayer";
 import { HistoryLog } from "./HistoryLog";
+import { getCapturedPieces } from "./capture-logic";
 
 const rows = 8;
 const columns = 8;
@@ -219,6 +220,25 @@ export function GHQBoard({
       lastTurnMoves.add(`${move[0]},${move[1]}`);
     }
   }
+
+  const redCaptures = useMemo(
+    () =>
+      getCapturedPieces({
+        playerId: "0",
+        systemMessages: plugins.history.data,
+        log,
+      }),
+    [plugins.history.data, log]
+  );
+  const blueCaptures = useMemo(
+    () =>
+      getCapturedPieces({
+        playerId: "1",
+        systemMessages: plugins.history.data,
+        log,
+      }),
+    [plugins.history.data, log]
+  );
 
   const cells = Array.from({ length: rows }).map((_, rowIndex) => {
     const colN = Array.from({ length: columns }, (_, index) => index);
@@ -514,12 +534,12 @@ export function GHQBoard({
       >
         <div
           className={classNames(
-            "col-span-2 h-full pt-10 flex flex-col justify-between",
+            "col-span-2 h-full pt-2 flex flex-col justify-between",
             ctx.currentPlayer === "0" ? "bg-red-50" : "bg-blue-50",
             { ["flex-col-reverse"]: isPrimaryPlayer("1") }
           )}
         >
-          <div className="flex flex-col gap-2 p-4 ">
+          <div className="flex flex-col gap-2 p-2">
             <div className="text-xl flex gap-1">
               <div className="font-bold">{G.userIds[1]}</div>
               <div>({G.elos?.[1] ?? 0})</div>
@@ -531,18 +551,33 @@ export function GHQBoard({
               startDate={G.turnStartTime}
               totalTimeAllowed={G.timeControl}
             />
-            <div className="items-center justify-center flex">
-              <ReserveBank
-                player="BLUE"
-                reserve={G.blueReserve}
-                selectedKind={
-                  isPrimaryPlayer("1") ? state.context.unitKind : undefined
-                }
-                selectable={
-                  isPrimaryPlayer("1") && !state.matches("activePieceSelected")
-                }
-                selectReserve={selectReserve}
-              />
+            <div>
+              <div>Reserve</div>
+              <div className="items-center justify-center flex">
+                <ReserveBank
+                  player="BLUE"
+                  reserve={G.blueReserve}
+                  selectedKind={
+                    isPrimaryPlayer("1") ? state.context.unitKind : undefined
+                  }
+                  selectable={
+                    isPrimaryPlayer("1") &&
+                    !state.matches("activePieceSelected")
+                  }
+                  selectReserve={selectReserve}
+                />
+              </div>
+            </div>
+            <div>
+              <div className="">Captures</div>
+              <div className="items-center justify-center flex">
+                <ReserveBank
+                  player="RED"
+                  reserve={blueCaptures}
+                  selectable={false}
+                  selectReserve={() => {}}
+                />
+              </div>
             </div>
           </div>
 
@@ -604,18 +639,34 @@ export function GHQBoard({
               startDate={G.turnStartTime}
               totalTimeAllowed={G.timeControl}
             />
-            <div className="items-center justify-center flex">
-              <ReserveBank
-                player="RED"
-                selectedKind={
-                  isPrimaryPlayer("0") ? state.context.unitKind : undefined
-                }
-                reserve={G.redReserve}
-                selectable={
-                  isPrimaryPlayer("0") && !state.matches("activePieceSelected")
-                }
-                selectReserve={selectReserve}
-              />
+            <div>
+              <div className="">Reserve</div>
+              <div className="items-center justify-center flex">
+                <ReserveBank
+                  player="RED"
+                  selectedKind={
+                    isPrimaryPlayer("0") ? state.context.unitKind : undefined
+                  }
+                  reserve={G.redReserve}
+                  selectable={
+                    isPrimaryPlayer("0") &&
+                    !state.matches("activePieceSelected")
+                  }
+                  selectReserve={selectReserve}
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="">Captures</div>
+              <div className="items-center justify-center flex">
+                <ReserveBank
+                  player="BLUE"
+                  reserve={redCaptures}
+                  selectable={false}
+                  selectReserve={() => {}}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -652,10 +703,13 @@ function ReserveBank(props: {
         }}
         key={kind}
         className={classNames(
-          "col-span-1 select-none flex font-bold text-xl p-1 flex-col items-center cursor-pointer ",
+          "col-span-1 select-none flex font-bold text-xl p-1 flex-col items-center",
           props.player === "RED" ? "text-red-600" : "text-blue-600",
           { ["cursor-pointer"]: props.selectable },
-          { ["hover:bg-gray-100 "]: props.selectedKind !== kind },
+          {
+            ["hover:bg-gray-100 "]:
+              props.selectable && props.selectedKind !== kind,
+          },
           { ["bg-gray-200 "]: props.selectedKind === kind }
         )}
       >
@@ -671,6 +725,14 @@ function ReserveBank(props: {
       </div>
     );
   });
+
+  if (reserves.every((r) => r === null)) {
+    return (
+      <div className="flex-1 flex items-center justify-center font-bold text-gray-500">
+        None
+      </div>
+    );
+  }
 
   return <div className="grid flex-1 grid-cols-6">{reserves}</div>;
 }
