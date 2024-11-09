@@ -144,6 +144,16 @@ export const boards: Record<string, GHQState["board"]> = {
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, R.HQ],
   ],
+  "Puzzle: capture hq!": [
+    [B.HQ, null, B.IN, null, null, null, null, null],
+    [B.IN, null, null, null, null, null, null, null],
+    [R.IN, null, B.IN, null, null, null, null, null],
+    [null, R.AI, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, R.AB, R.HQ],
+  ],
 };
 
 export type BoardType = keyof typeof boards;
