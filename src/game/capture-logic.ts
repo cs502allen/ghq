@@ -1,6 +1,16 @@
-import { Coordinate, GHQState, Player, Square, Units } from "@/game/engine";
-import type { Ctx } from "boardgame.io";
+import {
+  Coordinate,
+  GHQState,
+  NonNullSquare,
+  Player,
+  ReserveFleet,
+  Square,
+  Units,
+} from "@/game/engine";
+import type { Ctx, LogEntry } from "boardgame.io";
 import { bombardedSquares } from "@/game/move-logic";
+import { HistoryState } from "./move-history-plugin";
+import { BoardProps } from "boardgame.io/react";
 
 export function captureCandidates(
   lastMovedInfantry: Coordinate,
@@ -226,8 +236,11 @@ function maximizeEngagement(
   return engagedPairs;
 }
 
-export function clearBombardedSquares(G: GHQState, ctx: Ctx): Coordinate[] {
-  const clearedSquares: Coordinate[] = [];
+export function clearBombardedSquares(
+  G: GHQState,
+  ctx: Ctx
+): { coordinate: Coordinate; square: NonNullSquare }[] {
+  const results: { coordinate: Coordinate; square: NonNullSquare }[] = [];
 
   const bombarded = bombardedSquares(G.board);
 
@@ -247,12 +260,15 @@ export function clearBombardedSquares(G: GHQState, ctx: Ctx): Coordinate[] {
         square.player !== currentPlayerColor
       ) {
         G.board[x][y] = null;
-        clearedSquares.push([x, y]);
+        results.push({
+          coordinate: [x, y],
+          square,
+        });
       }
     });
   });
 
-  return clearedSquares;
+  return results;
 }
 
 function isEnemyPiece({
@@ -318,4 +334,61 @@ function isCapturableHQ({
   }
 
   return false;
+}
+
+export type CapturedFleet = ReserveFleet;
+
+export function getCapturedPieces({
+  playerId,
+  systemMessages,
+  log,
+}: {
+  playerId: "0" | "1";
+  systemMessages: HistoryState;
+  log: BoardProps<GHQState>["log"];
+}): CapturedFleet {
+  const filteredLog: LogEntry[] = [];
+
+  const undoneMoves: LogEntry[] = [];
+  for (const entry of log) {
+    if (entry.action.type === "UNDO") {
+      const lastMove = filteredLog.pop();
+      lastMove && undoneMoves.push(lastMove);
+    } else if (entry.action.type === "REDO") {
+      const lastUndoneMove = undoneMoves.pop();
+      lastUndoneMove && filteredLog.push(lastUndoneMove);
+    } else {
+      filteredLog.push(entry);
+    }
+  }
+
+  const playerCaptures = filteredLog
+    .filter((entry) => entry.action.type === "MAKE_MOVE")
+    .filter((entry) => entry.metadata?.capturedPieceType)
+    .filter((entry) => entry.action.payload.playerID === playerId)
+    .map((entry) => entry?.metadata?.capturedPieceType);
+
+  const systemCaptures = systemMessages.log
+    .filter((entry) => entry.playerId === playerId)
+    .filter((entry) => entry.captured)
+    .flatMap(({ captured }) => {
+      return (captured ?? []).map(({ square }) => square?.type);
+    });
+  const capturedFleet: Record<string, number> = {
+    INFANTRY: 0,
+    ARMORED_INFANTRY: 0,
+    AIRBORNE_INFANTRY: 0,
+    ARTILLERY: 0,
+    ARMORED_ARTILLERY: 0,
+    HEAVY_ARTILLERY: 0,
+  };
+
+  for (const capture of [...playerCaptures, ...systemCaptures]) {
+    if (!(capture in capturedFleet)) {
+      capturedFleet[capture] = 0;
+    }
+    capturedFleet[capture]++;
+  }
+
+  return capturedFleet as CapturedFleet;
 }

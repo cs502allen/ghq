@@ -52,7 +52,7 @@ const CountdownTimer = ({
   };
 
   return (
-    <div className="text-center flex justify-center items-center pb-10">
+    <div className="text-center flex justify-center items-center">
       <div
         className={classNames(
           active ? "bg-gray-900" : "bg-gray-500",
