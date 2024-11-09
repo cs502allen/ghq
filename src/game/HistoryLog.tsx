@@ -45,8 +45,9 @@ export function HistoryLog({
 
         const capture = entry?.metadata?.capturePreference;
         if (capture) {
+          const captureType = entry?.metadata?.capturedPieceType ?? "piece";
           const captureNotation = coordinateToAlgebraic(capture);
-          description += ` and captured ${captureNotation}`;
+          description += ` and captured ${captureType.toLowerCase()} on ${captureNotation}`;
           isCapture = true;
         }
       } else if (type === "Reinforce") {
@@ -68,6 +69,8 @@ export function HistoryLog({
         )}`;
       } else if (type === "Skip") {
         description = "skipped the remainder of their turn";
+      } else if (type === "Resign") {
+        description = "resigned";
       }
       return {
         turn: entry.turn,

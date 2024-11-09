@@ -170,14 +170,20 @@ const Move: Move<GHQState> = (
 
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
 
-  // TODO(tyler): ensure we're authorized to capture this piece
+  let capturedPieceType: UnitType | undefined;
 
   if (capturePreference) {
+    capturedPieceType =
+      G.board[capturePreference[0]][capturePreference[1]]?.type;
     G.board[capturePreference[0]][capturePreference[1]] = null;
     G.lastTurnCaptures[ctx.currentPlayer as "0" | "1"].push(capturePreference);
   }
 
-  log.setMetadata({ pieceType: piece?.type, capturePreference });
+  log.setMetadata({
+    pieceType: piece?.type,
+    capturePreference,
+    capturedPieceType,
+  });
 };
 
 const MoveAndOrient: Move<GHQState> = (
