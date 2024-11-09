@@ -21,6 +21,7 @@ import { PlayOnlineButton } from "@/app/live/PlayOnlineButton";
 import { SoundPlayer } from "./SoundPlayer";
 import { HistoryLog } from "./HistoryLog";
 import { getCapturedPieces } from "./capture-logic";
+import { getUsernames } from "@/lib/supabase";
 
 const rows = 8;
 const columns = 8;
@@ -48,6 +49,20 @@ export function GHQBoard({
   log,
 }: BoardProps<GHQState>) {
   const divRef = useRef(null); // Create a ref
+  const [usernames, setUsernames] = React.useState<string[]>([]);
+
+  useEffect(() => {
+    async function fetchUsernames() {
+      if (!G.userIds[0] || !G.userIds[1]) return;
+      const userIds = [G.userIds["0"], G.userIds["1"]];
+      const usernames = await getUsernames(userIds);
+      setUsernames(usernames);
+    }
+
+    if (!usernames.length) {
+      fetchUsernames();
+    }
+  }, [G.userIds]);
 
   const isPrimaryPlayer = useCallback(
     (playerId: string) => {
@@ -544,7 +559,9 @@ export function GHQBoard({
         >
           <div className="flex flex-col gap-2 p-2">
             <div className="text-xl flex gap-1">
-              <div className="font-bold">{G.userIds[1]}</div>
+              <div className="font-bold">
+                {usernames?.[1] ?? G.userIds["1"]}
+              </div>
               <div>({G.elos?.[1] ?? 0})</div>
             </div>
             <CountdownTimer
@@ -632,7 +649,9 @@ export function GHQBoard({
 
           <div className="flex flex-col gap-2 p-4">
             <div className="text-xl flex gap-1">
-              <div className="font-bold">{G.userIds[0]}</div>
+              <div className="font-bold">
+                {usernames?.[0] ?? G.userIds["0"]}
+              </div>
               <div>({G.elos?.[0] ?? 0})</div>
             </div>
             <CountdownTimer
