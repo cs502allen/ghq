@@ -217,12 +217,3 @@ export function bombardedSquares(board: GHQState["board"]): Bombarded {
 
   return bombarded;
 }
-
-export function isAuthorizedToMovePiece(ctx: Ctx, piece?: Square): boolean {
-  if (!piece) {
-    return false;
-  }
-
-  const currentPlayer = ctx.currentPlayer === "0" ? "RED" : "BLUE";
-  return piece.player === currentPlayer;
-}

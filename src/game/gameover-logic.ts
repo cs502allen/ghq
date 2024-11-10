@@ -26,7 +26,7 @@ function newWinner(player: Player, reason: string): GameoverState {
   };
 }
 
-function isHqOnBoard(board: GHQState["board"], player: Player): boolean {
+export function isHqOnBoard(board: GHQState["board"], player: Player): boolean {
   return board.some((rows) =>
     rows.some((square) => square?.type === "HQ" && square.player === player)
   );

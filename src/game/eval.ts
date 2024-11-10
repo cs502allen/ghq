@@ -1,3 +1,4 @@
+import { isPieceArtillery } from "./board-moves";
 import { GHQState, Player } from "./engine";
 
 const unitScores: Record<string, number> = {
@@ -26,6 +27,9 @@ export function calculateEval(board: GHQState["board"]): number {
     BLUE: 0,
   };
 
+  // TODO(tyler): give points for bombarding central squares
+  // TODO(tyler): give points for getting to a position where you can take a piece for free
+
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board[i].length; j++) {
       const square = board[i][j];
@@ -33,7 +37,17 @@ export function calculateEval(board: GHQState["board"]): number {
         continue;
       }
 
-      scores[square.player] += (unitScores[square.type] ?? 0) + gradient[i][j];
+      if (square.type === "AIRBORNE_INFANTRY") {
+        const homeRow = square.player === "RED" ? 7 : 0;
+        const distance = Math.abs(i - homeRow);
+        scores[square.player] += unitScores.AIRBORNE_INFANTRY - 0.7 * distance;
+      } else if (isPieceArtillery(square)) {
+        scores[square.player] +=
+          (unitScores[square.type] ?? 0) + gradient[i][j];
+      } else {
+        scores[square.player] +=
+          (unitScores[square.type] ?? 0) + gradient[i][j];
+      }
     }
   }
 

@@ -107,7 +107,9 @@ function getAdjacentPieces(
 
 function maximizeEngagement(
   board: GHQState["board"],
-  excludeCoordinate: Coordinate | null
+  excludeCoordinate: Coordinate | null,
+  attacker?: NonNullSquare,
+  attackerCoordinates?: Coordinate
 ): Record<Player, Coordinate>[] {
   const N = 8; // Size of the board
 
@@ -134,7 +136,17 @@ function maximizeEngagement(
         continue;
       }
 
-      const unit = board[i]?.[j];
+      let attackerUnit: Square = null;
+      if (
+        attacker &&
+        attackerCoordinates &&
+        attackerCoordinates[0] === i &&
+        attackerCoordinates[1] === j
+      ) {
+        attackerUnit = attacker;
+      }
+
+      const unit = attackerUnit || board[i]?.[j];
       if (!unit) {
         continue;
       }
@@ -172,11 +184,16 @@ function maximizeEngagement(
 
       // Check if the adjacent position is within bounds and has a '1'
       if (
-        x1 >= 0 &&
-        x1 < N &&
-        y1 >= 0 &&
-        y1 < N &&
-        board[x1]?.[y1]?.player === "BLUE"
+        (x1 >= 0 &&
+          x1 < N &&
+          y1 >= 0 &&
+          y1 < N &&
+          // If red is attacking, then we're looking for any blue piece as a pair
+          board[x1]?.[y1]?.player === "BLUE") ||
+        // But if blue is attacking, the board won't have the blue piece there yet, so we need to check the attacker coordinates
+        (attackerCoordinates &&
+          x1 === attackerCoordinates[0] &&
+          y1 === attackerCoordinates[1])
       ) {
         if (
           excludeCoordinate &&
@@ -391,4 +408,82 @@ export function getCapturedPieces({
   }
 
   return capturedFleet as CapturedFleet;
+}
+
+export interface CaptureCandidatesArgs {
+  attacker: NonNullSquare;
+  attackerFrom: Coordinate;
+  attackerTo: Coordinate;
+  board: GHQState["board"];
+}
+
+export function captureCandidatesV2({
+  attacker,
+  attackerFrom,
+  attackerTo,
+  board,
+}: CaptureCandidatesArgs): Coordinate[] {
+  const engagedPairs = maximizeEngagement(board, null);
+
+  // If you're not infantry, you're not capturing anything boi
+  if (!isInfantry(attacker)) {
+    return [];
+  }
+
+  const engagedInfantry: Record<string, Player> = {};
+  for (const pairs of engagedPairs) {
+    engagedInfantry[`${pairs.RED[0]},${pairs.RED[1]}`] = "RED";
+    engagedInfantry[`${pairs.BLUE[0]},${pairs.BLUE[1]}`] = "BLUE";
+  }
+
+  // If moving here could result in more engaged pairs, then we can't capture anything.
+  const potentiallyEngagedPairs = maximizeEngagement(
+    board,
+    attackerFrom,
+    attacker,
+    attackerTo
+  );
+  if (potentiallyEngagedPairs.length > engagedPairs.length) {
+    return [];
+  }
+
+  // Find the adjacent pieces to the last moved infantry
+  const attackerAdjacentPieces = getAdjacentPieces(board, attackerTo);
+
+  // Find capturable pieces
+  const attackablePieces = attackerAdjacentPieces.filter((coord) => {
+    const piece = board[coord[0]][coord[1]];
+
+    // It must be an enemy piece
+    if (!isEnemyPiece({ piece, attacker })) {
+      return false;
+    }
+
+    // If it is already engaged, it's capturable
+    if (isAlreadyEngaged(engagedInfantry, coord)) {
+      return true;
+    }
+
+    // If it's non-infantry and non-HQ, it's capturable
+    if (!isInfantry(piece) && !isHQ(piece)) {
+      return true;
+    }
+
+    // If it's capturable HQ, it's capturable
+    if (
+      isCapturableHQ({
+        board,
+        engagedInfantry,
+        lastMovedInfantry: attackerTo,
+        coord,
+        attacker,
+      })
+    ) {
+      return true;
+    }
+
+    return false;
+  });
+
+  return attackablePieces;
 }
