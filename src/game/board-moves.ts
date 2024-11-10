@@ -126,7 +126,7 @@ function getPlayerPieces(
   return playerPieces;
 }
 
-function isPieceArtillery(piece: NonNullSquare) {
+export function isPieceArtillery(piece: NonNullSquare) {
   return (
     piece.type === "ARTILLERY" ||
     piece.type === "ARMORED_ARTILLERY" ||
