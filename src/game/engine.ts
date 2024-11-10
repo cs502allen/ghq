@@ -1,10 +1,12 @@
-import type { FnContext, Game, Move } from "boardgame.io";
+import type { Ctx, FnContext, Game, Move } from "boardgame.io";
 import { INVALID_MOVE } from "boardgame.io/core";
 
-import { isAuthorizedToMovePiece } from "./move-logic";
 import { clearBombardedSquares } from "@/game/capture-logic";
 import { appendHistory, HistoryPlugin } from "./move-history-plugin";
 import { getGameoverState } from "./gameover-logic";
+import { isMoveAllowed } from "./board-moves";
+import { calculateEval } from "./eval";
+import { isAuthorizedToMovePiece } from "./move-logic";
 
 export const Units: {
   [key: string]: {
@@ -54,7 +56,9 @@ export const Units: {
 
 export type UnitType = keyof typeof Units;
 
-export type Orientation = 0 | 45 | 90 | 135 | 180 | 225 | 270 | 315;
+export const orientations = [0, 45, 90, 135, 180, 225, 270, 315] as const;
+export type Orientation = (typeof orientations)[number];
+
 export type Coordinate = [number, number];
 export type Player = "RED" | "BLUE";
 
@@ -96,6 +100,7 @@ export interface GHQState {
     [Square, Square, Square, Square, Square, Square, Square, Square],
     [Square, Square, Square, Square, Square, Square, Square, Square]
   ];
+  eval: number;
   redReserve: ReserveFleet;
   blueReserve: ReserveFleet;
   // time control
@@ -152,6 +157,7 @@ const Reinforce: Move<GHQState> = (
   G.board[to[0]][to[1]] = s;
 
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
+  G.eval = calculateEval(G.board);
 };
 const Move: Move<GHQState> = (
   { G, ctx, log, ...plugins },
@@ -183,6 +189,7 @@ const Move: Move<GHQState> = (
     capturePreference,
     capturedPieceType,
   });
+  G.eval = calculateEval(G.board);
 };
 
 const MoveAndOrient: Move<GHQState> = (
@@ -204,6 +211,7 @@ const MoveAndOrient: Move<GHQState> = (
   G.board[to[0]][to[1]] = piece;
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
   log.setMetadata({ pieceType: piece?.type });
+  G.eval = calculateEval(G.board);
 };
 const ChangeOrientation: Move<GHQState> = (
   { G, ctx, log },
@@ -219,6 +227,7 @@ const ChangeOrientation: Move<GHQState> = (
   G.board[on[0]][on[1]] = piece;
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(on);
   log.setMetadata({ pieceType: piece?.type });
+  G.eval = calculateEval(G.board);
 };
 
 const Skip: Move<GHQState> = ({ G, ctx, events }) => {
@@ -330,6 +339,7 @@ export const GHQGame: Game<GHQState> = {
           { type: "HQ", player: "RED" },
         ],
       ],
+      eval: 0,
       redReserve: {
         INFANTRY: 5,
         ARMORED_INFANTRY: 3,
@@ -386,6 +396,7 @@ export const GHQGame: Game<GHQState> = {
         });
       }
       G.turnStartTime = Date.now();
+      G.eval = calculateEval(G.board);
     },
     onEnd: ({ ctx, G }) => {
       const elapsed = Date.now() - G.turnStartTime;
