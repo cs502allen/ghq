@@ -184,11 +184,16 @@ function maximizeEngagement(
 
       // Check if the adjacent position is within bounds and has a '1'
       if (
-        x1 >= 0 &&
-        x1 < N &&
-        y1 >= 0 &&
-        y1 < N &&
-        board[x1]?.[y1]?.player === "BLUE"
+        (x1 >= 0 &&
+          x1 < N &&
+          y1 >= 0 &&
+          y1 < N &&
+          // If red is attacking, then we're looking for any blue piece as a pair
+          board[x1]?.[y1]?.player === "BLUE") ||
+        // But if blue is attacking, the board won't have the blue piece there yet, so we need to check the attacker coordinates
+        (attackerCoordinates &&
+          x1 === attackerCoordinates[0] &&
+          y1 === attackerCoordinates[1])
       ) {
         if (
           excludeCoordinate &&
@@ -405,11 +410,19 @@ export function getCapturedPieces({
   return capturedFleet as CapturedFleet;
 }
 
-export function captureCandidatesV2(
-  attacker: NonNullSquare,
-  attackerCoordinates: Coordinate,
-  board: GHQState["board"]
-): Coordinate[] {
+export interface CaptureCandidatesArgs {
+  attacker: NonNullSquare;
+  attackerFrom: Coordinate;
+  attackerTo: Coordinate;
+  board: GHQState["board"];
+}
+
+export function captureCandidatesV2({
+  attacker,
+  attackerFrom,
+  attackerTo,
+  board,
+}: CaptureCandidatesArgs): Coordinate[] {
   const engagedPairs = maximizeEngagement(board, null);
 
   // If you're not infantry, you're not capturing anything boi
@@ -426,16 +439,16 @@ export function captureCandidatesV2(
   // If moving here could result in more engaged pairs, then we can't capture anything.
   const potentiallyEngagedPairs = maximizeEngagement(
     board,
-    null,
+    attackerFrom,
     attacker,
-    attackerCoordinates
+    attackerTo
   );
   if (potentiallyEngagedPairs.length > engagedPairs.length) {
     return [];
   }
 
   // Find the adjacent pieces to the last moved infantry
-  const attackerAdjacentPieces = getAdjacentPieces(board, attackerCoordinates);
+  const attackerAdjacentPieces = getAdjacentPieces(board, attackerTo);
 
   // Find capturable pieces
   const attackablePieces = attackerAdjacentPieces.filter((coord) => {
@@ -461,7 +474,7 @@ export function captureCandidatesV2(
       isCapturableHQ({
         board,
         engagedInfantry,
-        lastMovedInfantry: attackerCoordinates,
+        lastMovedInfantry: attackerTo,
         coord,
         attacker,
       })

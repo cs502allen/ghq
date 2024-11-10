@@ -207,7 +207,14 @@ describe("computing allowed captures v2", () => {
       [null, null, null, null, null, null, null, null],
       [null, null, null, null, null, null, null, null],
     ];
-    expect(captureCandidatesV2(RINF, [3, 1], board)).toEqual([]);
+    expect(
+      captureCandidatesV2({
+        attacker: RINF,
+        attackerFrom: [4, 1],
+        attackerTo: [3, 1],
+        board,
+      })
+    ).toEqual([]);
   });
   it("doesnt allow capturing defended pieces 3", () => {
     const board: GHQState["board"] = [
@@ -220,7 +227,14 @@ describe("computing allowed captures v2", () => {
       [null, null, null, null, null, null, null, null],
       [null, RAIR, null, null, null, null, null, null],
     ];
-    expect(captureCandidatesV2(RAIR, [3, 1], board)).toEqual([]);
+    expect(
+      captureCandidatesV2({
+        attacker: RAIR,
+        attackerFrom: [7, 1],
+        attackerTo: [3, 1],
+        board,
+      })
+    ).toEqual([]);
   });
   it("allows capturing defended pieces", () => {
     const board: GHQState["board"] = [
@@ -233,6 +247,53 @@ describe("computing allowed captures v2", () => {
       [null, null, null, null, null, null, null, null],
       [null, RAIR, null, null, null, null, null, null],
     ];
-    expect(captureCandidatesV2(RAIR, [2, 2], board)).toEqual([[2, 1]]);
+    expect(
+      captureCandidatesV2({
+        attacker: RAIR,
+        attackerFrom: [7, 1],
+        attackerTo: [2, 2],
+        board,
+      })
+    ).toEqual([[2, 1]]);
+  });
+  it("doesn't allow capturing defended pieces", () => {
+    const board: GHQState["board"] = [
+      [B_HQ, BART, null, null, null, null, null, null],
+      [BINF, BINF, BINF, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, RINF, RINF, RINF],
+      [null, null, null, null, RAIR, null, RART, R_HQ],
+    ];
+    expect(
+      captureCandidatesV2({
+        attacker: RAIR,
+        attackerFrom: [7, 4],
+        attackerTo: [0, 2],
+        board,
+      })
+    ).toEqual([]);
+  });
+  it("doesn't allow capturing defended pieces", () => {
+    const board: GHQState["board"] = [
+      [B_HQ, BART, null, BAIR, null, null, null, null],
+      [BINF, BINF, BINF, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, RINF, RINF, RINF],
+      [null, null, null, null, null, null, RART, R_HQ],
+    ];
+    expect(
+      captureCandidatesV2({
+        attacker: BAIR,
+        attackerFrom: [0, 3],
+        attackerTo: [7, 5],
+        board,
+      })
+    ).toEqual([]);
   });
 });

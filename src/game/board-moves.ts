@@ -83,7 +83,12 @@ export function getAllowedMoves({
       } else {
         allMoves.push({ name: "Move", args: [playerPiece.coordinate, move] });
 
-        const captures = captureCandidatesV2(playerPiece.piece, move, board);
+        const captures = captureCandidatesV2({
+          attacker: playerPiece.piece,
+          attackerFrom: playerPiece.coordinate,
+          attackerTo: move,
+          board,
+        });
         for (const capture of captures) {
           allMoves.push({
             name: "Move",
