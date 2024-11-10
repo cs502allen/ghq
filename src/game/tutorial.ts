@@ -8,7 +8,9 @@ const B: Record<string, Square> = {
   AI: { type: "ARMORED_INFANTRY", player: "BLUE" },
   AB: { type: "AIRBORNE_INFANTRY", player: "BLUE" },
   AR: { type: "ARTILLERY", player: "BLUE", orientation: 180 },
+  A1: { type: "ARTILLERY", player: "BLUE", orientation: 135 },
   AA: { type: "ARMORED_ARTILLERY", player: "BLUE", orientation: 180 },
+  A2: { type: "ARMORED_ARTILLERY", player: "BLUE", orientation: 225 },
   HA: { type: "HEAVY_ARTILLERY", player: "BLUE", orientation: 180 },
   H1: { type: "HEAVY_ARTILLERY", player: "BLUE", orientation: 135 },
 };
@@ -153,6 +155,26 @@ export const boards: Record<string, GHQState["board"]> = {
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, R.AB, R.HQ],
+  ],
+  "Puzzle: Collapse the center line": [
+    [B.HQ, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, B.IN, null, null, null, null, null, null],
+    [null, null, B.AI, B.AI, B.AI, null, null, null],
+    [null, null, R.IN, R.IN, R.IN, null, null, null],
+    [null, null, null, null, null, R.AI, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, R.HQ],
+  ],
+  "Puzzle: Avoid being captured next turn": [
+    [B.HQ, null, null, null, null, null, null, null],
+    [null, B.AI, B.A1, B.IN, B.IN, B.A2, null, null],
+    [null, null, B.AI, null, null, B.IN, B.IN, null],
+    [null, null, null, R.IN, R.AR, R.IN, null, null],
+    [null, null, null, null, R.AI, null, null, null],
+    [null, null, null, null, R.AI, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, R.HQ],
   ],
 };
 
