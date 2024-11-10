@@ -107,7 +107,9 @@ function getAdjacentPieces(
 
 function maximizeEngagement(
   board: GHQState["board"],
-  excludeCoordinate: Coordinate | null
+  excludeCoordinate: Coordinate | null,
+  attacker?: NonNullSquare,
+  attackerCoordinates?: Coordinate
 ): Record<Player, Coordinate>[] {
   const N = 8; // Size of the board
 
@@ -134,7 +136,17 @@ function maximizeEngagement(
         continue;
       }
 
-      const unit = board[i]?.[j];
+      let attackerUnit: Square = null;
+      if (
+        attacker &&
+        attackerCoordinates &&
+        attackerCoordinates[0] === i &&
+        attackerCoordinates[1] === j
+      ) {
+        attackerUnit = attacker;
+      }
+
+      const unit = attackerUnit || board[i]?.[j];
       if (!unit) {
         continue;
       }
@@ -391,4 +403,74 @@ export function getCapturedPieces({
   }
 
   return capturedFleet as CapturedFleet;
+}
+
+export function captureCandidatesV2(
+  attacker: NonNullSquare,
+  attackerCoordinates: Coordinate,
+  board: GHQState["board"]
+): Coordinate[] {
+  const engagedPairs = maximizeEngagement(board, null);
+
+  // If you're not infantry, you're not capturing anything boi
+  if (!isInfantry(attacker)) {
+    return [];
+  }
+
+  const engagedInfantry: Record<string, Player> = {};
+  for (const pairs of engagedPairs) {
+    engagedInfantry[`${pairs.RED[0]},${pairs.RED[1]}`] = "RED";
+    engagedInfantry[`${pairs.BLUE[0]},${pairs.BLUE[1]}`] = "BLUE";
+  }
+
+  // If moving here could result in more engaged pairs, then we can't capture anything.
+  const potentiallyEngagedPairs = maximizeEngagement(
+    board,
+    null,
+    attacker,
+    attackerCoordinates
+  );
+  if (potentiallyEngagedPairs.length > engagedPairs.length) {
+    return [];
+  }
+
+  // Find the adjacent pieces to the last moved infantry
+  const attackerAdjacentPieces = getAdjacentPieces(board, attackerCoordinates);
+
+  // Find capturable pieces
+  const attackablePieces = attackerAdjacentPieces.filter((coord) => {
+    const piece = board[coord[0]][coord[1]];
+
+    // It must be an enemy piece
+    if (!isEnemyPiece({ piece, attacker })) {
+      return false;
+    }
+
+    // If it is already engaged, it's capturable
+    if (isAlreadyEngaged(engagedInfantry, coord)) {
+      return true;
+    }
+
+    // If it's non-infantry and non-HQ, it's capturable
+    if (!isInfantry(piece) && !isHQ(piece)) {
+      return true;
+    }
+
+    // If it's capturable HQ, it's capturable
+    if (
+      isCapturableHQ({
+        board,
+        engagedInfantry,
+        lastMovedInfantry: attackerCoordinates,
+        coord,
+        attacker,
+      })
+    ) {
+      return true;
+    }
+
+    return false;
+  });
+
+  return attackablePieces;
 }

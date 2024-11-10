@@ -4,9 +4,9 @@ import { INVALID_MOVE } from "boardgame.io/core";
 import { clearBombardedSquares } from "@/game/capture-logic";
 import { appendHistory, HistoryPlugin } from "./move-history-plugin";
 import { getGameoverState } from "./gameover-logic";
-import { isMoveAllowed } from "./board-moves";
+import { getAllowedMoves, isMoveAllowed } from "./board-moves";
 import { calculateEval } from "./eval";
-import { isAuthorizedToMovePiece } from "./move-logic";
+import { ai } from "./ai";
 
 export const Units: {
   [key: string]: {
@@ -79,6 +79,32 @@ export type ReserveFleet = {
   HEAVY_ARTILLERY: number;
 };
 
+export type AllowedMove =
+  | ReinforceMove
+  | MoveMove
+  | MoveAndOrientMove
+  | SkipMove;
+
+export interface ReinforceMove {
+  name: "Reinforce";
+  args: [unitType: keyof ReserveFleet, to: Coordinate];
+}
+
+export interface MoveMove {
+  name: "Move";
+  args: [from: Coordinate, to: Coordinate, capturePreference?: Coordinate];
+}
+
+export interface MoveAndOrientMove {
+  name: "MoveAndOrient";
+  args: [from: Coordinate, to: Coordinate, orientation?: Orientation];
+}
+
+export interface SkipMove {
+  name: "Skip";
+  args: [];
+}
+
 export interface GHQState {
   isOnline?: boolean;
   matchId: string;
@@ -100,6 +126,7 @@ export interface GHQState {
     [Square, Square, Square, Square, Square, Square, Square, Square],
     [Square, Square, Square, Square, Square, Square, Square, Square]
   ];
+  thisTurnMoves: AllowedMove[];
   eval: number;
   redReserve: ReserveFleet;
   blueReserve: ReserveFleet;
@@ -130,6 +157,14 @@ const Reinforce: Move<GHQState> = (
   to: Coordinate
 ) => {
   const reserve = ctx.currentPlayer === "0" ? G.redReserve : G.blueReserve;
+  if (
+    !isMoveAllowed(G, ctx, {
+      name: "Reinforce",
+      args: [unitType, to],
+    })
+  ) {
+    return INVALID_MOVE;
+  }
 
   if (reserve[unitType] === 0) {
     return INVALID_MOVE;
@@ -156,6 +191,10 @@ const Reinforce: Move<GHQState> = (
   };
   G.board[to[0]][to[1]] = s;
 
+  G.thisTurnMoves.push({
+    name: "Reinforce",
+    args: [unitType, to],
+  });
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
   G.eval = calculateEval(G.board);
 };
@@ -166,7 +205,12 @@ const Move: Move<GHQState> = (
   capturePreference?: Coordinate
 ) => {
   const piece = G.board[from[0]][from[1]];
-  if (!isAuthorizedToMovePiece(ctx, piece)) {
+  if (
+    !isMoveAllowed(G, ctx, {
+      name: "Move",
+      args: [from, to, capturePreference],
+    })
+  ) {
     return INVALID_MOVE;
   }
 
@@ -184,6 +228,10 @@ const Move: Move<GHQState> = (
     G.lastTurnCaptures[ctx.currentPlayer as "0" | "1"].push(capturePreference);
   }
 
+  G.thisTurnMoves.push({
+    name: "Move",
+    args: [from, to],
+  });
   log.setMetadata({
     pieceType: piece?.type,
     capturePreference,
@@ -202,7 +250,12 @@ const MoveAndOrient: Move<GHQState> = (
   if (typeof Units[piece.type].artilleryRange === "undefined") {
     return INVALID_MOVE;
   }
-  if (!isAuthorizedToMovePiece(ctx, piece)) {
+  if (
+    !isMoveAllowed(G, ctx, {
+      name: "MoveAndOrient",
+      args: [from, to, orientation],
+    })
+  ) {
     return INVALID_MOVE;
   }
 
@@ -210,6 +263,11 @@ const MoveAndOrient: Move<GHQState> = (
   G.board[from[0]][from[1]] = null;
   G.board[to[0]][to[1]] = piece;
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
+
+  G.thisTurnMoves.push({
+    name: "MoveAndOrient",
+    args: [from, to, orientation],
+  });
   log.setMetadata({ pieceType: piece?.type });
   G.eval = calculateEval(G.board);
 };
@@ -219,7 +277,12 @@ const ChangeOrientation: Move<GHQState> = (
   orientation: Orientation
 ) => {
   const piece = G.board[on[0]][on[1]];
-  if (!isAuthorizedToMovePiece(ctx, piece)) {
+  if (
+    !isMoveAllowed(G, ctx, {
+      name: "MoveAndOrient",
+      args: [on, on, orientation],
+    })
+  ) {
     return INVALID_MOVE;
   }
 
@@ -339,6 +402,7 @@ export const GHQGame: Game<GHQState> = {
           { type: "HQ", player: "RED" },
         ],
       ],
+      thisTurnMoves: [],
       eval: 0,
       redReserve: {
         INFANTRY: 5,
@@ -378,6 +442,7 @@ export const GHQGame: Game<GHQState> = {
   turn: {
     maxMoves: 3,
     onBegin: ({ ctx, G, random, log, ...plugins }) => {
+      G.thisTurnMoves = [];
       G.lastTurnMoves[ctx.currentPlayer as "0" | "1"] = [];
       G.lastTurnCaptures[ctx.currentPlayer as "0" | "1"] = [];
 
@@ -413,6 +478,7 @@ export const GHQGame: Game<GHQState> = {
   minPlayers: 2,
   maxPlayers: 2,
   moves: GameMoves,
+  ai,
 };
 
 export function newOnlineGHQGame({

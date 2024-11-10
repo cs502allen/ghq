@@ -26,6 +26,8 @@ export function calculateEval(board: GHQState["board"]): number {
     BLUE: 0,
   };
 
+  // TODO(tyler): give points for bombarding central squares
+
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board[i].length; j++) {
       const square = board[i][j];

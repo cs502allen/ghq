@@ -47,6 +47,10 @@ function App() {
     router.push("/");
   }
 
+  async function playBot() {
+    router.push("/bot");
+  }
+
   if (!user) {
     return null;
   }
@@ -57,6 +61,7 @@ function App() {
       <div className="flex gap-2">
         <PlayOnlineButton />
         <Button onClick={playLocal}>👨‍💻 Play local</Button>
+        <Button onClick={playBot}>🤖 Play bot</Button>
       </div>
 
       <Learn />
