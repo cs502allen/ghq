@@ -7,13 +7,6 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   color: var(--foreground);
   background: var(--background);
@@ -69,10 +62,9 @@ body {
   height: 100%;
   position: absolute;
   pointer-events: none; /* Ensures the overlay doesn't interfere with clicks */
-
 }
 .target-square::after {
-  content: '⌖'; /* The Unicode character */
+  content: "⌖"; /* The Unicode character */
   position: absolute;
   top: -45%;
   left: 50%;
