@@ -45,7 +45,6 @@ export default function ReplayCapability({ client }: { client: any }) {
     }
 
     const log = nonAutomaticLogs(client.log);
-    console.log(log);
 
     let state = initialState;
     for (let i = 0; i < log.length; i++) {
