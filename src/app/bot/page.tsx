@@ -8,6 +8,7 @@ import ReplayCapability from "@/game/ReplayCapability";
 import { Local } from "boardgame.io/multiplayer";
 import { MCTSBot } from "boardgame.io/ai";
 
+// From https://github.com/boardgameio/boardgame.io/issues/7 so we can pass in custom iterations/playoutDepth
 class CustomMCTSBot extends MCTSBot {
   constructor(opts: any) {
     super({ ...opts, ...opts.game.ai });
@@ -27,7 +28,6 @@ export default function Page() {
     <div>
       {client && <ReplayCapability client={client} />}
       <App ref={(ref) => setClient(ref?.client)} playerID="0" />
-      {/* <App ref={(ref) => setClient(ref?.client)} /> */}
     </div>
   );
 }
