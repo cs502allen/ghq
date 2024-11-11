@@ -38,6 +38,8 @@ const rows = 8;
 const columns = 8;
 
 import { useMeasure } from "@uidotdev/usehooks";
+import { Button } from "@/app/live/Button";
+import { useRouter } from "next/navigation";
 
 const squareSizes = {
   small: 75,
@@ -67,6 +69,7 @@ export function GHQBoard({
   plugins,
   log,
 }: BoardProps<GHQState>) {
+  const router = useRouter();
   const [usernames, setUsernames] = React.useState<string[]>([]);
 
   const [measureRef, { width, height }] = useMeasure();
@@ -806,7 +809,7 @@ export function GHQBoard({
                 )}
               </h2>
               {ctx.gameover.reason && ctx.gameover.reason}
-              <PlayOnlineButton />
+              <Button onClick={async () => router.push("/")}>🏠 Home</Button>
             </div>
           ) : (
             <div
@@ -821,15 +824,20 @@ export function GHQBoard({
                 {ctx.numMoves !== 2 ? "s" : ""}{" "}
               </div>
               <div className="flex gap-1 justify-center items-center">
-                <SkipButton skip={() => moves.Skip()} />
-                {G.drawOfferedBy && G.drawOfferedBy !== ctx.currentPlayer ? (
-                  <AcceptDrawButton draw={() => moves.AcceptDraw()} />
-                ) : (
-                  <OfferDrawButton
-                    draw={(offer: boolean) => moves.OfferDraw(offer)}
-                  />
+                {ctx.currentPlayer === playerID && (
+                  <>
+                    <SkipButton skip={() => moves.Skip()} />
+                    {G.drawOfferedBy &&
+                    G.drawOfferedBy !== ctx.currentPlayer ? (
+                      <AcceptDrawButton draw={() => moves.AcceptDraw()} />
+                    ) : (
+                      <OfferDrawButton
+                        draw={(offer: boolean) => moves.OfferDraw(offer)}
+                      />
+                    )}
+                    <ResignButton resign={() => moves.Resign()} />
+                  </>
                 )}
-                <ResignButton resign={() => moves.Resign()} />
               </div>
             </div>
           )}
