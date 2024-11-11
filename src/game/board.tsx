@@ -1,4 +1,12 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+"use client";
+
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Coordinate,
   GHQState,
@@ -28,6 +36,14 @@ import { coordsForThisTurnMoves } from "./board-moves";
 
 const rows = 8;
 const columns = 8;
+
+import { useMeasure } from "@uidotdev/usehooks";
+
+const squareSizes = {
+  small: 75,
+  large: 90,
+};
+
 //coordinate string x,y
 type Annotations = {
   [key: string]: {
@@ -51,8 +67,18 @@ export function GHQBoard({
   plugins,
   log,
 }: BoardProps<GHQState>) {
-  const divRef = useRef(null); // Create a ref
   const [usernames, setUsernames] = React.useState<string[]>([]);
+
+  const [measureRef, { width, height }] = useMeasure();
+
+  const squareSize = useMemo(() => {
+    const smallestDim: number = Math.min(width || 0, height || 0);
+    if (smallestDim && smallestDim - 90 - squareSizes.large * 8 > 0) {
+      return squareSizes.large;
+    } else {
+      return squareSizes.small;
+    }
+  }, [width, height]);
 
   useEffect(() => {
     async function fetchUsernames() {
@@ -118,6 +144,20 @@ export function GHQBoard({
     })
   );
 
+  const renderBoard = state.matches("replay")
+    ? ctx.currentPlayer === "0"
+      ? G.redTurnStartBoard
+      : G.blueTurnStartBoard
+    : G.board;
+
+  const renderMoves = state.matches("replay")
+    ? G.lastPlayerMoves
+    : G.thisTurnMoves;
+
+  useEffect(() => {
+    console.log(JSON.stringify(renderMoves));
+  }, [renderMoves]);
+
   useHotkeys("escape", () => send({ type: "DESELECT" }), [send]);
   useHotkeys(
     "left",
@@ -137,12 +177,17 @@ export function GHQBoard({
   );
 
   useEffect(() => {
-    send({
-      type: "START_TURN",
-      player: isPrimaryPlayer("0") ? "RED" : "BLUE",
-      disabledPieces: coordsForThisTurnMoves(G.thisTurnMoves),
-    });
-  }, [isPrimaryPlayer, G.thisTurnMoves]);
+    if (G.isOnline && ctx.currentPlayer !== playerID) {
+      send({ type: "NOT_TURN" });
+    } else {
+      console.log("NEW TURN");
+      send({
+        type: "START_TURN",
+        player: isPrimaryPlayer("0") ? "RED" : "BLUE",
+        disabledPieces: coordsForThisTurnMoves(G.thisTurnMoves),
+      });
+    }
+  }, [isPrimaryPlayer, ctx.turn]);
 
   const [rightClicked, setRightClicked] = React.useState<Set<string>>(
     new Set()
@@ -172,7 +217,7 @@ export function GHQBoard({
         : { moveTo: true };
     });
 
-    const bombarded = bombardedSquares(G.board);
+    const bombarded = bombardedSquares(renderBoard);
     Object.entries(bombarded).forEach(([key, value]) => {
       if (annotate[key]) {
         annotate[key].bombardedBy = value;
@@ -231,7 +276,7 @@ export function GHQBoard({
     }
 
     return annotate;
-  }, [state.context, G.board]);
+  }, [state.context, renderBoard]);
 
   const lastTurnMoves = new Set<string>();
   for (const [key, value] of Object.entries(G.lastTurnMoves ?? {})) {
@@ -259,13 +304,132 @@ export function GHQBoard({
     [plugins.history.data, log]
   );
 
+  const pieces = useMemo(() => {
+    return renderBoard.map((cols, x) => {
+      return cols.map((square, y) => {
+        // has piece on it
+        if (square) {
+          const add180 =
+            square &&
+            ((isPrimaryPlayer("0") && square.player === "BLUE") ||
+              (isPrimaryPlayer("1") && square.player === "RED"));
+
+          const annotationsForSquare = annotations[`${x},${y}`];
+
+          const moved = state.matches("replay.animate")
+            ? renderMoves.filter(
+                (i) =>
+                  (i.name === "Move" || i.name === "MoveAndOrient") &&
+                  i.args[0][0] === x &&
+                  i.args[0][1] === y
+              )[0]
+            : undefined;
+
+          if (moved) console.log("MOVED " + JSON.stringify(moved));
+
+          const moveOrder = moved ? renderMoves.indexOf(moved) : 0;
+
+          const renderX = moved ? moved.args[1]![0] : x;
+          const renderY = moved ? moved.args[1]![1] : y;
+
+          const left = isPrimaryPlayer("1")
+            ? squareSize * 8 - renderY * squareSize - squareSize
+            : renderY * squareSize;
+          const top = isPrimaryPlayer("1")
+            ? squareSize * 8 - renderX * squareSize - squareSize
+            : renderX * squareSize;
+
+          const renderedOrientation =
+            moved && moved.args[2]
+              ? (moved.args[2] as Orientation)
+              : square.orientation;
+
+          if (moved)
+            console.log(
+              "RENDERED ORIENTATION",
+              renderedOrientation,
+              square.orientation
+            );
+
+          const selectingOrientation = Boolean(
+            square &&
+              Units[square.type].artilleryRange &&
+              annotationsForSquare?.selectedPiece
+          );
+          const hidePiece = Boolean(annotations[`${x},${y}`]?.hidePiece);
+
+          return (
+            <div
+              key={`${x},${y}`}
+              className={classNames(
+                "pointer-events-none absolute w-20 h-5 flex items-center justify-center",
+                { ["animate-move"]: state.matches("replay.animate") }
+              )}
+              style={{
+                left,
+                top,
+                width: squareSize,
+                height: squareSize,
+                transitionDelay: `${moveOrder * 250}ms`,
+              }}
+            >
+              {square && !selectingOrientation && !hidePiece ? (
+                <div
+                  className={classNames(
+                    "flex items-center justify-center select-none font-bold text-3xl",
+                    square.player === "RED" ? "text-red-600" : "text-blue-600",
+                    {
+                      // @todo this is really only for infantry. Adjust when we do orientation
+                      // ["rotate-180"]:
+                      //   (isPrimaryPlayer("0") && square.player === "BLUE") ||
+                      //   (isPrimaryPlayer("1") && square.player === "RED"),
+                    }
+                  )}
+                >
+                  <img
+                    src={`/${
+                      Units[square.type].imagePathPrefix
+                    }-${square.player.toLowerCase()}.png`}
+                    width="52"
+                    height="52"
+                    className={classNames(
+                      "select-none",
+                      { ["animate-move"]: state.matches("replay.animate") },
+                      {
+                        ["opacity-50"]:
+                          (ctx.currentPlayer === "0" &&
+                            square.player === "BLUE") ||
+                          (ctx.currentPlayer === "1" &&
+                            square.player === "RED"),
+                      }
+                    )}
+                    draggable="false"
+                    style={{
+                      transitionDelay: `${moveOrder * 250}ms`,
+                      transform: renderedOrientation
+                        ? isPrimaryPlayer("1")
+                          ? `rotate(${renderedOrientation - 180}deg)`
+                          : `rotate(${renderedOrientation}deg)`
+                        : `rotate(${add180 ? 180 : 0}deg)`,
+                    }}
+                    alt={Units[square.type].imagePathPrefix}
+                  />
+                </div>
+              ) : null}
+            </div>
+          );
+        }
+      });
+    });
+  }, [ctx.turn, renderBoard, state.value, renderMoves]);
+
   const cells = Array.from({ length: rows }).map((_, rowIndex) => {
     const colN = Array.from({ length: columns }, (_, index) => index);
     const cols = isPrimaryPlayer("0") ? colN : colN.reverse();
     return (
       <tr key={rowIndex}>
         {cols.map((colIndex) => {
-          const square = G.board[rowIndex][colIndex];
+          const square = renderBoard[rowIndex][colIndex];
 
           const annotationsForSquare = annotations[`${rowIndex},${colIndex}`];
 
@@ -357,8 +521,8 @@ export function GHQBoard({
                     ? "inset 0 0 8px darkgray"
                     : "",
                 textAlign: "center",
-                width: "90px",
-                height: "90px",
+                width: squareSize,
+                height: squareSize,
               }}
             >
               {lastTurnMoves.has(`${rowIndex},${colIndex}`) ? (
@@ -372,43 +536,43 @@ export function GHQBoard({
                 colIndex={colIndex}
                 rowIndex={rowIndex}
               />
-              {square && !selectingOrientation && !hidePiece ? (
-                <div
-                  className={classNames(
-                    "flex items-center justify-center select-none font-bold text-3xl",
-                    square.player === "RED" ? "text-red-600" : "text-blue-600",
-                    {
-                      // @todo this is really only for infantry. Adjust when we do orientation
-                      // ["rotate-180"]:
-                      //   (isPrimaryPlayer("0") && square.player === "BLUE") ||
-                      //   (isPrimaryPlayer("1") && square.player === "RED"),
-                    }
-                  )}
-                >
-                  <img
-                    src={`/${
-                      Units[square.type].imagePathPrefix
-                    }-${square.player.toLowerCase()}.png`}
-                    width="52"
-                    height="52"
-                    className={classNames("select-none", {
-                      ["opacity-50"]:
-                        (ctx.currentPlayer === "0" &&
-                          square.player === "BLUE") ||
-                        (ctx.currentPlayer === "1" && square.player === "RED"),
-                    })}
-                    draggable="false"
-                    style={{
-                      transform: square.orientation
-                        ? isPrimaryPlayer("1")
-                          ? `rotate(${square.orientation - 180}deg)`
-                          : `rotate(${square.orientation}deg)`
-                        : `rotate(${add180 ? 180 : 0}deg)`,
-                    }}
-                    alt={Units[square.type].imagePathPrefix}
-                  />
-                </div>
-              ) : null}
+              {/*{square && !selectingOrientation && !hidePiece ? (*/}
+              {/*  <div*/}
+              {/*    className={classNames(*/}
+              {/*      "flex items-center justify-center select-none font-bold text-3xl",*/}
+              {/*      square.player === "RED" ? "text-red-600" : "text-blue-600",*/}
+              {/*      {*/}
+              {/*        // @todo this is really only for infantry. Adjust when we do orientation*/}
+              {/*        // ["rotate-180"]:*/}
+              {/*        //   (isPrimaryPlayer("0") && square.player === "BLUE") ||*/}
+              {/*        //   (isPrimaryPlayer("1") && square.player === "RED"),*/}
+              {/*      }*/}
+              {/*    )}*/}
+              {/*  >*/}
+              {/*    <img*/}
+              {/*      src={`/${*/}
+              {/*        Units[square.type].imagePathPrefix*/}
+              {/*      }-${square.player.toLowerCase()}.png`}*/}
+              {/*      width="52"*/}
+              {/*      height="52"*/}
+              {/*      className={classNames("select-none", {*/}
+              {/*        ["opacity-50"]:*/}
+              {/*          (ctx.currentPlayer === "0" &&*/}
+              {/*            square.player === "BLUE") ||*/}
+              {/*          (ctx.currentPlayer === "1" && square.player === "RED"),*/}
+              {/*      })}*/}
+              {/*      draggable="false"*/}
+              {/*      style={{*/}
+              {/*        transform: square.orientation*/}
+              {/*          ? isPrimaryPlayer("1")*/}
+              {/*            ? `rotate(${square.orientation - 180}deg)`*/}
+              {/*            : `rotate(${square.orientation}deg)`*/}
+              {/*          : `rotate(${add180 ? 180 : 0}deg)`,*/}
+              {/*      }}*/}
+              {/*      alt={Units[square.type].imagePathPrefix}*/}
+              {/*    />*/}
+              {/*  </div>*/}
+              {/*) : null}*/}
 
               {annotationsForSquare?.showProxyPiece ? (
                 <div
@@ -455,6 +619,7 @@ export function GHQBoard({
 
               {square && selectingOrientation && !hidePiece ? (
                 <SelectOrientation
+                  squareSize={squareSize}
                   initialOrientation={square.orientation!}
                   player={square.player}
                   onChange={(orientation: Orientation) => {
@@ -491,6 +656,7 @@ export function GHQBoard({
               {showTarget ? <div className="target-square "></div> : null}
               {aiming && state.context.selectedPiece ? (
                 <SelectOrientation
+                  squareSize={squareSize}
                   initialOrientation={
                     state.context.selectedPiece!.piece!.orientation!
                   }
@@ -536,22 +702,38 @@ export function GHQBoard({
   });
 
   return (
-    <div className="grid bg-gray-100 absolute w-full h-[calc(100%-40px)] grid-cols-8">
+    <div className="flex bg-gray-100 absolute w-full h-[calc(100%-40px)] grid-cols-8">
       <SoundPlayer ctx={ctx} G={G} />
-      <div className={classNames("col-span-2 bg-white")}>
+      <div className={classNames("flex-1  bg-white")}>
         <EvalBar evalValue={G.eval} />
         <HistoryLog systemMessages={plugins.history.data} log={log} />
       </div>
-      <div className="col-span-4 border-r-2 border-gray-100 flex items-center justify-center">
-        <table ref={divRef} style={{ borderCollapse: "collapse" }}>
+      <div
+        className=" border-r-2 border-gray-100 flex items-center justify-center relative "
+        ref={measureRef}
+        style={{
+          width: squareSize * 8,
+          height: squareSize * 8,
+        }}
+      >
+        <table
+          style={{
+            borderCollapse: "collapse",
+            width: squareSize * 8,
+            height: squareSize * 8,
+          }}
+          className="table-fixed relative"
+        >
           {/*flip board*/}
           <tbody>{isPrimaryPlayer("0") ? cells : cells.reverse()}</tbody>
+          {/*overlay pieces */}
         </table>
+        {pieces}
       </div>
 
       <div
         className={classNames(
-          "col-span-2  bg-white flex flex-col justify-between",
+          "flex-1  bg-white flex flex-col justify-between",
           isPrimaryPlayer("0") ? "bg-red-50" : "bg-blue-50"
         )}
       >

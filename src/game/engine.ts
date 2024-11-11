@@ -127,6 +127,27 @@ export interface GHQState {
     [Square, Square, Square, Square, Square, Square, Square, Square],
     [Square, Square, Square, Square, Square, Square, Square, Square]
   ];
+  redTurnStartBoard: [
+    [Square, Square, Square, Square, Square, Square, Square, Square],
+    [Square, Square, Square, Square, Square, Square, Square, Square],
+    [Square, Square, Square, Square, Square, Square, Square, Square],
+    [Square, Square, Square, Square, Square, Square, Square, Square],
+    [Square, Square, Square, Square, Square, Square, Square, Square],
+    [Square, Square, Square, Square, Square, Square, Square, Square],
+    [Square, Square, Square, Square, Square, Square, Square, Square],
+    [Square, Square, Square, Square, Square, Square, Square, Square]
+  ];
+  blueTurnStartBoard: [
+    [Square, Square, Square, Square, Square, Square, Square, Square],
+    [Square, Square, Square, Square, Square, Square, Square, Square],
+    [Square, Square, Square, Square, Square, Square, Square, Square],
+    [Square, Square, Square, Square, Square, Square, Square, Square],
+    [Square, Square, Square, Square, Square, Square, Square, Square],
+    [Square, Square, Square, Square, Square, Square, Square, Square],
+    [Square, Square, Square, Square, Square, Square, Square, Square],
+    [Square, Square, Square, Square, Square, Square, Square, Square]
+  ];
+  lastPlayerMoves: AllowedMove[];
   thisTurnMoves: AllowedMove[];
   eval: number;
   redReserve: ReserveFleet;
@@ -294,6 +315,10 @@ const ChangeOrientation: Move<GHQState> = (
   piece!.orientation = orientation;
   G.board[on[0]][on[1]] = piece;
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(on);
+  G.thisTurnMoves.push({
+    name: "MoveAndOrient",
+    args: [on, on, orientation],
+  });
   log.setMetadata({ pieceType: piece?.type });
   G.eval = calculateEval(G.board);
 };
@@ -351,6 +376,53 @@ export const GameMoves = {
 
 export type GameMoveType = typeof GameMoves;
 
+export const defaultBoard: GHQState["board"] = [
+  [
+    { type: "HQ", player: "BLUE" },
+    { type: "ARTILLERY", player: "BLUE", orientation: 180 },
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+  ],
+  [
+    { type: "INFANTRY", player: "BLUE" },
+    { type: "INFANTRY", player: "BLUE" },
+    { type: "INFANTRY", player: "BLUE" },
+    null,
+    null,
+    null,
+    null,
+    null,
+  ],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [
+    null,
+    null,
+    null,
+    null,
+    null,
+    { type: "INFANTRY", player: "RED" },
+    { type: "INFANTRY", player: "RED" },
+    { type: "INFANTRY", player: "RED" },
+  ],
+  [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    { type: "ARTILLERY", player: "RED", orientation: 0 },
+    { type: "HQ", player: "RED" },
+  ],
+];
+
 export const GHQGame: Game<GHQState> = {
   plugins: [HistoryPlugin],
   setup: ({ ctx, ...plugins }, setupData) => {
@@ -360,53 +432,11 @@ export const GHQGame: Game<GHQState> = {
       blueElapsed: 0,
       redElapsed: 0,
       bonusTime: 5 * 1000,
+      lastPlayerMoves: [],
       timeControl: 10 * 60 * 1000,
-      board: [
-        [
-          { type: "HQ", player: "BLUE" },
-          { type: "ARTILLERY", player: "BLUE", orientation: 180 },
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-        ],
-        [
-          { type: "INFANTRY", player: "BLUE" },
-          { type: "INFANTRY", player: "BLUE" },
-          { type: "INFANTRY", player: "BLUE" },
-          null,
-          null,
-          null,
-          null,
-          null,
-        ],
-        [null, null, null, null, null, null, null, null],
-        [null, null, null, null, null, null, null, null],
-        [null, null, null, null, null, null, null, null],
-        [null, null, null, null, null, null, null, null],
-        [
-          null,
-          null,
-          null,
-          null,
-          null,
-          { type: "INFANTRY", player: "RED" },
-          { type: "INFANTRY", player: "RED" },
-          { type: "INFANTRY", player: "RED" },
-        ],
-        [
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          { type: "ARTILLERY", player: "RED", orientation: 0 },
-          { type: "HQ", player: "RED" },
-        ],
-      ],
+      redTurnStartBoard: defaultBoard,
+      blueTurnStartBoard: defaultBoard,
+      board: defaultBoard,
       thisTurnMoves: [],
       eval: 0,
       redReserve: {
@@ -447,6 +477,7 @@ export const GHQGame: Game<GHQState> = {
   turn: {
     maxMoves: 3,
     onBegin: ({ ctx, G, random, log, ...plugins }) => {
+      G.lastPlayerMoves = G.thisTurnMoves;
       G.thisTurnMoves = [];
       G.lastTurnMoves[ctx.currentPlayer as "0" | "1"] = [];
       G.lastTurnCaptures[ctx.currentPlayer as "0" | "1"] = [];
@@ -470,6 +501,13 @@ export const GHQGame: Game<GHQState> = {
     },
     onEnd: ({ ctx, G }) => {
       const elapsed = Date.now() - G.turnStartTime;
+
+      if (ctx.currentPlayer === "0") {
+        G.redTurnStartBoard = JSON.parse(JSON.stringify(G.board));
+      } else {
+        G.blueTurnStartBoard = JSON.parse(JSON.stringify(G.board));
+      }
+
       if (ctx.currentPlayer === "0") {
         G.redElapsed = G.redElapsed + elapsed - G.bonusTime;
       } else {
