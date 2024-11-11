@@ -52,8 +52,8 @@ function App() {
     router.push("/bot");
   }
 
-  if (!user) {
-    return null;
+  async function goLearn() {
+    router.push("/learn");
   }
 
   return (
@@ -68,12 +68,13 @@ function App() {
         </div>
 
         <div className="col-span-1 flex flex-col gap-2">
-          <div className="flex flex-col gap-4 border rounded p-2">
+          <div className="flex flex-col gap-2 border rounded p-4">
             <div className="text-2xl">Play a game</div>
-            <div className="flex flex-col gap-4 justify-center items-center">
+            <div className="flex flex-wrap gap-2 justify-center items-center">
               <PlayOnlineButton />
               <Button onClick={playLocal}>👨‍💻 Pass n&apos; Play</Button>
               <Button onClick={playBot}>🤖 Play Bot</Button>
+              <Button onClick={goLearn}>📚 Learn</Button>
             </div>
           </div>
 
