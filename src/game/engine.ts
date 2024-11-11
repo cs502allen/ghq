@@ -4,7 +4,7 @@ import { INVALID_MOVE } from "boardgame.io/core";
 import { clearBombardedSquares } from "@/game/capture-logic";
 import { appendHistory, HistoryPlugin } from "./move-history-plugin";
 import { getGameoverState } from "./gameover-logic";
-import { getAllowedMoves, isMoveAllowed } from "./board-moves";
+import { isMoveAllowed } from "./board-moves";
 import { calculateEval } from "./eval";
 import { ai } from "./ai";
 
@@ -107,6 +107,7 @@ export interface SkipMove {
 
 export interface GHQState {
   isOnline?: boolean;
+  isReplayMode?: boolean;
   matchId: string;
   userIds: {
     "0": string;
@@ -158,6 +159,7 @@ const Reinforce: Move<GHQState> = (
 ) => {
   const reserve = ctx.currentPlayer === "0" ? G.redReserve : G.blueReserve;
   if (
+    !G.isReplayMode &&
     !isMoveAllowed(G, ctx, {
       name: "Reinforce",
       args: [unitType, to],
@@ -206,6 +208,7 @@ const Move: Move<GHQState> = (
 ) => {
   const piece = G.board[from[0]][from[1]];
   if (
+    !G.isReplayMode &&
     !isMoveAllowed(G, ctx, {
       name: "Move",
       args: [from, to, capturePreference],
@@ -251,6 +254,7 @@ const MoveAndOrient: Move<GHQState> = (
     return INVALID_MOVE;
   }
   if (
+    !G.isReplayMode &&
     !isMoveAllowed(G, ctx, {
       name: "MoveAndOrient",
       args: [from, to, orientation],
@@ -278,6 +282,7 @@ const ChangeOrientation: Move<GHQState> = (
 ) => {
   const piece = G.board[on[0]][on[1]];
   if (
+    !G.isReplayMode &&
     !isMoveAllowed(G, ctx, {
       name: "MoveAndOrient",
       args: [on, on, orientation],
