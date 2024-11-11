@@ -73,7 +73,7 @@ function App() {
           <Image src="/icon.png" alt="GHQ" width={32} height={32} />
           GHQ
         </div>
-        <div>
+        <div className="p-2">
           <ClerkLoading>
             <Loader2 className="w-6 h-6 text-gray-500 animate-spin" />
           </ClerkLoading>
@@ -95,12 +95,12 @@ function App() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
-        <div className="col-span-2 border rounded p-4 bg-slate-50">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+        <div className="col-span-2 border rounded p-4 bg-slate-50 lg:order-1 order-2">
           <Learn />
         </div>
 
-        <div className="col-span-1 flex flex-col gap-2">
+        <div className="col-span-1 flex flex-col gap-2 lg:order-2 order-1">
           <div className="flex flex-col gap-2 border rounded p-4 bg-slate-50">
             <div className="text-2xl">Play a game</div>
             <div className="flex flex-wrap gap-2 justify-center items-center">
