@@ -69,7 +69,7 @@ export function PlayOnlineButton() {
   return (
     <>
       <Button onClick={playOnline} loadingText="Searching...">
-        🌎 Play online
+        🌎 Play Online
       </Button>
       {isMatchmaking && <MatchmakingModal onCancel={cancelMatchmaking} />}
     </>

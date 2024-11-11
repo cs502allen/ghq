@@ -4,9 +4,9 @@ export function Learn() {
   // export const boards: Record<string, GHQState["board"]> = {
 
   return (
-    <div>
+    <div className="flex flex-col gap-2 p-2">
       <div className="text-2xl mt-2">Learn to play</div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="flex flex-col gap-1">
         {Object.keys(boards).map((boardType: string) => (
           <a
             key={boardType}

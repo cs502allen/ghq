@@ -20,7 +20,7 @@ export function Button({
 
   return (
     <button
-      className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded"
+      className="bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-600 hover:to-blue-800 text-white font-bold py-2 px-4 rounded-lg h-20 w-40"
       onClick={doOnClick}
     >
       {loading ? <div>{_loadingText}</div> : children}
