@@ -5,7 +5,7 @@ import { Button } from "./Button";
 import MatchmakingModal from "./MatchmakingModal";
 import { useCallback, useEffect, useState } from "react";
 import { API_URL } from "./config";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import { ghqFetch } from "@/lib/api";
 
 interface MatchmakingData {
@@ -34,10 +34,6 @@ export function PlayOnlineButton({
       });
       if (data.match) {
         const playerId = data.match.playerId;
-        localStorage.setItem(
-          `credentials:${data.match.id}:${playerId}`,
-          data.match.credentials
-        );
         router.push(`/live/${data.match.id}?playerId=${playerId}`);
         setIsMatchmaking(false);
       }
