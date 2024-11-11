@@ -535,11 +535,11 @@ function maximizeEngagementV2(
     }
   }
 
-  // Add attacker to the end of the list so it is prioritized last in the search.
+  // Add the attacker to the list of pieces at the end, to make it last priority for matching.
   if (attacker.player === "RED") {
     pieces0.push({ x: attackerTo[0], y: attackerTo[1] });
     piece0Index[`${attackerTo[0]},${attackerTo[1]}`] = index0++;
-  } else if (attacker.player === "BLUE") {
+  } else {
     pieces1.push({ x: attackerTo[0], y: attackerTo[1] });
     piece1Index[`${attackerTo[0]},${attackerTo[1]}`] = index1++;
   }
@@ -562,18 +562,25 @@ function maximizeEngagementV2(
 
       // Check if the adjacent position is within bounds and has a '1'
       if (
-        (x1 >= 0 &&
-          x1 < N &&
-          y1 >= 0 &&
-          y1 < N &&
-          // If red is attacking, then we're looking for any blue piece as a pair
-          board[x1]?.[y1]?.player === "BLUE") ||
-        // But if blue is attacking, the board won't have the blue piece there yet, so we need to check the attacker coordinates
-        (x1 === attackerTo[0] && y1 === attackerTo[1])
+        x1 >= 0 &&
+        x1 < N &&
+        y1 >= 0 &&
+        y1 < N &&
+        // If red is attacking, then we're looking for any blue piece as a pair
+        (board[x1]?.[y1]?.player === "BLUE" ||
+          // But if blue is attacking, the board won't have the blue piece there yet, so we need to check the attacker coordinates
+          (attacker.player === "BLUE" &&
+            x1 === attackerTo[0] &&
+            y1 === attackerTo[1]))
       ) {
         const idx1 = piece1Index[`${x1},${y1}`];
         if (idx1 !== undefined) {
-          adjList[i].push(idx1);
+          // Put attacker last in the list, to prioritize other engagements first.
+          if (x1 === attackerTo[0] && y1 === attackerTo[1]) {
+            adjList[i].push(idx1);
+          } else {
+            adjList[i].unshift(idx1);
+          }
         }
       }
     }
