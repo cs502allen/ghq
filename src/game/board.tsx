@@ -144,14 +144,14 @@ export function GHQBoard({
     })
   );
 
-  const renderBoard =
-    state.value !== "replay"
-      ? playerID === "0"
-        ? G.redTurnStartBoard
-        : G.blueTurnStartBoard
-      : G.board;
-  const renderMoves =
-    state.value === "replay" ? G.lastPlayerMoves : G.thisTurnMoves;
+  const renderBoard = state.matches("replay")
+    ? ctx.currentPlayer === "0"
+      ? G.redTurnStartBoard
+      : G.blueTurnStartBoard
+    : G.board;
+  const renderMoves = state.matches("replay")
+    ? G.lastPlayerMoves
+    : G.thisTurnMoves;
 
   useHotkeys("escape", () => send({ type: "DESELECT" }), [send]);
   useHotkeys(
@@ -175,6 +175,7 @@ export function GHQBoard({
     if (G.isOnline && ctx.currentPlayer !== playerID) {
       send({ type: "NOT_TURN" });
     } else {
+      console.log("NEW TURN");
       send({
         type: "START_TURN",
         player: isPrimaryPlayer("0") ? "RED" : "BLUE",
@@ -310,15 +311,16 @@ export function GHQBoard({
 
           const annotationsForSquare = annotations[`${x},${y}`];
 
-          console.log(JSON.stringify(renderMoves, null, 2));
-          const moved = renderMoves.filter(
-            (i) =>
-              (i.name === "Move" || i.name === "MoveAndOrient") &&
-              i.args[0][0] === x &&
-              i.args[0][1] === y
-          )[0];
+          const moved = state.matches("replay.animate")
+            ? renderMoves.filter(
+                (i) =>
+                  (i.name === "Move" || i.name === "MoveAndOrient") &&
+                  i.args[0][0] === x &&
+                  i.args[0][1] === y
+              )[0]
+            : undefined;
 
-          if (moved) console.log("was moved?", [x, y], moved && moved.args[1]);
+          const moveOrder = moved ? renderMoves.indexOf(moved) : 0;
 
           const renderX = moved ? moved.args[1]![0] : x;
           const renderY = moved ? moved.args[1]![1] : y;
@@ -337,15 +339,21 @@ export function GHQBoard({
           );
           const hidePiece = Boolean(annotations[`${x},${y}`]?.hidePiece);
 
+          console.log(`${moveOrder * 250}ms`);
+
           return (
             <div
-              key={`${state.value.toString()}-${x},${y}`}
-              className="pointer-events-none absolute w-20 h-5  animate-move flex items-center justify-center"
+              key={`${x},${y}`}
+              className={classNames(
+                "pointer-events-none absolute w-20 h-5 flex items-center justify-center",
+                { ["animate-move"]: state.matches("replay.animate") }
+              )}
               style={{
                 left,
                 top,
                 width: squareSize,
                 height: squareSize,
+                transitionDelay: `${moveOrder * 250}ms`,
               }}
             >
               {square && !selectingOrientation && !hidePiece ? (
@@ -390,7 +398,7 @@ export function GHQBoard({
         }
       });
     });
-  }, [ctx.turn, renderBoard, renderMoves]);
+  }, [ctx.turn, renderBoard, state.value, renderMoves]);
 
   const cells = Array.from({ length: rows }).map((_, rowIndex) => {
     const colN = Array.from({ length: columns }, (_, index) => index);

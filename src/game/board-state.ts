@@ -86,8 +86,18 @@ export const turnStateMachine = createMachine({
   states: {
     notTurn: {},
     replay: {
-      after: {
-        1000: "ready", // Transitions to the 'ready' state after 1000 milliseconds (1 second)
+      initial: "draw",
+      states: {
+        draw: {
+          after: {
+            200: "animate",
+          },
+        },
+        animate: {
+          after: {
+            1000: "#turn-machine.ready", // Transitions to the 'ready' state after 1000 milliseconds (1 second)
+          },
+        },
       },
     },
     ready: {

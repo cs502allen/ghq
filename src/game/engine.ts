@@ -478,12 +478,6 @@ export const GHQGame: Game<GHQState> = {
       G.lastTurnMoves[ctx.currentPlayer as "0" | "1"] = [];
       G.lastTurnCaptures[ctx.currentPlayer as "0" | "1"] = [];
 
-      if (ctx.currentPlayer === "0") {
-        G.redTurnStartBoard = JSON.parse(JSON.stringify(G.board));
-      } else {
-        G.blueTurnStartBoard = JSON.parse(JSON.stringify(G.board));
-      }
-
       const captured = clearBombardedSquares(G, ctx);
       if (captured.length > 0) {
         const clearedSquares = captured.map(({ coordinate }) => coordinate);
@@ -503,6 +497,13 @@ export const GHQGame: Game<GHQState> = {
     },
     onEnd: ({ ctx, G }) => {
       const elapsed = Date.now() - G.turnStartTime;
+
+      if (ctx.currentPlayer === "0") {
+        G.redTurnStartBoard = JSON.parse(JSON.stringify(G.board));
+      } else {
+        G.blueTurnStartBoard = JSON.parse(JSON.stringify(G.board));
+      }
+
       if (ctx.currentPlayer === "0") {
         G.redElapsed = G.redElapsed + elapsed - G.bonusTime;
       } else {
