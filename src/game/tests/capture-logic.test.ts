@@ -236,7 +236,7 @@ describe("computing allowed captures v2", () => {
       })
     ).toEqual([]);
   });
-  it("allows capturing defended pieces", () => {
+  it("doesn't allow capturing defended pieces 1", () => {
     const board: GHQState["board"] = [
       [null, null, null, null, null, null, null, null],
       [null, null, null, null, null, null, null, null],
@@ -252,6 +252,26 @@ describe("computing allowed captures v2", () => {
         attacker: RAIR,
         attackerFrom: [7, 1],
         attackerTo: [2, 2],
+        board,
+      })
+    ).toEqual([]);
+  });
+  it.only("allows capturing defended pieces 1", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, BINF, null, null, null, null, null, null],
+      [null, RINF, BART, null, null, null, null, null],
+      [null, null, RINF, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, RAIR, null, null, null, null, null, null],
+    ];
+    expect(
+      captureCandidatesV2({
+        attacker: RAIR,
+        attackerFrom: [7, 1],
+        attackerTo: [1, 1],
         board,
       })
     ).toEqual([[2, 1]]);
@@ -292,6 +312,26 @@ describe("computing allowed captures v2", () => {
         attacker: BAIR,
         attackerFrom: [0, 3],
         attackerTo: [7, 5],
+        board,
+      })
+    ).toEqual([]);
+  });
+  it("doesn't allow capturing defended pieces", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, BINF, RINF, null, null, null, null, null],
+      [null, RINF, null, RINF, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+    ];
+    expect(
+      captureCandidatesV2({
+        attacker: BINF,
+        attackerFrom: [1, 1],
+        attackerTo: [2, 2],
         board,
       })
     ).toEqual([]);
