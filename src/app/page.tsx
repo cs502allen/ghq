@@ -96,12 +96,12 @@ function App() {
       </div>
 
       <div className="grid grid-cols-3 gap-2">
-        <div className="col-span-2 border rounded p-4">
+        <div className="col-span-2 border rounded p-4 bg-slate-50">
           <Learn />
         </div>
 
         <div className="col-span-1 flex flex-col gap-2">
-          <div className="flex flex-col gap-2 border rounded p-4">
+          <div className="flex flex-col gap-2 border rounded p-4 bg-slate-50">
             <div className="text-2xl">Play a game</div>
             <div className="flex flex-wrap gap-2 justify-center items-center">
               <PlayOnlineButton openSignInDialog={openSignInDialog} />
@@ -111,7 +111,7 @@ function App() {
             </div>
           </div>
 
-          <div className="border rounded p-4 min-h-[400px]">
+          <div className="border rounded p-4 min-h-[400px] bg-slate-50">
             <div className="text-2xl">Live games</div>
             <div className="flex flex-col gap-2">
               {games.map((game: Game) => (
