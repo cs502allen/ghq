@@ -706,14 +706,16 @@ export function GHQBoard({
   });
 
   return (
-    <div className="flex bg-gray-100 absolute w-full h-[calc(100%-40px)] grid-cols-8">
+    <div className="flex flex-col md:flex-row bg-gray-100 absolute w-full h-[calc(100%-40px)]">
       <SoundPlayer ctx={ctx} G={G} />
-      <div className={classNames("flex-1  bg-white")}>
+
+      <div className={classNames("flex-1 bg-white order-3 md:order-1")}>
         <EvalBar evalValue={G.eval} />
         <HistoryLog systemMessages={plugins.history.data} log={log} />
       </div>
+
       <div
-        className=" border-r-2 border-gray-100 flex items-center justify-center relative "
+        className="border-r-2 border-gray-100 flex items-center justify-center relative order-1 md:order-2"
         ref={measureRef}
         style={{
           width: squareSize * 8,
@@ -737,7 +739,7 @@ export function GHQBoard({
 
       <div
         className={classNames(
-          "flex-1  bg-white flex flex-col justify-between",
+          "flex-1 bg-white flex flex-col justify-between order-2 md:order-3",
           isPrimaryPlayer("0") ? "bg-red-50" : "bg-blue-50"
         )}
       >
