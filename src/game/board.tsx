@@ -827,7 +827,7 @@ export function GHQBoard({
                 {ctx.numMoves !== 2 ? "s" : ""}{" "}
               </div>
               <div className="flex gap-1 justify-center items-center">
-                {ctx.currentPlayer === playerID ? (
+                {ctx.currentPlayer === playerID || !G.isOnline ? (
                   <>
                     <SkipButton skip={() => moves.Skip()} />
                     {G.drawOfferedBy &&
@@ -842,6 +842,14 @@ export function GHQBoard({
                   </>
                 ) : (
                   <AbortGameButton matchId={G.matchId} />
+                )}
+                {!G.isOnline && (
+                  <button
+                    className="bg-blue-500 text-white py-1 px-2 text-sm rounded hover:bg-blue-600 flex gap-1 items-center"
+                    onClick={() => router.push("/")}
+                  >
+                    🏠 Home
+                  </button>
                 )}
               </div>
             </div>
