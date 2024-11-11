@@ -25,6 +25,7 @@ export default function EvalBar({ evalValue }: { evalValue: number }) {
           height: "100%",
           backgroundColor: "var(--red)",
           zIndex: 1,
+          transition: "width 0.5s ease-in-out",
         }}
       />
       <div
@@ -36,7 +37,7 @@ export default function EvalBar({ evalValue }: { evalValue: number }) {
           fontWeight: "bold",
         }}
       >
-        {evalValue}
+        {/* {evalValue} */}
       </div>
     </div>
   );
