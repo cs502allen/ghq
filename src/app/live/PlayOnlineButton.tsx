@@ -16,10 +16,14 @@ interface MatchmakingData {
   };
 }
 
-export function PlayOnlineButton() {
+export function PlayOnlineButton({
+  openSignInDialog,
+}: {
+  openSignInDialog: () => void;
+}) {
   const router = useRouter();
   const [isMatchmaking, setIsMatchmaking] = useState(false);
-  const { getToken } = useAuth();
+  const { isSignedIn, getToken } = useAuth();
 
   const checkMatchmaking = useCallback(async () => {
     try {
@@ -43,6 +47,11 @@ export function PlayOnlineButton() {
   }, [router]);
 
   async function playOnline() {
+    if (!isSignedIn) {
+      openSignInDialog();
+      return;
+    }
+
     setIsMatchmaking(true);
   }
 

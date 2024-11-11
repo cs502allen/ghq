@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { Learn } from "@/components/Learn";
 import Image from "next/image";
+import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 interface Game {
   id: string;
@@ -19,7 +20,6 @@ interface Game {
 
 function App() {
   const router = useRouter();
-  const { user } = useUser();
   const { isSignedIn, getToken } = useAuth();
   const [games, setGames] = useState<Game[]>([]);
 
@@ -56,12 +56,39 @@ function App() {
     router.push("/learn");
   }
 
+  function openSignInDialog() {
+    if (!isSignedIn) {
+      const signInButton = document.getElementById("sign-in-button");
+      if (signInButton) {
+        signInButton.click();
+      }
+    }
+  }
+
   return (
     <div className="p-2 flex flex-col gap-4 lg:px-48">
-      <div className="text-4xl font-bold text-blue-400 flex gap-2 items-center">
-        <Image src="/icon.png" alt="GHQ" width={32} height={32} />
-        GHQ
+      <div className="flex justify-between">
+        <div className="text-4xl font-bold text-blue-400 flex gap-2 items-center">
+          <Image src="/icon.png" alt="GHQ" width={32} height={32} />
+          GHQ
+        </div>
+        <div>
+          <SignedOut>
+            <SignInButton mode="modal">
+              <div
+                id="sign-in-button"
+                className="bg-blue-800 hover:bg-blue-900 text-sm font-bold text-white rounded px-2 py-1 cursor-pointer"
+              >
+                Sign in
+              </div>
+            </SignInButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+        </div>
       </div>
+
       <div className="grid grid-cols-3 gap-2">
         <div className="col-span-2 border rounded p-4">
           <Learn />
@@ -71,7 +98,7 @@ function App() {
           <div className="flex flex-col gap-2 border rounded p-4">
             <div className="text-2xl">Play a game</div>
             <div className="flex flex-wrap gap-2 justify-center items-center">
-              <PlayOnlineButton />
+              <PlayOnlineButton openSignInDialog={openSignInDialog} />
               <Button onClick={playLocal}>👨‍💻 Pass n&apos; Play</Button>
               <Button onClick={playBot}>🤖 Play Bot</Button>
               <Button onClick={goLearn}>📚 Learn</Button>
