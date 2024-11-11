@@ -70,8 +70,8 @@ function App() {
     <div className="p-2 flex flex-col gap-4 lg:px-48">
       <div className="flex justify-between">
         <div className="text-4xl font-bold text-blue-400 flex gap-2 items-center">
-          <Image src="/icon.png" alt="GHQ" width={32} height={32} />
-          GHQ
+          <Image src="/icon.png" alt="GHQ" width={40} height={40} />
+          <Image src="/ghq-letters.png" alt="GHQ" width={120} height={32} />
         </div>
         <div className="p-2">
           <ClerkLoading>
