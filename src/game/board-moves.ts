@@ -11,6 +11,22 @@ import {
 } from "./engine";
 import { movesForActivePiece, spawnPositionsForPlayer } from "./move-logic";
 
+export function coordsForThisTurnMoves(
+  thisTurnMoves: AllowedMove[]
+): Coordinate[] {
+  return thisTurnMoves
+    .filter(
+      (move) =>
+        move.name === "Move" ||
+        move.name === "MoveAndOrient" ||
+        move.name === "Reinforce"
+    )
+    .map((move) => {
+      // Assume the 2nd arg is the coordinate the piece landed on)
+      return move.args[1];
+    });
+}
+
 export function getAllowedMoves({
   board,
   redReserve,
@@ -27,18 +43,9 @@ export function getAllowedMoves({
   const allMoves: AllowedMove[] = [{ name: "Skip", args: [] }];
 
   const thisTurnMoveCoordinates = new Set(
-    thisTurnMoves
-      .filter(
-        (move) =>
-          move.name === "Move" ||
-          move.name === "MoveAndOrient" ||
-          move.name === "Reinforce"
-      )
-      .map((move) => {
-        // Assume the 2nd arg is the coordinate the piece landed on)
-        const coord = move.args[1];
-        return `${coord[0]},${coord[1]}`;
-      })
+    coordsForThisTurnMoves(thisTurnMoves).map(
+      (coord) => `${coord[0]},${coord[1]}`
+    )
   );
 
   // Find all reinforce moves available
