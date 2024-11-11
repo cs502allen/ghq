@@ -32,17 +32,19 @@ export default function Page() {
     return (
       <div className="p-2 flex flex-col gap-4 lg:px-48">
         <Header />
-        <div className="text-2xl">Lessons</div>
-        <div className="flex flex-wrap gap-1">
-          {Object.keys(boards).map((boardType: string) => (
-            <a
-              key={boardType}
-              href={`/learn?boardType=${boardType}`}
-              className="py-3 px-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md min-w-96"
-            >
-              <div className="tracking-tight text-gray-900">{boardType}</div>
-            </a>
-          ))}
+        <div className="flex flex-col gap-2 border rounded p-4 bg-slate-50">
+          <div className="text-2xl">Lessons</div>
+          <div className="flex flex-wrap gap-1">
+            {Object.keys(boards).map((boardType: string) => (
+              <a
+                key={boardType}
+                href={`/learn?boardType=${boardType}`}
+                className="py-3 px-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md min-w-96"
+              >
+                <div className="tracking-tight text-gray-900">{boardType}</div>
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     );
