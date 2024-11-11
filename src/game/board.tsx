@@ -149,9 +149,14 @@ export function GHQBoard({
       ? G.redTurnStartBoard
       : G.blueTurnStartBoard
     : G.board;
+
   const renderMoves = state.matches("replay")
     ? G.lastPlayerMoves
     : G.thisTurnMoves;
+
+  useEffect(() => {
+    console.log(JSON.stringify(renderMoves));
+  }, [renderMoves]);
 
   useHotkeys("escape", () => send({ type: "DESELECT" }), [send]);
   useHotkeys(
@@ -320,6 +325,8 @@ export function GHQBoard({
               )[0]
             : undefined;
 
+          if (moved) console.log("MOVED " + JSON.stringify(moved));
+
           const moveOrder = moved ? renderMoves.indexOf(moved) : 0;
 
           const renderX = moved ? moved.args[1]![0] : x;
@@ -332,14 +339,24 @@ export function GHQBoard({
             ? squareSize * 8 - renderX * squareSize - squareSize
             : renderX * squareSize;
 
+          const renderedOrientation =
+            moved && moved.args[2]
+              ? (moved.args[2] as Orientation)
+              : square.orientation;
+
+          if (moved)
+            console.log(
+              "RENDERED ORIENTATION",
+              renderedOrientation,
+              square.orientation
+            );
+
           const selectingOrientation = Boolean(
             square &&
               Units[square.type].artilleryRange &&
               annotationsForSquare?.selectedPiece
           );
           const hidePiece = Boolean(annotations[`${x},${y}`]?.hidePiece);
-
-          console.log(`${moveOrder * 250}ms`);
 
           return (
             <div
@@ -375,18 +392,24 @@ export function GHQBoard({
                     }-${square.player.toLowerCase()}.png`}
                     width="52"
                     height="52"
-                    className={classNames("select-none", {
-                      ["opacity-50"]:
-                        (ctx.currentPlayer === "0" &&
-                          square.player === "BLUE") ||
-                        (ctx.currentPlayer === "1" && square.player === "RED"),
-                    })}
+                    className={classNames(
+                      "select-none",
+                      { ["animate-move"]: state.matches("replay.animate") },
+                      {
+                        ["opacity-50"]:
+                          (ctx.currentPlayer === "0" &&
+                            square.player === "BLUE") ||
+                          (ctx.currentPlayer === "1" &&
+                            square.player === "RED"),
+                      }
+                    )}
                     draggable="false"
                     style={{
-                      transform: square.orientation
+                      transitionDelay: `${moveOrder * 250}ms`,
+                      transform: renderedOrientation
                         ? isPrimaryPlayer("1")
-                          ? `rotate(${square.orientation - 180}deg)`
-                          : `rotate(${square.orientation}deg)`
+                          ? `rotate(${renderedOrientation - 180}deg)`
+                          : `rotate(${renderedOrientation}deg)`
                         : `rotate(${add180 ? 180 : 0}deg)`,
                     }}
                     alt={Units[square.type].imagePathPrefix}
@@ -596,6 +619,7 @@ export function GHQBoard({
 
               {square && selectingOrientation && !hidePiece ? (
                 <SelectOrientation
+                  squareSize={squareSize}
                   initialOrientation={square.orientation!}
                   player={square.player}
                   onChange={(orientation: Orientation) => {

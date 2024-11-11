@@ -6,6 +6,7 @@ import { useState, useRef } from "react";
 export function SelectOrientation(
   props: PropsWithChildren<{
     player: Player;
+    squareSize: number;
     initialOrientation: Orientation;
     onChange: (orientation: Orientation) => void;
   }>
@@ -86,7 +87,7 @@ export function SelectOrientation(
         "top-0 absolute overflow-hidden opacity-80 flex flex-col",
         color
       )}
-      style={{ width: 90, height: 90 }}
+      style={{ width: props.squareSize, height: props.squareSize }}
     >
       <div className="grid grid-cols-7 gap-2 w-full">
         <div

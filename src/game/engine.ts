@@ -315,6 +315,10 @@ const ChangeOrientation: Move<GHQState> = (
   piece!.orientation = orientation;
   G.board[on[0]][on[1]] = piece;
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(on);
+  G.thisTurnMoves.push({
+    name: "MoveAndOrient",
+    args: [on, on, orientation],
+  });
   log.setMetadata({ pieceType: piece?.type });
   G.eval = calculateEval(G.board);
 };

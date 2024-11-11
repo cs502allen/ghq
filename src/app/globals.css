@@ -80,5 +80,5 @@ body {
 
 
 .animate-move {
-  transition: left 0.2s ease-out, top 0.2s ease-out;
+  transition: left 0.2s ease-out, top 0.2s ease-out, transform 0.2s ease-out;
 }
