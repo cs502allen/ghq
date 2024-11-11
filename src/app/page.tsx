@@ -8,6 +8,7 @@ import ReplayCapability from "@/game/ReplayCapability";
 
 const App = Client({
   game: GHQGame,
+  debug: false,
   board: GHQBoard,
 });
 

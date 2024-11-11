@@ -77,3 +77,8 @@ body {
   cursor: pointer;
   pointer-events: none; /* Ensures the overlay doesn't interfere with clicks */
 }
+
+
+.animate-move {
+  transition: left 0.2s ease-out, top 0.2s ease-out;
+}

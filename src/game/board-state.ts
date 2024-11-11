@@ -42,6 +42,7 @@ export const turnStateMachine = createMachine({
     };
     events:
       | { type: "START_TURN"; player: Player; disabledPieces: Coordinate[] }
+      | { type: "NOT_TURN" }
       | {
           type: "SELECT_ACTIVE_PIECE";
           at: Coordinate;
@@ -73,13 +74,22 @@ export const turnStateMachine = createMachine({
         disabledPieces: event.disabledPieces,
         player: event.player,
       })),
-      target: ".ready",
+      target: ".replay",
+    },
+    NOT_TURN: {
+      target: ".notTurn",
     },
     DESELECT: {
       target: ".ready",
     },
   },
   states: {
+    notTurn: {},
+    replay: {
+      after: {
+        1000: "ready", // Transitions to the 'ready' state after 1000 milliseconds (1 second)
+      },
+    },
     ready: {
       entry: assign({
         selectedPiece: undefined,
