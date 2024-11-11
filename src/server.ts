@@ -124,20 +124,26 @@ server.router.delete("/matchmaking", (ctx) => {
 });
 
 server.router.get("/matches", async (ctx) => {
-  const allLiveMatches = await server.db.listMatches({
-    where: { isGameover: false },
-  });
+  const { data: matchesData, error: matchesError } = await supabase
+    .from("matches")
+    .select(
+      "id, created_at, player0_id, player1_id, player0_elo, player1_elo, winner_id, status"
+    )
+    .order("created_at", { ascending: false })
+    .limit(10);
 
-  const matches = await Promise.all(
-    allLiveMatches.slice(0, 10).map(async (matchId) => {
-      const res = await server.db.fetch(matchId, { state: true });
-      return { ...res, id: matchId, usernames: [] as string[] };
-    })
-  );
+  if (matchesError) {
+    console.log({
+      message: "Error fetching matches",
+      matchesError,
+    });
+    ctx.body = JSON.stringify({ matches: [] });
+    return;
+  }
 
-  const userIds = matches.flatMap((match) => [
-    match.state.G.userIds["0"],
-    match.state.G.userIds["1"],
+  const userIds = matchesData.flatMap((match) => [
+    match.player0_id,
+    match.player1_id,
   ]);
 
   const { data: users, error } = await supabase
@@ -152,14 +158,31 @@ server.router.get("/matches", async (ctx) => {
     });
   }
 
+  const matches: {
+    id: string;
+    player1: string;
+    player1Elo: number;
+    player2: string;
+    player2Elo: number;
+    winner: string | null;
+    status: string;
+    createdAt: string;
+  }[] = [];
+
   if (users) {
     const userMap = new Map(users.map((user) => [user.id, user.username]));
 
-    for (const match of matches) {
-      match.usernames = [
-        userMap.get(match.state.G.userIds["0"]),
-        userMap.get(match.state.G.userIds["1"]),
-      ];
+    for (const match of matchesData) {
+      matches.push({
+        id: match.id,
+        player1: userMap.get(match.player0_id),
+        player2: userMap.get(match.player1_id),
+        winner: userMap.get(match.winner_id) ?? null,
+        player1Elo: match.player0_elo,
+        player2Elo: match.player1_elo,
+        status: match.status,
+        createdAt: match.created_at,
+      });
     }
   }
 
@@ -187,6 +210,63 @@ server.router.get("/matches/:matchId", async (ctx) => {
   };
 
   ctx.body = JSON.stringify(match);
+});
+
+server.router.delete("/matches/:matchId", async (ctx) => {
+  const userId = ctx.state.auth.userId;
+  const matchId = ctx.params.matchId;
+
+  const { state } = await db.fetch(matchId, {
+    state: true,
+  });
+
+  if (!state) {
+    ctx.body = JSON.stringify({});
+    return null;
+  }
+
+  // Ensure the calling user is authorized to abort this game
+  const { error: findMatchError } = await supabase
+    .from("active_user_matches")
+    .select("match_id, player_id, credentials")
+    .eq("user_id", userId)
+    .eq("match_id", ctx.params.matchId)
+    .single();
+  if (findMatchError) {
+    ctx.body = JSON.stringify({});
+    return null;
+  }
+
+  const { error } = await supabase
+    .from("active_user_matches")
+    .delete()
+    .eq("match_id", matchId);
+  if (error) {
+    console.log({
+      message: "Error deleting active_user_matches",
+      userId,
+      matchId,
+      error,
+    });
+    ctx.throw(400, "Error deleting active user match");
+    return;
+  }
+
+  supabase
+    .from("matches")
+    .update({ status: "ABORTED" })
+    .eq("id", matchId)
+    .then(({ error }) => {
+      if (error) {
+        console.log({
+          message: "Error updating matches table",
+          matchId,
+          error,
+        });
+      }
+    });
+
+  ctx.body = JSON.stringify({});
 });
 
 server.run(8000);
@@ -328,7 +408,8 @@ function onGameEnd({ ctx, G }: { ctx: any; G: GHQState }): void | GHQState {
   const { status, winner } = ctx.gameover as GameoverState;
   const player0Id = G.userIds["0"];
   const player1Id = G.userIds["1"];
-  const winnerId = winner === "RED" ? player0Id : player1Id;
+  const winnerId =
+    status === "WIN" ? (winner === "RED" ? player0Id : player1Id) : null;
 
   // Update match with winner and status
   supabase

@@ -40,6 +40,7 @@ const columns = 8;
 import { useMeasure } from "@uidotdev/usehooks";
 import { Button } from "@/app/live/Button";
 import { useRouter } from "next/navigation";
+import AbortGameButton from "./AbortGameButton";
 
 const squareSizes = {
   small: 75,
@@ -824,7 +825,7 @@ export function GHQBoard({
                 {ctx.numMoves !== 2 ? "s" : ""}{" "}
               </div>
               <div className="flex gap-1 justify-center items-center">
-                {ctx.currentPlayer === playerID && (
+                {ctx.currentPlayer === playerID ? (
                   <>
                     <SkipButton skip={() => moves.Skip()} />
                     {G.drawOfferedBy &&
@@ -837,6 +838,8 @@ export function GHQBoard({
                     )}
                     <ResignButton resign={() => moves.Resign()} />
                   </>
+                ) : (
+                  <AbortGameButton matchId={G.matchId} />
                 )}
               </div>
             </div>

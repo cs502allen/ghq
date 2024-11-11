@@ -4,13 +4,18 @@ import { API_URL } from "./live/config";
 import { ghqFetch } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { Loader2 } from "lucide-react";
+import { DateTime } from "luxon";
+import classNames from "classnames";
 
 interface Game {
   id: string;
+  winner: string;
   player1: string;
+  player1Elo: number;
   player2: string;
+  player2Elo: number;
   status: string;
+  createdAt: string;
 }
 
 export default function LiveGamesList() {
@@ -20,8 +25,10 @@ export default function LiveGamesList() {
 
   useEffect(() => {
     if (!isSignedIn) {
+      setLoading(false);
       return;
     }
+
     setLoading(true);
 
     ghqFetch<{ matches: Game[] }>({
@@ -30,21 +37,14 @@ export default function LiveGamesList() {
       method: "GET",
     })
       .then((data) => {
-        setGames(
-          data?.matches?.map((match: any) => ({
-            id: match.id,
-            player1: match.usernames[0],
-            player2: match.usernames[1],
-            status: `Turn ${match.state.ctx.turn}`,
-          })) ?? []
-        );
+        setGames(data.matches ?? []);
       })
       .finally(() => setLoading(false));
   }, [isSignedIn]);
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-2xl">Live games</div>
+      <div className="text-2xl">Recent games</div>
 
       {!loading && games.length === 0 && (
         <div className="text-gray-600">No games found</div>
@@ -62,16 +62,38 @@ export default function LiveGamesList() {
           <a
             key={game.id}
             href={`/live/${game.id}`}
-            className="py-2 px-3 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md"
+            className="py-2 px-3 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md flex justify-between"
           >
             <div className="tracking-tight">
-              <div>
-                {game.player1}
-                <span className="text-gray-400"> vs.</span>
+              <div className="flex gap-1">
+                <div
+                  className={classNames(
+                    game.player1 === game.winner && "text-green-700"
+                  )}
+                >
+                  {game.player1}
+                </div>{" "}
+                ({game.player1Elo})<span className="text-gray-500"> vs.</span>
               </div>
-              <div>{game.player2}</div>
+              <div className="flex gap-1">
+                <div
+                  className={classNames(
+                    game.player2 === game.winner && "text-green-700"
+                  )}
+                >
+                  {game.player2}
+                </div>{" "}
+                ({game.player2Elo})
+              </div>
             </div>
-            <p className="text-gray-600">{game.status}</p>
+
+            <div className="flex flex-col justify-end items-end">
+              <div>{game.status.toLowerCase()}</div>
+
+              <div className="text-gray-500">
+                {DateTime.fromISO(game.createdAt).toRelative()}
+              </div>
+            </div>
           </a>
         ))}
       </div>
