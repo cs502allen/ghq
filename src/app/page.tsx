@@ -6,10 +6,11 @@ import { API_URL } from "./live/config";
 import { PlayOnlineButton } from "./live/PlayOnlineButton";
 import { ghqFetch } from "@/lib/api";
 import { useEffect, useState } from "react";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { ClerkLoaded, ClerkLoading, useAuth, useUser } from "@clerk/nextjs";
 import { Learn } from "@/components/Learn";
 import Image from "next/image";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { Loader2 } from "lucide-react";
 
 interface Game {
   id: string;
@@ -73,19 +74,24 @@ function App() {
           GHQ
         </div>
         <div>
-          <SignedOut>
-            <SignInButton mode="modal">
-              <div
-                id="sign-in-button"
-                className="bg-blue-800 hover:bg-blue-900 text-sm font-bold text-white rounded px-2 py-1 cursor-pointer"
-              >
-                Sign in
-              </div>
-            </SignInButton>
-          </SignedOut>
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
+          <ClerkLoading>
+            <Loader2 className="w-6 h-6 text-gray-500 animate-spin" />
+          </ClerkLoading>
+          <ClerkLoaded>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <div
+                  id="sign-in-button"
+                  className="bg-blue-800 hover:bg-blue-900 text-sm font-bold text-white rounded px-2 py-1 cursor-pointer"
+                >
+                  Sign in
+                </div>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+          </ClerkLoaded>
         </div>
       </div>
 
