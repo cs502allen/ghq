@@ -23,14 +23,12 @@ export const turnStateMachine = createMachine({
   id: "turn-machine",
   context: {
     disabledPieces: [],
-    moves: 0,
     player: "RED",
     // selectedPiece
   },
   types: {} as {
     context: {
       disabledPieces: Coordinate[];
-      moves: number;
       player: Player;
 
       // move active piece
@@ -43,7 +41,7 @@ export const turnStateMachine = createMachine({
       unitKind?: keyof ReserveFleet;
     };
     events:
-      | { type: "START_TURN"; player: Player }
+      | { type: "START_TURN"; player: Player; disabledPieces: Coordinate[] }
       | {
           type: "SELECT_ACTIVE_PIECE";
           at: Coordinate;
@@ -72,8 +70,7 @@ export const turnStateMachine = createMachine({
   on: {
     START_TURN: {
       actions: assign(({ event }) => ({
-        disabledPieces: [],
-        moves: 0,
+        disabledPieces: event.disabledPieces,
         player: event.player,
       })),
       target: ".ready",

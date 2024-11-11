@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
+  Coordinate,
   GHQState,
   NonNullSquare,
   Orientation,
@@ -23,6 +24,7 @@ import { HistoryLog } from "./HistoryLog";
 import { getCapturedPieces } from "./capture-logic";
 import { getUsernames } from "@/lib/supabase";
 import EvalBar from "./EvalBar";
+import { coordsForThisTurnMoves } from "./board-moves";
 
 const rows = 8;
 const columns = 8;
@@ -138,8 +140,9 @@ export function GHQBoard({
     send({
       type: "START_TURN",
       player: isPrimaryPlayer("0") ? "RED" : "BLUE",
+      disabledPieces: coordsForThisTurnMoves(G.thisTurnMoves),
     });
-  }, [isPrimaryPlayer]);
+  }, [isPrimaryPlayer, G.thisTurnMoves]);
 
   const [rightClicked, setRightClicked] = React.useState<Set<string>>(
     new Set()
