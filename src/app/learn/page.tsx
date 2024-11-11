@@ -7,6 +7,7 @@ import ReplayCapability from "@/game/ReplayCapability";
 import { BoardType, newTutorialGHQGame } from "@/game/tutorial";
 import { useSearchParams } from "next/navigation";
 import { boards } from "@/game/tutorial";
+import Image from "next/image";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -28,7 +29,11 @@ export default function Page() {
 
   if (!App) {
     return (
-      <div className="p-2 flex flex-col gap-4">
+      <div className="p-2 flex flex-col gap-4 lg:px-48">
+        <div className="text-4xl font-bold text-blue-400 flex gap-2 items-center">
+          <Image src="/icon.png" alt="GHQ" width={32} height={32} />
+          GHQ
+        </div>
         <div className="text-2xl">Lessons</div>
         <div className="flex flex-wrap gap-1">
           {Object.keys(boards).map((boardType: string) => (

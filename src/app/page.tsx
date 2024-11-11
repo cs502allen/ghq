@@ -57,13 +57,13 @@ function App() {
   }
 
   return (
-    <div className="p-2 flex flex-col gap-4">
+    <div className="p-2 flex flex-col gap-4 lg:px-48">
       <div className="text-4xl font-bold text-blue-400 flex gap-2 items-center">
         <Image src="/icon.png" alt="GHQ" width={32} height={32} />
         GHQ
       </div>
       <div className="grid grid-cols-3 gap-2">
-        <div className="col-span-2 border rounded">
+        <div className="col-span-2 border rounded p-4">
           <Learn />
         </div>
 
@@ -78,7 +78,7 @@ function App() {
             </div>
           </div>
 
-          <div className="border rounded p-2 min-h-[400px]">
+          <div className="border rounded p-4 min-h-[400px]">
             <div className="text-2xl">Live games</div>
             <div className="flex flex-col gap-2">
               {games.map((game: Game) => (
