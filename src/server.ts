@@ -406,6 +406,13 @@ async function getOrCreateUser(userId: string): Promise<User> {
     .single();
 
   if (user) {
+    if (user.username !== clerkUser.username) {
+      await supabase
+        .from("users")
+        .update({ username: clerkUser.username })
+        .eq("id", userId);
+    }
+
     return user;
   }
 
@@ -413,7 +420,7 @@ async function getOrCreateUser(userId: string): Promise<User> {
     const newUser = {
       id: userId,
       elo: 1000,
-      username: `${clerkUser.firstName} ${clerkUser.lastName}`,
+      username: clerkUser.username ?? "Anonymous",
     };
     const { error: insertError } = await supabase
       .from("users")
