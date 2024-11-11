@@ -69,7 +69,7 @@ export default function AbortGameModal({
                   className="bg-red-500 text-white py-2 px-4 text-sm rounded hover:bg-red-600 flex gap-1 items-center mt-2"
                   onClick={() => abortGame(matchId)}
                 >
-                  Yes, I'm sure
+                  Yes, I&apos;m sure
                 </button>
               )}
             </div>
