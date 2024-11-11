@@ -5,7 +5,6 @@ import { GHQGame, newOnlineGHQGame } from "@/game/engine";
 import { GHQBoard } from "@/game/board";
 import { SocketIO } from "boardgame.io/multiplayer";
 import { useCallback, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { API_URL } from "../config";
 import MultiplayerReplayCapability from "@/game/MultiplayerReplayCapability";
 import { ghqFetch } from "@/lib/api";
@@ -24,7 +23,6 @@ const OfflineGameClient = Client({
 });
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
-  const searchParams = useSearchParams();
   const [matchId, setMatchId] = useState<string | null>(null);
   const [playerId, setPlayerId] = useState<string | undefined>();
   const [credentials, setCredentials] = useState<string>("");
@@ -55,13 +53,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }, [matchId]);
 
   params.then(({ id }) => setMatchId(id));
-
-  useEffect(() => {
-    const playerId = searchParams.get("playerId");
-    if (playerId) {
-      setPlayerId(playerId);
-    }
-  }, [searchParams]);
 
   const [onlineClient, setOnlineClient] = useState<any | null>(null);
   const [offlineClient, setOfflineClient] = useState<any | null>(null);

@@ -33,8 +33,7 @@ export function PlayOnlineButton({
         method: "POST",
       });
       if (data.match) {
-        const playerId = data.match.playerId;
-        router.push(`/live/${data.match.id}?playerId=${playerId}`);
+        router.push(`/live/${data.match.id}`);
         setIsMatchmaking(false);
       }
     } catch (error) {
