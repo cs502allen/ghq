@@ -4,10 +4,11 @@ import { Client } from "boardgame.io/react";
 import { GHQGame, newOnlineGHQGame } from "@/game/engine";
 import { GHQBoard } from "@/game/board";
 import { SocketIO } from "boardgame.io/multiplayer";
-import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 import { API_URL } from "../config";
 import MultiplayerReplayCapability from "@/game/MultiplayerReplayCapability";
+import { ghqFetch } from "@/lib/api";
+import { useAuth } from "@clerk/nextjs";
 
 const GameClient = Client({
   game: newOnlineGHQGame({}),
@@ -22,27 +23,36 @@ const OfflineGameClient = Client({
 });
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
-  const searchParams = useSearchParams();
   const [matchId, setMatchId] = useState<string | null>(null);
   const [playerId, setPlayerId] = useState<string | undefined>();
   const [credentials, setCredentials] = useState<string>("");
+  const { isSignedIn, getToken } = useAuth();
+
+  const getMatchInfo = useCallback(
+    async (matchId: string) => {
+      try {
+        const data = await ghqFetch<any>({
+          url: `${API_URL}/matches/${matchId}`,
+          getToken,
+        });
+        if (data?.credentials && data?.playerId) {
+          setCredentials(data.credentials);
+          setPlayerId(data.playerId);
+        }
+      } catch (error) {
+        console.error("Error polling matchmaking API:", error);
+      }
+    },
+    [getToken]
+  );
 
   useEffect(() => {
-    if (matchId) {
-      setCredentials(
-        localStorage.getItem(`credentials:${matchId}:${playerId}`) ?? ""
-      );
+    if (isSignedIn && matchId) {
+      getMatchInfo(matchId);
     }
   }, [matchId]);
 
   params.then(({ id }) => setMatchId(id));
-
-  useEffect(() => {
-    const playerId = searchParams.get("playerId");
-    if (playerId) {
-      setPlayerId(playerId);
-    }
-  }, [searchParams]);
 
   const [onlineClient, setOnlineClient] = useState<any | null>(null);
   const [offlineClient, setOfflineClient] = useState<any | null>(null);

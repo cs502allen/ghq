@@ -5,7 +5,7 @@ import { Button } from "./Button";
 import MatchmakingModal from "./MatchmakingModal";
 import { useCallback, useEffect, useState } from "react";
 import { API_URL } from "./config";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import { ghqFetch } from "@/lib/api";
 
 interface MatchmakingData {
@@ -16,10 +16,14 @@ interface MatchmakingData {
   };
 }
 
-export function PlayOnlineButton() {
+export function PlayOnlineButton({
+  openSignInDialog,
+}: {
+  openSignInDialog: () => void;
+}) {
   const router = useRouter();
   const [isMatchmaking, setIsMatchmaking] = useState(false);
-  const { getToken } = useAuth();
+  const { isSignedIn, getToken } = useAuth();
 
   const checkMatchmaking = useCallback(async () => {
     try {
@@ -29,12 +33,7 @@ export function PlayOnlineButton() {
         method: "POST",
       });
       if (data.match) {
-        const playerId = data.match.playerId;
-        localStorage.setItem(
-          `credentials:${data.match.id}:${playerId}`,
-          data.match.credentials
-        );
-        router.push(`/live/${data.match.id}?playerId=${playerId}`);
+        router.push(`/live/${data.match.id}`);
         setIsMatchmaking(false);
       }
     } catch (error) {
@@ -43,6 +42,11 @@ export function PlayOnlineButton() {
   }, [router]);
 
   async function playOnline() {
+    if (!isSignedIn) {
+      openSignInDialog();
+      return;
+    }
+
     setIsMatchmaking(true);
   }
 
@@ -69,7 +73,7 @@ export function PlayOnlineButton() {
   return (
     <>
       <Button onClick={playOnline} loadingText="Searching...">
-        🌎 Play online
+        🌎 Play Online
       </Button>
       {isMatchmaking && <MatchmakingModal onCancel={cancelMatchmaking} />}
     </>

@@ -166,6 +166,29 @@ server.router.get("/matches", async (ctx) => {
   ctx.body = JSON.stringify({ matches });
 });
 
+server.router.get("/matches/:matchId", async (ctx) => {
+  const userId = ctx.state.auth.userId;
+
+  const { data, error } = await supabase
+    .from("active_user_matches")
+    .select("match_id, player_id, credentials")
+    .eq("user_id", userId)
+    .eq("match_id", ctx.params.matchId)
+    .single();
+  if (error) {
+    ctx.body = JSON.stringify({});
+    return;
+  }
+
+  const match = {
+    id: data?.match_id || "",
+    playerId: data?.player_id,
+    credentials: data?.credentials,
+  };
+
+  ctx.body = JSON.stringify(match);
+});
+
 server.run(8000);
 
 interface CreatedMatch {
