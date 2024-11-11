@@ -7,10 +7,11 @@ import { useAuth } from "@clerk/nextjs";
 import { Learn } from "@/components/Learn";
 import Header from "@/components/Header";
 import LiveGamesList from "./LiveGamesList";
+import LatestMessage from "@/components/LatestMessage";
 
 function App() {
   const router = useRouter();
-  const { isSignedIn, getToken } = useAuth();
+  const { isSignedIn } = useAuth();
 
   async function playLocal() {
     router.push("/local");
@@ -36,6 +37,7 @@ function App() {
   return (
     <div className="p-2 flex flex-col gap-4 lg:px-48">
       <Header />
+      <LatestMessage />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
         <div className="col-span-2 border rounded p-4 bg-slate-50 lg:order-1 order-2">
