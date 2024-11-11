@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Coordinate,
   GHQState,
@@ -28,6 +34,14 @@ import { coordsForThisTurnMoves } from "./board-moves";
 
 const rows = 8;
 const columns = 8;
+
+import { useMeasure } from "@uidotdev/usehooks";
+
+const squareSizes = {
+  small: 75,
+  large: 90,
+};
+
 //coordinate string x,y
 type Annotations = {
   [key: string]: {
@@ -51,8 +65,19 @@ export function GHQBoard({
   plugins,
   log,
 }: BoardProps<GHQState>) {
-  const divRef = useRef(null); // Create a ref
   const [usernames, setUsernames] = React.useState<string[]>([]);
+
+  const [measureRef, { width, height }] = useMeasure();
+
+  const squareSize = useMemo(() => {
+    const smallestDim: number = Math.min(width || 0, height || 0);
+    console.log(smallestDim);
+    if (smallestDim && smallestDim - 90 - squareSizes.large * 8 > 0) {
+      return squareSizes.large;
+    } else {
+      return squareSizes.small;
+    }
+  }, [width, height]);
 
   useEffect(() => {
     async function fetchUsernames() {
@@ -357,8 +382,8 @@ export function GHQBoard({
                     ? "inset 0 0 8px darkgray"
                     : "",
                 textAlign: "center",
-                width: "90px",
-                height: "90px",
+                width: squareSize,
+                height: squareSize,
               }}
             >
               {lastTurnMoves.has(`${rowIndex},${colIndex}`) ? (
@@ -542,8 +567,18 @@ export function GHQBoard({
         <EvalBar evalValue={G.eval} />
         <HistoryLog systemMessages={plugins.history.data} log={log} />
       </div>
-      <div className="col-span-4 border-r-2 border-gray-100 flex items-center justify-center">
-        <table ref={divRef} style={{ borderCollapse: "collapse" }}>
+      <div
+        className="col-span-4 border-r-2 border-gray-100 flex items-center justify-center"
+        ref={measureRef}
+      >
+        <table
+          style={{
+            borderCollapse: "collapse",
+            width: squareSize * 8,
+            height: squareSize * 8,
+          }}
+          className="table-fixed"
+        >
           {/*flip board*/}
           <tbody>{isPrimaryPlayer("0") ? cells : cells.reverse()}</tbody>
         </table>
