@@ -1,6 +1,7 @@
 import { Plugin } from "boardgame.io";
 import { GameMethod } from "boardgame.io/core";
 import { Coordinate, Square } from "./engine";
+import { PlayerPiece } from "./board-moves";
 
 export interface HistoryState {
   log: HistoryItem[];
@@ -12,6 +13,7 @@ export interface HistoryItem {
   isCapture: boolean;
   playerId?: string;
   captured?: { coordinate: Coordinate; square: Square }[];
+  capturedByInfantry?: PlayerPiece[];
 }
 
 export const HistoryPlugin: Plugin = {

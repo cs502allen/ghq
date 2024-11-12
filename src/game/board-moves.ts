@@ -11,6 +11,11 @@ import {
 } from "./engine";
 import { movesForActivePiece, spawnPositionsForPlayer } from "./move-logic";
 
+export interface PlayerPiece {
+  piece: NonNullSquare;
+  coordinate: Coordinate;
+}
+
 export function coordsForThisTurnMoves(
   thisTurnMoves: AllowedMove[]
 ): Coordinate[] {
@@ -107,11 +112,6 @@ export function getAllowedMoves({
   }
 
   return allMoves;
-}
-
-interface PlayerPiece {
-  piece: NonNullSquare;
-  coordinate: Coordinate;
 }
 
 function getPlayerPieces(

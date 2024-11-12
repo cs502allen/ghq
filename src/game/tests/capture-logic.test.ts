@@ -1,7 +1,11 @@
 import { describe, expect, it } from "@jest/globals";
 import { GHQState } from "@/game/engine";
 import { Blue, Red } from "@/game/tests/test-boards";
-import { captureCandidates, captureCandidatesV2 } from "@/game/capture-logic";
+import {
+  captureCandidates,
+  captureCandidatesV2,
+  freeInfantryCaptures,
+} from "@/game/capture-logic";
 
 const BINF = Blue.INFANTRY;
 const BAIR = Blue.AIRBORNE;
@@ -605,5 +609,96 @@ describe("computing allowed captures v2", () => {
         board,
       })
     ).toEqual([]);
+  });
+});
+
+describe("clear free captures", () => {
+  it("doesn't allow any free captures when engagement is equal", () => {
+    const board: GHQState["board"] = [
+      [RINF, BINF, null, null, null, null, null, null],
+      [null, RINF, null, null, null, BINF, null, null],
+      [null, BINF, null, null, null, RINF, null, null],
+      [null, null, null, null, RINF, BINF, null, null],
+      [null, null, null, RINF, BINF, RINF, BINF, null],
+      [null, null, null, BINF, RINF, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, RINF],
+    ];
+    expect(freeInfantryCaptures(board)).toEqual([]);
+  });
+  it("allows free captures on engaged attackers", () => {
+    const board: GHQState["board"] = [
+      [RINF, BINF, null, null, null, null, null, null],
+      [null, RINF, BINF, null, null, BINF, null, null],
+      [null, BINF, null, null, BINF, RINF, null, null],
+      [null, null, null, null, RINF, BINF, null, null],
+      [null, null, null, RINF, BINF, RINF, BINF, null],
+      [null, null, null, BINF, RINF, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, RINF],
+    ];
+
+    expect(freeInfantryCaptures(board)).toEqual(
+      expect.arrayContaining([
+        {
+          attacker: {
+            piece: BINF,
+            coordinate: [1, 2],
+          },
+          capture: {
+            piece: RINF,
+            coordinate: [1, 1],
+          },
+        },
+        {
+          attacker: {
+            piece: BINF,
+            coordinate: [4, 6],
+          },
+          capture: {
+            piece: RINF,
+            coordinate: [4, 5],
+          },
+        },
+      ])
+    );
+  });
+  it("allows capturing a smothered hq", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, BINF],
+      [null, null, null, null, null, null, BINF, R_HQ],
+    ];
+
+    // Making a note of the current behavior (two pieces attacking the HQ), even if it's weird
+    expect(freeInfantryCaptures(board)).toEqual(
+      expect.arrayContaining([
+        {
+          attacker: {
+            piece: BINF,
+            coordinate: [7, 6],
+          },
+          capture: {
+            piece: R_HQ,
+            coordinate: [7, 7],
+          },
+        },
+        {
+          attacker: {
+            piece: BINF,
+            coordinate: [6, 7],
+          },
+          capture: {
+            piece: R_HQ,
+            coordinate: [7, 7],
+          },
+        },
+      ])
+    );
   });
 });

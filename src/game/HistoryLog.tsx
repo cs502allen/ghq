@@ -79,8 +79,8 @@ export function HistoryLog({
       };
     });
 
-  const systemCaptureMessages = systemMessages.log.map(
-    ({ turn, isCapture, playerId, captured, message }) => {
+  const systemCaptureMessages = systemMessages.log.flatMap(
+    ({ turn, isCapture, playerId, captured, message, capturedByInfantry }) => {
       if (message) {
         return { turn, message, isCapture };
       }
@@ -89,15 +89,35 @@ export function HistoryLog({
         const player = playerId === "0" ? "Red" : "Blue";
         const clearedSquares = captured.map(({ coordinate }) => coordinate);
 
-        return {
-          turn,
-          isCapture,
-          message: `${player} artillery destroyed piece${
-            clearedSquares.length > 1 ? "s" : ""
-          } at ${clearedSquares
-            .map((coord) => coordinateToAlgebraic(coord))
-            .join(", ")}`,
-        };
+        if (capturedByInfantry) {
+          return capturedByInfantry.map((infantry, i) => {
+            const attackerPieceType =
+              typeof infantry.piece.type === "string"
+                ? infantry.piece.type.toLowerCase()
+                : "piece";
+            const capturedPieceType =
+              typeof captured[i]?.square?.type === "string"
+                ? captured[i]?.square?.type?.toLowerCase()
+                : "piece";
+            return {
+              turn,
+              isCapture,
+              message: `${player} ${attackerPieceType} captured ${capturedPieceType} at ${coordinateToAlgebraic(
+                clearedSquares[i]
+              )}`,
+            };
+          });
+        } else {
+          return {
+            turn,
+            isCapture,
+            message: `${player} artillery destroyed piece${
+              clearedSquares.length > 1 ? "s" : ""
+            } at ${clearedSquares
+              .map((coord) => coordinateToAlgebraic(coord))
+              .join(", ")}`,
+          };
+        }
       }
 
       return { turn, isCapture, message: "" };
