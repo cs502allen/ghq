@@ -149,11 +149,12 @@ export function GHQBoard({
     })
   );
 
-  const renderBoard = state.matches("replay")
-    ? ctx.currentPlayer === "0"
-      ? G.redTurnStartBoard
-      : G.blueTurnStartBoard
-    : G.board;
+  const renderBoard =
+    state.matches("replay") || state.matches("notTurn")
+      ? ctx.currentPlayer === "0"
+        ? G.redTurnStartBoard
+        : G.blueTurnStartBoard
+      : G.board;
 
   const renderMoves = state.matches("replay")
     ? G.lastPlayerMoves
