@@ -26,3 +26,31 @@ export async function getUsernames(userIds: string[]): Promise<string[]> {
 
   return userIds.map((userId) => userIdsToUsernames[userId] ?? userId);
 }
+
+export interface User {
+  id: string;
+  username: string;
+  elo: number;
+}
+
+export async function getUser(userId: string): Promise<User> {
+  const { data, error } = await supabase
+    .from("users")
+    .select("id, username, elo")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data) {
+    throw new Error("User not found");
+  }
+
+  return {
+    id: data.id,
+    username: data.username,
+    elo: data.elo,
+  };
+}

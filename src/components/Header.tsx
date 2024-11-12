@@ -1,11 +1,21 @@
 "use client";
 
-import { ClerkLoaded, ClerkLoading } from "@clerk/nextjs";
+import { ClerkLoaded, ClerkLoading, useClerk } from "@clerk/nextjs";
 import Image from "next/image";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
+import { getUser, User } from "@/lib/supabase";
+import { useEffect, useState } from "react";
 
 export default function Header() {
+  const { user } = useClerk();
+  const [userInfo, setUserInfo] = useState<User | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      getUser(user.id).then(setUserInfo);
+    }
+  }, [user]);
   return (
     <div className="flex justify-between">
       <a
@@ -25,6 +35,7 @@ export default function Header() {
         <ClerkLoading>
           <Loader2 className="w-6 h-6 text-gray-500 animate-spin" />
         </ClerkLoading>
+
         <ClerkLoaded>
           <SignedOut>
             <SignInButton mode="modal">
@@ -37,7 +48,14 @@ export default function Header() {
             </SignInButton>
           </SignedOut>
           <SignedIn>
-            <UserButton />
+            <div className="flex gap-1">
+              {userInfo && (
+                <div>
+                  {userInfo?.username} ({userInfo?.elo})
+                </div>
+              )}
+              <UserButton />
+            </div>
           </SignedIn>
         </ClerkLoaded>
       </div>
