@@ -8,10 +8,19 @@ import { Loader2 } from "lucide-react";
 export default function Header() {
   return (
     <div className="flex justify-between">
-      <div className="text-4xl font-bold text-blue-400 flex gap-2 items-center">
-        <Image src="/icon.png" alt="GHQ" width={40} height={40} />
+      <a
+        className="text-4xl font-bold text-blue-400 flex gap-2 items-center"
+        href="/"
+      >
+        <Image
+          src="/icon.png"
+          alt="GHQ"
+          width={40}
+          height={40}
+          className="cursor-pointer"
+        />
         <Image src="/ghq-letters.png" alt="GHQ" width={120} height={32} />
-      </div>
+      </a>
       <div className="p-2">
         <ClerkLoading>
           <Loader2 className="w-6 h-6 text-gray-500 animate-spin" />

@@ -41,6 +41,7 @@ import { useMeasure } from "@uidotdev/usehooks";
 import { Button } from "@/app/live/Button";
 import { useRouter } from "next/navigation";
 import AbortGameButton from "./AbortGameButton";
+import Header from "@/components/Header";
 
 const squareSizes = {
   small: 75,
@@ -710,6 +711,7 @@ export function GHQBoard({
       <SoundPlayer ctx={ctx} G={G} />
 
       <div className={classNames("flex-1 bg-white order-3 md:order-1")}>
+        <Header />
         <EvalBar evalValue={G.eval} />
         <HistoryLog systemMessages={plugins.history.data} log={log} />
       </div>
