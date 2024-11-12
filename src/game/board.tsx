@@ -706,201 +706,159 @@ export function GHQBoard({
     );
   });
 
+  const blueBank = (
+    <>
+      <CountdownTimer
+        active={ctx.currentPlayer === "1" && !ctx.gameover}
+        player="BLUE"
+        elapsed={G.blueElapsed}
+        startDate={G.turnStartTime}
+        totalTimeAllowed={G.timeControl}
+      />
+      <div className="items-center justify-center flex pt-5">
+        <ReserveBank
+          player="BLUE"
+          reserve={G.blueReserve}
+          selectedKind={
+            isPrimaryPlayer("1") ? state.context.unitKind : undefined
+          }
+          selectable={
+            isPrimaryPlayer("1") && !state.matches("activePieceSelected")
+          }
+          selectReserve={selectReserve}
+        />
+      </div>
+    </>
+  );
+
+  const redBank = (
+    <>
+      <CountdownTimer
+        active={ctx.currentPlayer === "0" && !ctx.gameover}
+        player="RED"
+        elapsed={G.redElapsed}
+        startDate={G.turnStartTime}
+        totalTimeAllowed={G.timeControl}
+      />
+      <div className="items-center justify-center flex pt-5">
+        <ReserveBank
+          player="RED"
+          reserve={G.redReserve}
+          selectedKind={
+            isPrimaryPlayer("0") ? state.context.unitKind : undefined
+          }
+          selectable={
+            isPrimaryPlayer("0") && !state.matches("activePieceSelected")
+          }
+          selectReserve={selectReserve}
+        />
+      </div>
+    </>
+  );
+
   return (
     <div className="flex flex-col md:flex-row bg-gray-100 absolute w-full h-[calc(100%-40px)]">
       <SoundPlayer ctx={ctx} G={G} />
 
-      <div className={classNames("flex-1 bg-white order-3 md:order-1")}>
+      <div
+        className={classNames("bg-white order-3 md:order-1")}
+        style={{ width: 450 }}
+      >
         <Header />
         <EvalBar evalValue={G.eval} />
         <HistoryLog systemMessages={plugins.history.data} log={log} />
+        {ctx.gameover ? (
+          <div className="flex flex-col items-center justify-center gap-1 justify-center items-center">
+            <h2
+              className={classNames(
+                "text-center font-semibold text-2xl",
+                ctx.gameover.status === "DRAW" && "text-gray-800",
+                ctx.gameover.status === "WIN" && ctx.gameover.winner === "RED"
+                  ? "text-red-500"
+                  : "text-blue-500"
+              )}
+            >
+              {ctx.gameover.status === "DRAW" ? (
+                "Draw!"
+              ) : (
+                <>{ctx.gameover.winner === "RED" ? "Red " : "Blue"} Won!</>
+              )}
+            </h2>
+            {ctx.gameover.reason && ctx.gameover.reason}
+            <Button onClick={async () => router.push("/")}>🏠 Home</Button>
+          </div>
+        ) : (
+          <div
+            className={classNames(
+              "text-center font-semibold flex items-center flex-col justify-center text-2xl flex-1",
+              ctx.currentPlayer === "0" ? "text-red-500" : "text-blue-500"
+            )}
+          >
+            {ctx.currentPlayer === "0" ? "Red's " : "Blue's"} Turn
+            <div className="text-lg text-gray-600 font-mono flex gap-1 justify-center items-center">
+              {3 - ctx.numMoves!} remaining move
+              {ctx.numMoves !== 2 ? "s" : ""}{" "}
+            </div>
+            <div className="flex gap-1 justify-center items-center">
+              {ctx.currentPlayer === playerID || !G.isOnline ? (
+                <>
+                  <SkipButton skip={() => moves.Skip()} />
+                  {G.drawOfferedBy && G.drawOfferedBy !== ctx.currentPlayer ? (
+                    <AcceptDrawButton draw={() => moves.AcceptDraw()} />
+                  ) : (
+                    <OfferDrawButton
+                      draw={(offer: boolean) => moves.OfferDraw(offer)}
+                    />
+                  )}
+                  <ResignButton resign={() => moves.Resign()} />
+                </>
+              ) : (
+                <AbortGameButton matchId={G.matchId} />
+              )}
+              {!G.isOnline && (
+                <button
+                  className="bg-blue-500 text-white py-1 px-2 text-sm rounded hover:bg-blue-600 flex gap-1 items-center"
+                  onClick={() => router.push("/")}
+                >
+                  🏠 Home
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <div
-        className="border-r-2 border-gray-100 flex items-center justify-center relative order-1 md:order-2"
+        className=" order-1 md:order-2 flex-1 flex flex-col items-center justify-center "
         ref={measureRef}
-        style={{
-          width: squareSize * 8,
-          height: squareSize * 8,
-        }}
       >
-        <table
+        <div className="pb-10" style={{ width: 400 }}>
+          {isPrimaryPlayer("1") ? redBank : blueBank}
+        </div>
+        <div
+          className="border-r-2 border-gray-100 flex items-center justify-center relative"
           style={{
-            borderCollapse: "collapse",
             width: squareSize * 8,
             height: squareSize * 8,
           }}
-          className="table-fixed relative"
         >
-          {/*flip board*/}
-          <tbody>{isPrimaryPlayer("0") ? cells : cells.reverse()}</tbody>
-          {/*overlay pieces */}
-        </table>
-        {pieces}
-      </div>
+          <table
+            style={{
+              borderCollapse: "collapse",
+              width: squareSize * 8,
+              height: squareSize * 8,
+            }}
+            className="table-fixed relative"
+          >
+            {/*flip board*/}
+            <tbody>{isPrimaryPlayer("0") ? cells : cells.reverse()}</tbody>
+            {/*overlay pieces */}
+          </table>
+          {pieces}
+        </div>
 
-      <div
-        className={classNames(
-          "flex-1 bg-white flex flex-col justify-between order-2 md:order-3",
-          isPrimaryPlayer("0") ? "bg-red-50" : "bg-blue-50"
-        )}
-      >
-        <div
-          className={classNames(
-            "col-span-2 h-full pt-2 flex flex-col justify-between",
-            ctx.currentPlayer === "0" ? "bg-red-50" : "bg-blue-50",
-            { ["flex-col-reverse"]: isPrimaryPlayer("1") }
-          )}
-        >
-          <div className="flex flex-col gap-2 p-2">
-            <div className="text-xl flex gap-1">
-              <div className="font-bold">
-                {usernames?.[1] ?? G.userIds["1"]}
-              </div>
-              <div>({G.elos?.[1] ?? 0})</div>
-            </div>
-            <CountdownTimer
-              active={ctx.currentPlayer === "1" && !ctx.gameover}
-              player="BLUE"
-              elapsed={G.blueElapsed}
-              startDate={G.turnStartTime}
-              totalTimeAllowed={G.timeControl}
-            />
-            <div>
-              <div>Reserve</div>
-              <div className="items-center justify-center flex">
-                <ReserveBank
-                  player="BLUE"
-                  reserve={G.blueReserve}
-                  selectedKind={
-                    isPrimaryPlayer("1") ? state.context.unitKind : undefined
-                  }
-                  selectable={
-                    isPrimaryPlayer("1") &&
-                    !state.matches("activePieceSelected")
-                  }
-                  selectReserve={selectReserve}
-                />
-              </div>
-            </div>
-            <div>
-              <div className="">Captures</div>
-              <div className="items-center justify-center flex">
-                <ReserveBank
-                  player="RED"
-                  reserve={blueCaptures}
-                  selectable={false}
-                  selectReserve={() => {}}
-                />
-              </div>
-            </div>
-          </div>
-
-          {ctx.gameover ? (
-            <div className="flex flex-col items-center justify-center gap-1 justify-center items-center">
-              <h2
-                className={classNames(
-                  "text-center font-semibold text-2xl",
-                  ctx.gameover.status === "DRAW" && "text-gray-800",
-                  ctx.gameover.status === "WIN" && ctx.gameover.winner === "RED"
-                    ? "text-red-500"
-                    : "text-blue-500"
-                )}
-              >
-                {ctx.gameover.status === "DRAW" ? (
-                  "Draw!"
-                ) : (
-                  <>{ctx.gameover.winner === "RED" ? "Red " : "Blue"} Won!</>
-                )}
-              </h2>
-              {ctx.gameover.reason && ctx.gameover.reason}
-              <Button onClick={async () => router.push("/")}>🏠 Home</Button>
-            </div>
-          ) : (
-            <div
-              className={classNames(
-                "text-center font-semibold flex items-center flex-col justify-center text-2xl flex-1",
-                ctx.currentPlayer === "0" ? "text-red-500" : "text-blue-500"
-              )}
-            >
-              {ctx.currentPlayer === "0" ? "Red's " : "Blue's"} Turn
-              <div className="text-lg text-gray-600 font-mono flex gap-1 justify-center items-center">
-                {3 - ctx.numMoves!} remaining move
-                {ctx.numMoves !== 2 ? "s" : ""}{" "}
-              </div>
-              <div className="flex gap-1 justify-center items-center">
-                {ctx.currentPlayer === playerID || !G.isOnline ? (
-                  <>
-                    <SkipButton skip={() => moves.Skip()} />
-                    {G.drawOfferedBy &&
-                    G.drawOfferedBy !== ctx.currentPlayer ? (
-                      <AcceptDrawButton draw={() => moves.AcceptDraw()} />
-                    ) : (
-                      <OfferDrawButton
-                        draw={(offer: boolean) => moves.OfferDraw(offer)}
-                      />
-                    )}
-                    <ResignButton resign={() => moves.Resign()} />
-                  </>
-                ) : (
-                  <AbortGameButton matchId={G.matchId} />
-                )}
-                {!G.isOnline && (
-                  <button
-                    className="bg-blue-500 text-white py-1 px-2 text-sm rounded hover:bg-blue-600 flex gap-1 items-center"
-                    onClick={() => router.push("/")}
-                  >
-                    🏠 Home
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-
-          <div className="flex flex-col gap-2 p-4">
-            <div className="text-xl flex gap-1">
-              <div className="font-bold">
-                {usernames?.[0] ?? G.userIds["0"]}
-              </div>
-              <div>({G.elos?.[0] ?? 0})</div>
-            </div>
-            <CountdownTimer
-              active={ctx.currentPlayer === "0" && !ctx.gameover}
-              player="RED"
-              elapsed={G.redElapsed}
-              startDate={G.turnStartTime}
-              totalTimeAllowed={G.timeControl}
-            />
-            <div>
-              <div className="">Reserve</div>
-              <div className="items-center justify-center flex">
-                <ReserveBank
-                  player="RED"
-                  selectedKind={
-                    isPrimaryPlayer("0") ? state.context.unitKind : undefined
-                  }
-                  reserve={G.redReserve}
-                  selectable={
-                    isPrimaryPlayer("0") &&
-                    !state.matches("activePieceSelected")
-                  }
-                  selectReserve={selectReserve}
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="">Captures</div>
-              <div className="items-center justify-center flex">
-                <ReserveBank
-                  player="BLUE"
-                  reserve={redCaptures}
-                  selectable={false}
-                  selectReserve={() => {}}
-                />
-              </div>
-            </div>
-          </div>
+        <div className="pt-10" style={{ width: 400 }}>
+          {isPrimaryPlayer("1") ? blueBank : redBank}
         </div>
       </div>
     </div>
