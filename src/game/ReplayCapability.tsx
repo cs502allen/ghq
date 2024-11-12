@@ -2,6 +2,8 @@ import { CreateGameReducer } from "boardgame.io/internal";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
+const disableReplays = true;
+
 export default function ReplayCapability({ client }: { client: any }) {
   const [latestLogLength, setLatestLogLength] = useState<number>(0);
   const [currentLogIndex, setCurrentLogIndex] = useState<
@@ -68,6 +70,10 @@ export default function ReplayCapability({ client }: { client: any }) {
     (e) => {
       e.preventDefault();
 
+      if (disableReplays) {
+        return;
+      }
+
       if (!client.log) {
         return;
       }
@@ -95,6 +101,10 @@ export default function ReplayCapability({ client }: { client: any }) {
     "up",
     (e) => {
       e.preventDefault();
+
+      if (disableReplays) {
+        return;
+      }
 
       if (!client.log) {
         return;

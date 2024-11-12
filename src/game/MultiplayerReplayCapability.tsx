@@ -1,6 +1,8 @@
 import { CreateGameReducer } from "boardgame.io/internal";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+
+const disableReplays = true;
 
 export default function MultiplayerReplayCapability({
   offlineClient,
@@ -91,6 +93,10 @@ export default function MultiplayerReplayCapability({
     (e) => {
       e.preventDefault();
 
+      if (disableReplays) {
+        return;
+      }
+
       if (!onlineClient.log) {
         return;
       }
@@ -120,6 +126,10 @@ export default function MultiplayerReplayCapability({
     "up",
     (e) => {
       e.preventDefault();
+
+      if (disableReplays) {
+        return;
+      }
 
       if (!onlineClient.log) {
         return;
