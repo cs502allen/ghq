@@ -20,14 +20,21 @@ export default function Rules() {
       </div>
 
       <div>
-        It was developed by Geoff Engelstein (watch his great{" "}
+        The physical game was developed by Geoff Engelstein (see his great{" "}
         <a
           className="text-blue-600 hover:text-blue-400"
           href="https://www.youtube.com/watch?v=zfXPIhvFPjw"
         >
           How To Play GHQ
         </a>{" "}
-        video).
+        video and{" "}
+        <a
+          className="text-blue-600 hover:text-blue-400"
+          href="https://boardgamegeek.com/file/download_redirect/b33521f1879221fd8284270e2845ff0c853160be870f0c74/GHQ+Rules+7x7+03+22+2024.pdf"
+        >
+          rule book
+        </a>
+        ).
       </div>
 
       <div>
@@ -128,7 +135,7 @@ export default function Rules() {
         <div className="px-4">
           <span className="font-bold">Captures:</span> If the other player moved
           pieces where they could be captured, or left them where they were
-          being attacked, remove them now (see Capturing on pg 4).
+          being attacked, remove them now.
         </div>
         <div className="px-4">
           <span className="font-bold">Take three Actions: </span>Captures may
@@ -192,8 +199,8 @@ export default function Rules() {
             <Image
               src="/rules/moving-regular.png"
               alt="moving-regular"
-              width={200}
-              height={200}
+              width={100}
+              height={100}
             />
           </div>
           <div>
@@ -241,14 +248,14 @@ export default function Rules() {
             <Image
               src="/rules/moving-airborne.png"
               alt="moving-regular"
-              width={100}
-              height={100}
+              width={200}
+              height={200}
             />
           </div>
           <Note>
             Note: Turning infantry units to help clarify engagements and
             captures is always free, does not cost an action, and may be done at
-            any time. (See Capturing on pg 4 for details).
+            any time.
           </Note>
           <Note>
             Note: No piece may move into or through a space under bombardment by
@@ -287,8 +294,8 @@ export default function Rules() {
             <Image
               src="/rules/rotating.png"
               alt="moving-regular"
-              width={100}
-              height={100}
+              width={160}
+              height={160}
             />
           </div>
           <Note>
@@ -333,7 +340,7 @@ export default function Rules() {
             in a standoff, the enemy will be captured. HOWEVER, if the moving
             piece is adjacent to more than one enemy piece, at least one of
             which is not engaged, the moving piece must engage that enemy and
-            cannot capture (See example on pg 6).
+            cannot capture.
           </div>
           <div className="flex gap-2 items-center justify-center">
             <Image
@@ -345,8 +352,8 @@ export default function Rules() {
             <Image
               src="/rules/engaging-2.png"
               alt="moving-regular"
-              width={160}
-              height={100}
+              width={50}
+              height={64}
             />
           </div>
           <div>
@@ -358,7 +365,7 @@ export default function Rules() {
             Important: Infantry may cause captures when they are adjacent to
             enemy units, but NOT diagonally. (Note that infantry can move
             diagonally, but not capture diagonally). Infantry capture artillery
-            differently. (See page 5).
+            differently.
           </Note>
           <div>
             An infantry that is engaged with an enemy may still move, but the
@@ -420,8 +427,7 @@ export default function Rules() {
           <div>
             Artillery always have a specific facing, which can include
             diagonally. After moving, the artillery can be turned to face in any
-            direction. Artillery can also rotate in place using an action (see
-            Actions on pg 4).
+            direction. Artillery can also rotate in place using an action
           </div>
           <div>
             Artillery bombard either two or three squares in the direction they
