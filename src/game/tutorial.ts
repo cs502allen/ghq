@@ -195,7 +195,12 @@ export function newTutorialGHQGame({
       redElapsed: 0,
       bonusTime: 5 * 1000,
       timeControl: 100 * 60 * 1000,
+      lastPlayerMoves: [],
+      redTurnStartBoard: boards[boardType],
+      blueTurnStartBoard: boards[boardType],
       board: boards[boardType],
+      thisTurnMoves: [],
+      eval: 0,
       redReserve: {
         INFANTRY: 99,
         ARMORED_INFANTRY: 99,

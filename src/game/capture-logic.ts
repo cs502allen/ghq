@@ -1,4 +1,5 @@
 import {
+  AllowedMove,
   Coordinate,
   GHQState,
   NonNullSquare,
@@ -11,6 +12,7 @@ import type { Ctx, LogEntry } from "boardgame.io";
 import { bombardedSquares } from "@/game/move-logic";
 import { HistoryState } from "./move-history-plugin";
 import { BoardProps } from "boardgame.io/react";
+import { PlayerPiece } from "./board-moves";
 
 export function captureCandidates(
   lastMovedInfantry: Coordinate,
@@ -40,8 +42,21 @@ export function captureCandidates(
     return [];
   }
 
-  // Find the adjacent pieces to the last moved infantry
-  const attackerAdjacentPieces = getAdjacentPieces(board, lastMovedInfantry);
+  return findAdjacentAttackablePieces(
+    board,
+    engagedInfantry,
+    attacker,
+    lastMovedInfantry
+  );
+}
+
+function findAdjacentAttackablePieces(
+  board: GHQState["board"],
+  engagedInfantry: Record<string, Player>,
+  attacker: NonNullSquare,
+  attackerCoords: Coordinate
+): Coordinate[] {
+  const attackerAdjacentPieces = getAdjacentPieces(board, attackerCoords);
 
   // Find capturable pieces
   const attackablePieces = attackerAdjacentPieces.filter((coord) => {
@@ -67,7 +82,7 @@ export function captureCandidates(
       isCapturableHQ({
         board,
         engagedInfantry,
-        lastMovedInfantry,
+        lastMovedInfantry: attackerCoords,
         coord,
         attacker,
       })
@@ -447,45 +462,12 @@ export function captureCandidatesV2({
     return [];
   }
 
-  // Find the adjacent pieces to the last moved infantry
-  const attackerAdjacentPieces = getAdjacentPieces(board, attackerTo);
-
-  // Find capturable pieces
-  const attackablePieces = attackerAdjacentPieces.filter((coord) => {
-    const piece = board[coord[0]][coord[1]];
-
-    // It must be an enemy piece
-    if (!isEnemyPiece({ piece, attacker })) {
-      return false;
-    }
-
-    // If it is already engaged, it's capturable
-    if (isAlreadyEngaged(engagedInfantry, coord)) {
-      return true;
-    }
-
-    // If it's non-infantry and non-HQ, it's capturable
-    if (!isInfantry(piece) && !isHQ(piece)) {
-      return true;
-    }
-
-    // If it's capturable HQ, it's capturable
-    if (
-      isCapturableHQ({
-        board,
-        engagedInfantry,
-        lastMovedInfantry: attackerTo,
-        coord,
-        attacker,
-      })
-    ) {
-      return true;
-    }
-
-    return false;
-  });
-
-  return attackablePieces;
+  return findAdjacentAttackablePieces(
+    board,
+    engagedInfantry,
+    attacker,
+    attackerTo
+  );
 }
 
 function maximizeEngagementV2(
@@ -627,4 +609,72 @@ function maximizeEngagementV2(
 
   // Return the list of engaged pairs
   return engagedPairs;
+}
+
+export interface FreeInfantryCapture {
+  attacker: PlayerPiece;
+  capture: PlayerPiece;
+}
+
+export function freeInfantryCaptures(
+  board: GHQState["board"]
+): FreeInfantryCapture[] {
+  const freeCaptures: FreeInfantryCapture[] = [];
+
+  const engagedPairs = maximizeEngagement(board, null);
+  const engagedInfantry: Record<string, Player> = {};
+  for (const pairs of engagedPairs) {
+    engagedInfantry[`${pairs.RED[0]},${pairs.RED[1]}`] = "RED";
+    engagedInfantry[`${pairs.BLUE[0]},${pairs.BLUE[1]}`] = "BLUE";
+  }
+
+  const unengagedInfantry = findUnengagedInfantry(board, engagedInfantry);
+
+  for (const infantry of unengagedInfantry) {
+    const attackablePieces = findAdjacentAttackablePieces(
+      board,
+      engagedInfantry,
+      infantry.piece,
+      infantry.coordinate
+    );
+
+    if (attackablePieces.length > 0) {
+      // Take the first attackable piece we can find
+      // Long term, we want to provide the user with the ability to select which piece they want to capture
+      // Tehcnically, this implementation is somewhat wrong because it doesn't optimally match all the capturable pieces
+      // In practice, it's a rare circumstance to arise, and it will be okay for now.
+      const captureCoord = attackablePieces[0];
+      const capturePiece = board[captureCoord[0]][captureCoord[1]];
+      if (capturePiece) {
+        freeCaptures.push({
+          attacker: infantry,
+          capture: { piece: capturePiece, coordinate: captureCoord },
+        });
+      }
+    }
+  }
+
+  return freeCaptures;
+}
+
+function findUnengagedInfantry(
+  board: GHQState["board"],
+  engagedInfantry: Record<string, Player>
+): PlayerPiece[] {
+  const unengagedInfantry: PlayerPiece[] = [];
+
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
+      const piece = board[i][j];
+      if (
+        piece &&
+        isInfantry(piece) &&
+        !isAlreadyEngaged(engagedInfantry, [i, j])
+      ) {
+        unengagedInfantry.push({ piece, coordinate: [i, j] });
+      }
+    }
+  }
+
+  return unengagedInfantry;
 }
