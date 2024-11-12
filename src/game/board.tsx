@@ -163,9 +163,9 @@ export function GHQBoard({
     ? G.lastPlayerMoves
     : G.thisTurnMoves;
 
-  useEffect(() => {
-    console.log(JSON.stringify(renderMoves));
-  }, [renderMoves]);
+  // useEffect(() => {
+  //   console.log(JSON.stringify(renderMoves));
+  // }, [renderMoves]);
 
   useHotkeys("escape", () => send({ type: "DESELECT" }), [send]);
   useHotkeys(
@@ -189,7 +189,7 @@ export function GHQBoard({
     if (G.isOnline && ctx.currentPlayer !== playerID) {
       send({ type: "NOT_TURN" });
     } else {
-      console.log("NEW TURN");
+      // console.log("NEW TURN");
       send({
         type: "START_TURN",
         player: isPrimaryPlayer("0") ? "RED" : "BLUE",
@@ -334,7 +334,7 @@ export function GHQBoard({
               )[0]
             : undefined;
 
-          if (moved) console.log("MOVED " + JSON.stringify(moved));
+          // if (moved) console.log("MOVED " + JSON.stringify(moved));
 
           const moveOrder = moved ? renderMoves.indexOf(moved) : 0;
 
@@ -353,12 +353,12 @@ export function GHQBoard({
               ? (moved.args[2] as Orientation)
               : square.orientation;
 
-          if (moved)
-            console.log(
-              "RENDERED ORIENTATION",
-              renderedOrientation,
-              square.orientation
-            );
+          // if (moved)
+          //   console.log(
+          //     "RENDERED ORIENTATION",
+          //     renderedOrientation,
+          //     square.orientation
+          //   );
 
           const selectingOrientation = Boolean(
             square &&

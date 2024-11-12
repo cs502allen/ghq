@@ -54,7 +54,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     if (isSignedIn && matchId) {
       getMatchInfo(matchId);
     }
-  }, [matchId]);
+  }, [isSignedIn, matchId, getMatchInfo]);
 
   const [onlineClient, setOnlineClient] = useState<any | null>(null);
   const [offlineClient, setOfflineClient] = useState<any | null>(null);
