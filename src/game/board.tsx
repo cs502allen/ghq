@@ -44,8 +44,8 @@ import AbortGameButton from "./AbortGameButton";
 import Header from "@/components/Header";
 
 const squareSizes = {
-  small: 75,
-  large: 90,
+  small: 65,
+  large: 75,
 };
 
 //coordinate string x,y
@@ -430,7 +430,7 @@ export function GHQBoard({
         }
       });
     });
-  }, [ctx.turn, renderBoard, state.value, renderMoves]);
+  }, [ctx.turn, renderBoard, width, state.value, renderMoves]);
 
   const cells = Array.from({ length: rows }).map((_, rowIndex) => {
     const colN = Array.from({ length: columns }, (_, index) => index);
@@ -712,13 +712,6 @@ export function GHQBoard({
 
   const blueBank = (
     <>
-      <CountdownTimer
-        active={ctx.currentPlayer === "1" && !ctx.gameover}
-        player="BLUE"
-        elapsed={G.blueElapsed}
-        startDate={G.turnStartTime}
-        totalTimeAllowed={G.timeControl}
-      />
       <div className="items-center justify-center flex pt-5">
         <ReserveBank
           player="BLUE"
@@ -731,39 +724,45 @@ export function GHQBoard({
           }
           selectReserve={selectReserve}
         />
+        <div className="ml-20 mb-2">
+          <CountdownTimer
+            active={ctx.currentPlayer === "1" && !ctx.gameover}
+            player="BLUE"
+            elapsed={G.blueElapsed}
+            startDate={G.turnStartTime}
+            totalTimeAllowed={G.timeControl}
+          />
+        </div>
       </div>
     </>
   );
 
   const redBank = (
-    <>
-      <CountdownTimer
-        active={ctx.currentPlayer === "0" && !ctx.gameover}
+    <div className=" flex ">
+      <ReserveBank
         player="RED"
-        elapsed={G.redElapsed}
-        startDate={G.turnStartTime}
-        totalTimeAllowed={G.timeControl}
+        reserve={G.redReserve}
+        selectedKind={isPrimaryPlayer("0") ? state.context.unitKind : undefined}
+        selectable={
+          isPrimaryPlayer("0") && !state.matches("activePieceSelected")
+        }
+        selectReserve={selectReserve}
       />
-      <div className="items-center justify-center flex pt-5">
-        <ReserveBank
+      <div className="ml-20 mt-6">
+        <CountdownTimer
+          active={ctx.currentPlayer === "0" && !ctx.gameover}
           player="RED"
-          reserve={G.redReserve}
-          selectedKind={
-            isPrimaryPlayer("0") ? state.context.unitKind : undefined
-          }
-          selectable={
-            isPrimaryPlayer("0") && !state.matches("activePieceSelected")
-          }
-          selectReserve={selectReserve}
+          elapsed={G.redElapsed}
+          startDate={G.turnStartTime}
+          totalTimeAllowed={G.timeControl}
         />
       </div>
-    </>
+    </div>
   );
 
   return (
-    <div className="flex flex-col md:flex-row bg-gray-100 absolute w-full h-[calc(100%-40px)]">
+    <div className="flex flex-col md:flex-row bg-gray-100 absolute w-full h-full overflow-hidden">
       <SoundPlayer ctx={ctx} G={G} />
-
       <div
         className={classNames("bg-white order-3 md:order-1")}
         style={{ width: 450 }}
@@ -833,12 +832,10 @@ export function GHQBoard({
       </div>
 
       <div
-        className=" order-1 md:order-2 flex-1 flex flex-col items-center justify-center "
+        className="order-1 md:order-2 flex-1 flex flex-col items-center justify-center "
         ref={measureRef}
       >
-        <div className="pb-10" style={{ width: 400 }}>
-          {isPrimaryPlayer("1") ? redBank : blueBank}
-        </div>
+        <div className=" flex">{isPrimaryPlayer("1") ? redBank : blueBank}</div>
         <div
           className="border-r-2 border-gray-100 flex items-center justify-center relative"
           style={{
@@ -861,9 +858,7 @@ export function GHQBoard({
           {pieces}
         </div>
 
-        <div className="pt-10" style={{ width: 400 }}>
-          {isPrimaryPlayer("1") ? blueBank : redBank}
-        </div>
+        <div className=" flex">{isPrimaryPlayer("1") ? blueBank : redBank}</div>
       </div>
     </div>
   );
@@ -895,7 +890,7 @@ function ReserveBank(props: {
         }}
         key={kind}
         className={classNames(
-          "col-span-1 select-none flex font-bold text-xl p-1 flex-col items-center",
+          "col-span-1 select-none flex font-bold text-xl p-1 flex-col items-center justify-end",
           props.player === "RED" ? "text-red-600" : "text-blue-600",
           { ["cursor-pointer"]: props.selectable },
           {
@@ -926,7 +921,7 @@ function ReserveBank(props: {
     );
   }
 
-  return <div className="grid flex-1 grid-cols-6">{reserves}</div>;
+  return <div className="grid flex-1 grid-cols-6 gap-5">{reserves}</div>;
 }
 
 function BoardCoordinateLabels({
