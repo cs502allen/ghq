@@ -47,12 +47,14 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   );
 
   useEffect(() => {
+    params.then(({ id }) => setMatchId(id));
+  }, [params]);
+
+  useEffect(() => {
     if (isSignedIn && matchId) {
       getMatchInfo(matchId);
     }
   }, [matchId]);
-
-  params.then(({ id }) => setMatchId(id));
 
   const [onlineClient, setOnlineClient] = useState<any | null>(null);
   const [offlineClient, setOfflineClient] = useState<any | null>(null);

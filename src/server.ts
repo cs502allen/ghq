@@ -199,6 +199,12 @@ server.router.get("/matches/:matchId", async (ctx) => {
     .eq("match_id", ctx.params.matchId)
     .single();
   if (error) {
+    console.log({
+      message: "Error fetching active user match",
+      userId,
+      matchId: ctx.params.matchId,
+      error,
+    });
     ctx.body = JSON.stringify({});
     return;
   }
