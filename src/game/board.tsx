@@ -44,6 +44,7 @@ import AbortGameButton from "./AbortGameButton";
 import Header from "@/components/Header";
 import BoardArrow, { BoardArrowType } from "./BoardArrow";
 import { useBoardArrow } from "./BoardArrowProvider";
+import { playCaptureSound, playMoveSound } from "./audio";
 
 const squareSizes = {
   small: 65,
@@ -365,6 +366,18 @@ export function GHQBoard({
               annotationsForSquare?.selectedPiece
           );
           const hidePiece = Boolean(annotations[`${x},${y}`]?.hidePiece);
+
+          if (moved) {
+            const delayMs = moveOrder * 250;
+            setTimeout(() => {
+              const captured = moved.args[2];
+              if (captured) {
+                playCaptureSound();
+              } else {
+                playMoveSound();
+              }
+            }, delayMs);
+          }
 
           return (
             <div
