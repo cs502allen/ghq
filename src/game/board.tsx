@@ -712,7 +712,7 @@ export function GHQBoard({
 
   const blueBank = (
     <>
-      <div className="items-center justify-center flex pt-5">
+      <div className="items-center justify-center flex py-2">
         <ReserveBank
           player="BLUE"
           reserve={G.blueReserve}
@@ -724,7 +724,7 @@ export function GHQBoard({
           }
           selectReserve={selectReserve}
         />
-        <div className="ml-20 mb-2 flex flex-col gap-1">
+        <div className="ml-20 my-2 flex flex-col gap-1">
           <div>
             {usernames[1]} ({G.elos[1]})
           </div>
@@ -741,7 +741,7 @@ export function GHQBoard({
   );
 
   const redBank = (
-    <div className=" flex ">
+    <div className="flex py-2">
       <ReserveBank
         player="RED"
         reserve={G.redReserve}
@@ -751,7 +751,7 @@ export function GHQBoard({
         }
         selectReserve={selectReserve}
       />
-      <div className="ml-20 mt-2 flex flex-col gap-1">
+      <div className="ml-20 my-2 flex flex-col gap-1">
         <div>
           {usernames[0]} ({G.elos[0]})
         </div>
