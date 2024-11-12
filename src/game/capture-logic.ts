@@ -617,7 +617,8 @@ export interface FreeInfantryCapture {
 }
 
 export function freeInfantryCaptures(
-  board: GHQState["board"]
+  board: GHQState["board"],
+  currentPlayer: Player
 ): FreeInfantryCapture[] {
   const freeCaptures: FreeInfantryCapture[] = [];
 
@@ -628,7 +629,11 @@ export function freeInfantryCaptures(
     engagedInfantry[`${pairs.BLUE[0]},${pairs.BLUE[1]}`] = "BLUE";
   }
 
-  const unengagedInfantry = findUnengagedInfantry(board, engagedInfantry);
+  const unengagedInfantry = findUnengagedInfantry(
+    board,
+    engagedInfantry,
+    currentPlayer
+  );
 
   for (const infantry of unengagedInfantry) {
     const attackablePieces = findAdjacentAttackablePieces(
@@ -659,7 +664,8 @@ export function freeInfantryCaptures(
 
 function findUnengagedInfantry(
   board: GHQState["board"],
-  engagedInfantry: Record<string, Player>
+  engagedInfantry: Record<string, Player>,
+  player: Player
 ): PlayerPiece[] {
   const unengagedInfantry: PlayerPiece[] = [];
 
@@ -668,6 +674,7 @@ function findUnengagedInfantry(
       const piece = board[i][j];
       if (
         piece &&
+        piece.player === player &&
         isInfantry(piece) &&
         !isAlreadyEngaged(engagedInfantry, [i, j])
       ) {

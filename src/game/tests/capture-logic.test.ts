@@ -624,7 +624,7 @@ describe("clear free captures", () => {
       [null, null, null, null, null, null, null, null],
       [null, null, null, null, null, null, null, RINF],
     ];
-    expect(freeInfantryCaptures(board)).toEqual([]);
+    expect(freeInfantryCaptures(board, "RED")).toEqual([]);
   });
   it("allows free captures on engaged attackers", () => {
     const board: GHQState["board"] = [
@@ -638,7 +638,7 @@ describe("clear free captures", () => {
       [null, null, null, null, null, null, null, RINF],
     ];
 
-    expect(freeInfantryCaptures(board)).toEqual(
+    expect(freeInfantryCaptures(board, "BLUE")).toEqual(
       expect.arrayContaining([
         {
           attacker: {
@@ -676,7 +676,7 @@ describe("clear free captures", () => {
     ];
 
     // Making a note of the current behavior (two pieces attacking the HQ), even if it's weird
-    expect(freeInfantryCaptures(board)).toEqual(
+    expect(freeInfantryCaptures(board, "BLUE")).toEqual(
       expect.arrayContaining([
         {
           attacker: {
@@ -700,5 +700,18 @@ describe("clear free captures", () => {
         },
       ])
     );
+  });
+  it("doesn't allow capturing a smothered hq on the opponent's turn", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, BINF],
+      [null, null, null, null, null, null, BINF, R_HQ],
+    ];
+    expect(freeInfantryCaptures(board, "RED")).toEqual([]);
   });
 });

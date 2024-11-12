@@ -502,7 +502,10 @@ export const GHQGame: Game<GHQState> = {
         });
       }
 
-      const freeCaptured = freeInfantryCaptures(G.board);
+      const freeCaptured = freeInfantryCaptures(
+        G.board,
+        ctx.currentPlayer === "0" ? "RED" : "BLUE"
+      );
       if (freeCaptured.length > 0) {
         const clearedSquares = freeCaptured.map(
           ({ capture }) => capture.coordinate
