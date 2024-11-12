@@ -39,12 +39,8 @@ function App() {
       <Header />
       <LatestMessage />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
-        <div className="col-span-2 border rounded p-4 bg-slate-50 lg:order-1 order-2">
-          <Learn />
-        </div>
-
-        <div className="col-span-1 flex flex-col gap-2 lg:order-2 order-1">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+        <div className="col-span-1 flex flex-col gap-2">
           <div className="flex flex-col gap-2 border rounded p-4 bg-slate-50">
             <div className="text-2xl">Play a game</div>
             <div className="flex flex-wrap gap-2 justify-center items-center">
@@ -56,8 +52,12 @@ function App() {
           </div>
 
           <div className="border rounded p-4 min-h-[400px] bg-slate-50 flex flex-col gap-2">
-            <LiveGamesList />
+            <Learn />
           </div>
+        </div>
+
+        <div className="col-span-1 border rounded p-4 bg-slate-50">
+          <LiveGamesList />
         </div>
       </div>
     </div>

@@ -126,7 +126,7 @@ export const boards: Record<string, GHQState["board"]> = {
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, R.HQ],
   ],
-  "Puzzle: capture an artillery": [
+  "Puzzle: Capture an artillery": [
     [B.HQ, null, null, B.H1, null, B.AR, null, null],
     [B.IN, B.IN, null, null, null, B.IN, null, null],
     [null, null, B.IN, B.AR, null, B.IN, null, null],
@@ -136,7 +136,7 @@ export const boards: Record<string, GHQState["board"]> = {
     [null, null, null, null, null, R.IN, R.IN, R.IN],
     [null, null, null, null, null, null, null, R.HQ],
   ],
-  "Puzzle: capture two infantry": [
+  "Puzzle: Capture two infantry": [
     [B.HQ, null, null, null, B.IN, null, null, null],
     [null, null, null, B.IN, R.IN, null, null, null],
     [null, null, B.IN, R.IN, null, R.IN, null, null],
@@ -146,7 +146,7 @@ export const boards: Record<string, GHQState["board"]> = {
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, R.HQ],
   ],
-  "Puzzle: capture hq!": [
+  "Puzzle: capture HQ!": [
     [B.HQ, null, B.IN, null, null, null, null, null],
     [B.IN, null, null, null, null, null, null, null],
     [R.IN, null, B.IN, null, null, null, null, null],
