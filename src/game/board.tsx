@@ -724,7 +724,10 @@ export function GHQBoard({
           }
           selectReserve={selectReserve}
         />
-        <div className="ml-20 mb-2">
+        <div className="ml-20 mb-2 flex flex-col gap-1">
+          <div>
+            {usernames[1]} ({G.elos[1]})
+          </div>
           <CountdownTimer
             active={ctx.currentPlayer === "1" && !ctx.gameover}
             player="BLUE"
@@ -748,7 +751,10 @@ export function GHQBoard({
         }
         selectReserve={selectReserve}
       />
-      <div className="ml-20 mt-6">
+      <div className="ml-20 mt-2 flex flex-col gap-1">
+        <div>
+          {usernames[0]} ({G.elos[0]})
+        </div>
         <CountdownTimer
           active={ctx.currentPlayer === "0" && !ctx.gameover}
           player="RED"

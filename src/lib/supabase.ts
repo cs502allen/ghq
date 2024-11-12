@@ -8,12 +8,21 @@ export const supabase = createClient(
 export async function getUsernames(userIds: string[]): Promise<string[]> {
   const { data, error } = await supabase
     .from("users")
-    .select("username")
+    .select("id, username")
     .in("id", userIds);
 
   if (error) {
     throw error;
   }
 
-  return data.map((user) => user.username);
+  if (!data) {
+    return [];
+  }
+
+  const userIdsToUsernames: Record<string, string> = {};
+  for (const { id, username } of data) {
+    userIdsToUsernames[id] = username;
+  }
+
+  return userIds.map((userId) => userIdsToUsernames[userId] ?? userId);
 }
