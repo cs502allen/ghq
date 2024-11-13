@@ -24,7 +24,7 @@ export async function getUsernames(userIds: string[]): Promise<string[]> {
     userIdsToUsernames[id] = username;
   }
 
-  return userIds.map((userId) => userIdsToUsernames[userId] ?? userId);
+  return userIds.map((userId) => userIdsToUsernames[userId] ?? "Anonymous");
 }
 
 export interface User {

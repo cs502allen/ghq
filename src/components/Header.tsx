@@ -51,7 +51,7 @@ export default function Header() {
             <div className="flex gap-1">
               {userInfo && (
                 <div>
-                  {userInfo?.username} ({userInfo?.elo})
+                  {userInfo?.username ?? "Anonymous"} ({userInfo?.elo})
                 </div>
               )}
               <UserButton />
