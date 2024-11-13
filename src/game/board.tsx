@@ -42,6 +42,8 @@ import { Button } from "@/app/live/Button";
 import { useRouter } from "next/navigation";
 import AbortGameButton from "./AbortGameButton";
 import Header from "@/components/Header";
+import BoardArrow, { BoardArrowType } from "./BoardArrow";
+import { useBoardArrow } from "./BoardArrowProvider";
 
 const squareSizes = {
   small: 65,
@@ -73,6 +75,7 @@ export function GHQBoard({
 }: BoardProps<GHQState>) {
   const router = useRouter();
   const [usernames, setUsernames] = React.useState<string[]>([]);
+  const { boardArrows, setBoardArrows } = useBoardArrow();
 
   const [measureRef, { width, height }] = useMeasure();
 
@@ -203,6 +206,7 @@ export function GHQBoard({
   );
   useEffect(() => {
     setRightClicked(new Set());
+    setBoardArrows([]);
   }, [G.board]);
 
   const selectReserve = useCallback(
@@ -496,6 +500,7 @@ export function GHQBoard({
               }}
               onContextMenu={(e) => {
                 e.preventDefault();
+
                 setRightClicked((prev) => {
                   const newSet = new Set(prev);
                   const key = `${rowIndex},${colIndex}`;
@@ -838,7 +843,7 @@ export function GHQBoard({
       </div>
 
       <div
-        className="order-1 md:order-2 flex-1 flex flex-col items-center justify-center "
+        className="order-1 md:order-2 flex-1 flex flex-col items-center justify-center"
         ref={measureRef}
       >
         <div className=" flex">{isPrimaryPlayer("1") ? redBank : blueBank}</div>
@@ -862,6 +867,16 @@ export function GHQBoard({
             {/*overlay pieces */}
           </table>
           {pieces}
+
+          {boardArrows.map((boardArrow) => (
+            <BoardArrow
+              key={`${boardArrow.from[0]},${boardArrow.from[1]}-${boardArrow.to[0]},${boardArrow.to[1]}`}
+              squareSize={squareSize}
+              from={boardArrow.from}
+              to={boardArrow.to}
+              className="fill-blue-400 stroke-blue-400"
+            />
+          ))}
         </div>
 
         <div className=" flex">{isPrimaryPlayer("1") ? blueBank : redBank}</div>
