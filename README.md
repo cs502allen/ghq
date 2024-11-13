@@ -9,4 +9,4 @@
 - Refactor of board logic is needed. We didn't know the reqs when we started so there's a lot to do. 
 - Build some cool variants. What does 4 player GHQ look like? Infinite canvas
 
-Huge Kudos to everyone who has contributed to https://github.com/boardgameio/boardgame.io. T
+Huge Kudos to everyone who has contributed to https://github.com/boardgameio/boardgame.io. 
