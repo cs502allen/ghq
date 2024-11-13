@@ -51,10 +51,10 @@ export default function AbortGameModal({
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Abort</DialogTitle>
+          <DialogTitle>Abandon</DialogTitle>
           <div>
-            Are you sure you want to abort this game? If you do this too often,
-            it could result in account suspension.
+            Are you sure you want to abandon this game? If you do this too
+            often, it could result in account suspension.
             <div className="flex">
               {submitting ? (
                 <div
@@ -62,7 +62,7 @@ export default function AbortGameModal({
                   onClick={() => abortGame(matchId)}
                 >
                   <Loader2 className="animate-spin w-4 h-4 mr-1" />
-                  Aborting...
+                  Abandoning...
                 </div>
               ) : (
                 <button
