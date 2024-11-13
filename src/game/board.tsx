@@ -152,7 +152,9 @@ export function GHQBoard({
     })
   );
 
-  const renderBoard = state.matches("notTurn")
+  const renderBoard = ctx.gameover
+    ? G.board
+    : state.matches("notTurn")
     ? ctx.currentPlayer === "1"
       ? G.redTurnStartBoard
       : G.blueTurnStartBoard
@@ -162,7 +164,9 @@ export function GHQBoard({
       : G.blueTurnStartBoard
     : G.board;
 
-  const renderMoves = state.matches("replay")
+  const renderMoves = ctx.gameover
+    ? G.lastPlayerMoves
+    : state.matches("replay")
     ? G.lastPlayerMoves
     : G.thisTurnMoves;
 
