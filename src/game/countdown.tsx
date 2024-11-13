@@ -20,6 +20,9 @@ const CountdownTimer = ({
   );
 
   useEffect(() => {
+    // Update the remaining time when elapsed changes, even if it's not our turn.
+    setRemainingTime(totalTimeAllowed - elapsed);
+
     // If the turn is not active, exit the effect without starting the countdown.
     if (!active) return;
 
