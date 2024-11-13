@@ -197,6 +197,7 @@ export function GHQBoard({
         type: "START_TURN",
         player: isPrimaryPlayer("0") ? "RED" : "BLUE",
         disabledPieces: coordsForThisTurnMoves(G.thisTurnMoves),
+        renderMoves: G.lastPlayerMoves.length,
       });
     }
   }, [isPrimaryPlayer, ctx.turn]);
