@@ -771,6 +771,15 @@ export function GHQBoard({
     </div>
   );
 
+  const historyEval = useMemo(() => {
+    return (
+      <>
+        <EvalBar evalValue={G.eval} />
+        <HistoryLog systemMessages={plugins.history.data} log={log} />
+      </>
+    );
+  }, [ctx.turn]);
+
   return (
     <div className="flex flex-col md:flex-row bg-gray-100 absolute w-full h-full overflow-hidden">
       <SoundPlayer ctx={ctx} G={G} />
@@ -779,8 +788,7 @@ export function GHQBoard({
         style={{ width: 450 }}
       >
         <Header />
-        <EvalBar evalValue={G.eval} />
-        <HistoryLog systemMessages={plugins.history.data} log={log} />
+        {historyEval}
         {ctx.gameover ? (
           <div className="flex flex-col items-center justify-center gap-1 justify-center items-center">
             <h2
