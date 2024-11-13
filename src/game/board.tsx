@@ -615,8 +615,8 @@ export function GHQBoard({
                       Units[annotationsForSquare?.showProxyPiece.type]
                         .imagePathPrefix
                     }-${annotationsForSquare?.showProxyPiece.player.toLowerCase()}.png`}
-                    width={pieceSize}
-                    height={pieceSize}
+                    width={pieceSize * 0.7}
+                    height={pieceSize * 0.7}
                     className="select-none"
                     draggable="false"
                     style={{
@@ -654,8 +654,8 @@ export function GHQBoard({
                     src={`/${
                       Units[square.type].imagePathPrefix
                     }-${square.player.toLowerCase()}.png`}
-                    width={pieceSize}
-                    height={pieceSize}
+                    width={pieceSize * 0.7}
+                    height={pieceSize * 0.7}
                     className="select-none"
                     draggable="false"
                     style={{
@@ -697,8 +697,8 @@ export function GHQBoard({
                       Units[state.context.selectedPiece.piece.type]
                         .imagePathPrefix
                     }-${state.context.player.toLowerCase()}.png`}
-                    width={pieceSize}
-                    height={pieceSize}
+                    width={pieceSize * 0.7}
+                    height={pieceSize * 0.7}
                     className="select-none"
                     draggable="false"
                     style={{
