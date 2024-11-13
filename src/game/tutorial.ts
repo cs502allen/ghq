@@ -246,6 +246,20 @@ export const boards: Record<string, TutorialSetupData> = {
     isPuzzle: true,
     boardArrows: [],
   },
+  "Take back the advantage": {
+    board: [
+      [B.HQ, null, null, null, null, null, null, null],
+      [B.H1, null, null, null, null, null, null, null],
+      [null, null, null, B.A2, B.AI, null, null, null],
+      [null, null, B.IN, null, null, R.AI, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, R.IN, R.AI, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, R.HQ],
+    ],
+    isPuzzle: true,
+    boardArrows: [],
+  },
 };
 
 export type BoardType = keyof typeof boards;
