@@ -257,7 +257,7 @@ const Move: Move<GHQState> = (
 
   G.thisTurnMoves.push({
     name: "Move",
-    args: [from, to],
+    args: [from, to, capturePreference],
   });
   log.setMetadata({
     pieceType: piece?.type,
