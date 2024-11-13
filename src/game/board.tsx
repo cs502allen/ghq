@@ -34,10 +34,6 @@ import { getUsernames } from "@/lib/supabase";
 import EvalBar from "./EvalBar";
 import { coordsForThisTurnMoves } from "./board-moves";
 
-const rows = 8;
-const columns = 8;
-const MOVE_SPEED_MS = 250;
-
 import { useMeasure } from "@uidotdev/usehooks";
 import { Button } from "@/app/live/Button";
 import { useRouter } from "next/navigation";
@@ -46,11 +42,7 @@ import Header from "@/components/Header";
 import BoardArrow, { BoardArrowType } from "./BoardArrow";
 import { useBoardArrow } from "./BoardArrowProvider";
 import { playCaptureSound, playMoveSound } from "./audio";
-
-const squareSizes = {
-  small: 65,
-  large: 75,
-};
+import { columns, MOVE_SPEED_MS, rows, squareSizes } from "@/game/constants";
 
 //coordinate string x,y
 type Annotations = {

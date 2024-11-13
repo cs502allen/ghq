@@ -13,10 +13,7 @@ import {
   spawnPositionsForPlayer,
 } from "@/game/move-logic";
 import { captureCandidates } from "@/game/capture-logic";
-
-/*
-// @todo there's a dead state when you click into a piece you can't move. No way out. Should add guard for allowed pieces > 1 and transition to ready state if failed
- */
+import { MOVE_SPEED_MS } from "@/game/constants";
 
 export const turnStateMachine = createMachine(
   {
@@ -25,6 +22,7 @@ export const turnStateMachine = createMachine(
     context: {
       disabledPieces: [],
       player: "RED",
+      renderMoves: 0,
       // selectedPiece
     },
 
@@ -416,7 +414,7 @@ export const turnStateMachine = createMachine(
   {
     delays: {
       REPLAY_DELAY: ({ context, event }) => {
-        return context.renderMoves * 250;
+        return context.renderMoves * MOVE_SPEED_MS;
       },
     },
   }
