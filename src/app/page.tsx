@@ -8,6 +8,7 @@ import { Learn } from "@/components/Learn";
 import Header from "@/components/Header";
 import LiveGamesList from "./LiveGamesList";
 import LatestMessage from "@/components/LatestMessage";
+import Leaderboard from "./Leaderboard";
 
 function App() {
   const router = useRouter();
@@ -56,8 +57,13 @@ function App() {
           </div>
         </div>
 
-        <div className="col-span-1 border rounded p-4 bg-slate-50">
-          <LiveGamesList />
+        <div className="col-span-1 flex flex-col gap-2">
+          <div className="border rounded p-4 bg-slate-50">
+            <Leaderboard />
+          </div>
+          <div className="border rounded p-4 bg-slate-50">
+            <LiveGamesList />
+          </div>
         </div>
       </div>
     </div>

@@ -521,3 +521,21 @@ async function getOrCreateUser(userId: string): Promise<User> {
 
   throw new Error("Unexpected error");
 }
+
+server.router.get("/leaderboard", async (ctx) => {
+  const { data: users, error } = await supabase
+    .from("users")
+    .select("id, username, elo")
+    .order("elo", { ascending: false })
+    .limit(10);
+
+  if (error) {
+    console.log({
+      message: "Error fetching users for matches",
+      error,
+    });
+    ctx.throw(400, "Error fetching users");
+  }
+
+  ctx.body = JSON.stringify({ users });
+});
