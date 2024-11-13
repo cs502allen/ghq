@@ -5,3 +5,7 @@ export const squareSizes = {
   small: 65,
   large: 75,
 };
+export const pieceSizes = {
+  small: 30,
+  large: 52,
+};

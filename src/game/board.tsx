@@ -42,7 +42,13 @@ import Header from "@/components/Header";
 import BoardArrow, { BoardArrowType } from "./BoardArrow";
 import { useBoardArrow } from "./BoardArrowProvider";
 import { playCaptureSound, playMoveSound } from "./audio";
-import { columns, MOVE_SPEED_MS, rows, squareSizes } from "@/game/constants";
+import {
+  columns,
+  MOVE_SPEED_MS,
+  rows,
+  pieceSizes,
+  squareSizes,
+} from "@/game/constants";
 
 //coordinate string x,y
 type Annotations = {
@@ -973,18 +979,34 @@ function BoardCoordinateLabels({
   colIndex: number;
   rowIndex: number;
 }) {
+  const color =
+    (rowIndex + colIndex) % 2 === 0 ? "text-gray-50" : "text-gray-400";
   return (
     <>
-      <div className="absolute top-0 left-1 text-sm font-bold text-gray-400">
+      <div
+        className={classNames("absolute top-0 left-1 text-xs font-bold", color)}
+      >
         {isPrimaryPlayer("0") && colIndex === 0 && rowIndexToRank(rowIndex)}
       </div>
-      <div className="absolute bottom-0 left-1 text-sm font-bold text-gray-400">
+      <div
+        className={classNames(
+          "absolute bottom-0 left-1 text-xs font-bold",
+          color
+        )}
+      >
         {isPrimaryPlayer("0") && rowIndex === 7 && colIndexToFile(colIndex)}
       </div>
-      <div className="absolute top-0 left-1 text-sm font-bold text-gray-400">
+      <div
+        className={classNames("absolute top-0 left-1 text-xs font-bold", color)}
+      >
         {isPrimaryPlayer("1") && colIndex === 7 && rowIndexToRank(rowIndex)}
       </div>
-      <div className="absolute bottom-0 left-1 text-sm font-bold text-gray-400">
+      <div
+        className={classNames(
+          "absolute bottom-0 left-1 text-xs font-bold",
+          color
+        )}
+      >
         {isPrimaryPlayer("1") && rowIndex === 0 && colIndexToFile(colIndex)}
       </div>
     </>
