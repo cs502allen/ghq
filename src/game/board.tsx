@@ -73,12 +73,12 @@ export function GHQBoard({
 
   const [measureRef, { width, height }] = useMeasure();
 
-  const squareSize = useMemo(() => {
+  const [squareSize, pieceSize] = useMemo(() => {
     const smallestDim: number = Math.min(width || 0, height || 0);
     if (smallestDim && smallestDim - 90 - squareSizes.large * 8 > 0) {
-      return squareSizes.large;
+      return [squareSizes.large, pieceSizes.large];
     } else {
-      return squareSizes.small;
+      return [squareSizes.small, pieceSizes.small];
     }
   }, [width, height]);
 
@@ -404,8 +404,8 @@ export function GHQBoard({
                     src={`/${
                       Units[square.type].imagePathPrefix
                     }-${square.player.toLowerCase()}.png`}
-                    width="52"
-                    height="52"
+                    width={pieceSize}
+                    height={pieceSize}
                     className={classNames(
                       "select-none",
                       { ["animate-move"]: state.matches("replay.animate") },
@@ -615,8 +615,8 @@ export function GHQBoard({
                       Units[annotationsForSquare?.showProxyPiece.type]
                         .imagePathPrefix
                     }-${annotationsForSquare?.showProxyPiece.player.toLowerCase()}.png`}
-                    width="35"
-                    height="35"
+                    width={pieceSize}
+                    height={pieceSize}
                     className="select-none"
                     draggable="false"
                     style={{
@@ -654,8 +654,8 @@ export function GHQBoard({
                     src={`/${
                       Units[square.type].imagePathPrefix
                     }-${square.player.toLowerCase()}.png`}
-                    width="35"
-                    height="35"
+                    width={pieceSize}
+                    height={pieceSize}
                     className="select-none"
                     draggable="false"
                     style={{
@@ -672,7 +672,10 @@ export function GHQBoard({
               {annotationsForSquare?.moveTo &&
               !aiming &&
               !state.matches("selectEnemyToCapture") ? (
-                <div className="rounded-full w-6 h-6 m-auto bg-green-600/40" />
+                <div
+                  className="rounded-full m-auto bg-green-600/40"
+                  style={{ width: pieceSize / 2, height: pieceSize / 2 }}
+                />
               ) : null}
               {showTarget ? <div className="target-square "></div> : null}
               {aiming && state.context.selectedPiece ? (
@@ -694,8 +697,8 @@ export function GHQBoard({
                       Units[state.context.selectedPiece.piece.type]
                         .imagePathPrefix
                     }-${state.context.player.toLowerCase()}.png`}
-                    width="35"
-                    height="35"
+                    width={pieceSize}
+                    height={pieceSize}
                     className="select-none"
                     draggable="false"
                     style={{
@@ -724,7 +727,7 @@ export function GHQBoard({
 
   const blueBank = (
     <>
-      <div className="items-center justify-center flex py-2">
+      <div className="items-center justify-center flex py-2 px-1">
         <ReserveBank
           player="BLUE"
           reserve={G.blueReserve}
@@ -736,7 +739,7 @@ export function GHQBoard({
           }
           selectReserve={selectReserve}
         />
-        <div className="ml-20 my-2 flex flex-col gap-1">
+        <div className="ml-4 lg:ml-20 my-2 flex flex-col gap-1">
           <div>
             {usernames[1]} ({G.elos[1]})
           </div>
@@ -753,7 +756,7 @@ export function GHQBoard({
   );
 
   const redBank = (
-    <div className="flex py-2">
+    <div className="flex py-2 px-1">
       <ReserveBank
         player="RED"
         reserve={G.redReserve}
@@ -763,7 +766,7 @@ export function GHQBoard({
         }
         selectReserve={selectReserve}
       />
-      <div className="ml-20 my-2 flex flex-col gap-1">
+      <div className="ml-4 lg:ml-20 my-2 flex flex-col gap-1">
         <div>
           {usernames[0]} ({G.elos[0]})
         </div>
@@ -788,10 +791,12 @@ export function GHQBoard({
   }, [ctx.turn]);
 
   return (
-    <div className="flex flex-col md:flex-row bg-gray-100 absolute w-full h-full overflow-hidden">
+    <div className="flex flex-col md:flex-row bg-gray-100 absolute w-full h-full overflow-x-hidden overflow-y-auto">
       <div
-        className={classNames("bg-white order-3 md:order-1")}
-        style={{ width: 450 }}
+        className={classNames(
+          "bg-white order-3 md:order-1",
+          "w-full md:w-[450px]"
+        )}
       >
         <Header />
         {historyEval}
