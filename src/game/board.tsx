@@ -36,6 +36,7 @@ import { coordsForThisTurnMoves } from "./board-moves";
 
 const rows = 8;
 const columns = 8;
+const MOVE_SPEED_MS = 250;
 
 import { useMeasure } from "@uidotdev/usehooks";
 import { Button } from "@/app/live/Button";
@@ -368,7 +369,7 @@ export function GHQBoard({
           const hidePiece = Boolean(annotations[`${x},${y}`]?.hidePiece);
 
           if (moved) {
-            const delayMs = moveOrder * 250;
+            const delayMs = moveOrder * MOVE_SPEED_MS;
             setTimeout(() => {
               const captured = moved.args[2];
               if (captured) {
@@ -391,7 +392,7 @@ export function GHQBoard({
                 top,
                 width: squareSize,
                 height: squareSize,
-                transitionDelay: `${moveOrder * 250}ms`,
+                transitionDelay: `${moveOrder * MOVE_SPEED_MS}ms`,
               }}
             >
               {square && !selectingOrientation && !hidePiece ? (
@@ -426,7 +427,7 @@ export function GHQBoard({
                     )}
                     draggable="false"
                     style={{
-                      transitionDelay: `${moveOrder * 250}ms`,
+                      transitionDelay: `${moveOrder * MOVE_SPEED_MS}ms`,
                       transform: renderedOrientation
                         ? isPrimaryPlayer("1")
                           ? `rotate(${renderedOrientation - 180}deg)`
