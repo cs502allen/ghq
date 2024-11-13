@@ -292,31 +292,25 @@ export function GHQBoard({
     return annotate;
   }, [state.context, renderBoard]);
 
-  const lastTurnMoves = new Set<string>();
-  for (const [key, value] of Object.entries(G.lastTurnMoves ?? {})) {
-    for (const move of value) {
-      lastTurnMoves.add(`${move[0]},${move[1]}`);
+  const lastTurnMoves = useMemo(() => {
+    const movesSet = new Set<string>();
+    for (const [key, value] of Object.entries(G.lastTurnMoves ?? {})) {
+      for (const move of value) {
+        movesSet.add(`${move[0]},${move[1]}`);
+      }
     }
-  }
+    return movesSet;
+  }, [ctx.turn]);
 
-  const redCaptures = useMemo(
-    () =>
-      getCapturedPieces({
-        playerId: "0",
-        systemMessages: plugins.history.data,
-        log,
-      }),
-    [plugins.history.data, log]
-  );
-  const blueCaptures = useMemo(
-    () =>
-      getCapturedPieces({
-        playerId: "1",
-        systemMessages: plugins.history.data,
-        log,
-      }),
-    [plugins.history.data, log]
-  );
+  const lastTurnCaptures = useMemo(() => {
+    const movesSet = new Set<string>();
+    for (const [key, value] of Object.entries(G.lastTurnCaptures ?? {})) {
+      for (const move of value) {
+        movesSet.add(`${move[0]},${move[1]}`);
+      }
+    }
+    return movesSet;
+  }, [ctx.turn]);
 
   const pieces = useMemo(() => {
     return renderBoard.map((cols, x) => {
@@ -543,6 +537,12 @@ export function GHQBoard({
               {lastTurnMoves.has(`${rowIndex},${colIndex}`) ? (
                 <div
                   className="absolute w-full h-full bg-yellow-300 top-0"
+                  style={{ pointerEvents: "none", opacity: 0.3 }}
+                ></div>
+              ) : null}
+              {lastTurnCaptures.has(`${rowIndex},${colIndex}`) ? (
+                <div
+                  className="absolute w-full h-full bg-red-300 top-0"
                   style={{ pointerEvents: "none", opacity: 0.3 }}
                 ></div>
               ) : null}
@@ -783,7 +783,6 @@ export function GHQBoard({
 
   return (
     <div className="flex flex-col md:flex-row bg-gray-100 absolute w-full h-full overflow-hidden">
-      <SoundPlayer ctx={ctx} G={G} />
       <div
         className={classNames("bg-white order-3 md:order-1")}
         style={{ width: 450 }}
