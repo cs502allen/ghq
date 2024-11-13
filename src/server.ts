@@ -170,7 +170,9 @@ server.router.get("/matches", async (ctx) => {
   }[] = [];
 
   if (users) {
-    const userMap = new Map(users.map((user) => [user.id, user.username]));
+    const userMap = new Map(
+      users.map((user) => [user.id, user.username ?? "Anonymous"])
+    );
 
     for (const match of matchesData) {
       matches.push({
