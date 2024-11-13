@@ -11,7 +11,7 @@ const BINF = Blue.INFANTRY;
 const BAIR = Blue.AIRBORNE;
 const RAIR = Red.AIRBORNE;
 const BARM = Blue.ARMORED_INF;
-const BART = Red.ARTILLERY(0);
+const BART = Blue.ARTILLERY(180);
 const RINF = Red.INFANTRY;
 const RART = Red.ARTILLERY(0);
 const R_HQ = Red.HQ;
@@ -525,7 +525,7 @@ describe("computing allowed captures v2", () => {
       captureCandidatesV2({
         attacker: BAIR,
         attackerFrom: [0, 0],
-        attackerTo: [7, 6],
+        attackerTo: [6, 7],
         board,
       })
     ).toEqual([[6, 6]]);
@@ -713,5 +713,31 @@ describe("clear free captures", () => {
       [null, null, null, null, null, null, BINF, R_HQ],
     ];
     expect(freeInfantryCaptures(board, "RED")).toEqual([]);
+  });
+  it("doesn't allow capturing while standing in front of an artillery 1", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, BART, null],
+      [null, null, null, null, null, null, RINF, null],
+    ];
+    expect(freeInfantryCaptures(board, "RED")).toEqual([]);
+  });
+  it("doesn't allow capturing while standing in front of an artillery 2", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, BINF, null, null, null],
+      [null, null, null, null, RART, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+    ];
+    expect(freeInfantryCaptures(board, "BLUE")).toEqual([]);
   });
 });

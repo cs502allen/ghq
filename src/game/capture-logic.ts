@@ -72,8 +72,8 @@ function findAdjacentAttackablePieces(
       return true;
     }
 
-    // If it's non-infantry and non-HQ, it's capturable
-    if (!isInfantry(piece) && !isHQ(piece)) {
+    // If it's an artillery that we're not standing in it's line of fire, it's capturable
+    if (isNonDirectArtillery(piece, coord, attackerCoords)) {
       return true;
     }
 
@@ -324,10 +324,6 @@ function isInfantry(square?: Square): boolean {
   return !!square && Units[square.type].canCapture;
 }
 
-function isHQ(square?: Square): boolean {
-  return !!square && square.type === "HQ";
-}
-
 function isCapturableHQ({
   board,
   engagedInfantry,
@@ -366,6 +362,40 @@ function isCapturableHQ({
   }
 
   return false;
+}
+
+function isArtillery(piece: Square): boolean {
+  return (
+    !!piece &&
+    (piece.type === "ARTILLERY" ||
+      piece.type === "ARMORED_ARTILLERY" ||
+      piece.type === "HEAVY_ARTILLERY") &&
+    piece.orientation !== undefined
+  );
+}
+
+function isNonDirectArtillery(
+  piece: Square,
+  coord: Coordinate,
+  attackerCoords: Coordinate
+): boolean {
+  if (!isArtillery(piece) || piece?.orientation === undefined) {
+    return false;
+  }
+
+  // Calculate the direction vector based on the orientation
+  const radians = ((piece.orientation - 180) * Math.PI) / 180;
+  const directionX = Math.round(Math.cos(radians));
+  const directionY = Math.round(Math.sin(radians));
+
+  // Calculate the square directly in front of the artillery
+  const front: Coordinate = [coord[0] + directionX, coord[1] + directionY];
+
+  return !areCoordsEqual(front, attackerCoords);
+}
+
+function areCoordsEqual(coord1: Coordinate, coord2: Coordinate): boolean {
+  return coord1[0] === coord2[0] && coord1[1] === coord2[1];
 }
 
 export type CapturedFleet = ReserveFleet;
