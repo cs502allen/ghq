@@ -798,7 +798,7 @@ export function GHQBoard({
         <HistoryLog systemMessages={plugins.history.data} log={log} />
       </>
     );
-  }, [ctx.turn]);
+  }, [ctx.turn, ctx.gameover]);
 
   return (
     <div className="flex flex-col md:flex-row bg-gray-100 absolute w-full h-full overflow-x-hidden overflow-y-auto">

@@ -9,6 +9,7 @@ const unitScores: Record<string, number> = {
   ARTILLERY: 3,
   ARMORED_ARTILLERY: 5,
   HEAVY_ARTILLERY: 6,
+  HQ: 100,
 };
 
 const gradient: number[][] = [
