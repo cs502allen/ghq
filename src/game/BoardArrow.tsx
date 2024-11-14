@@ -11,7 +11,6 @@ interface BoardArrowProps {
   from: Coordinate;
   to: Coordinate;
   className: string;
-  strokeWidth?: number;
 }
 
 const BoardArrow: React.FC<BoardArrowProps> = ({
@@ -19,14 +18,14 @@ const BoardArrow: React.FC<BoardArrowProps> = ({
   from,
   to,
   className,
-  strokeWidth = 12,
 }) => {
+  const strokeWidth = squareSize / 5;
   const startX = from[1] * squareSize + squareSize / 2;
   const startY = from[0] * squareSize + squareSize / 2;
   const endX = to[1] * squareSize + squareSize / 2;
   const endY = to[0] * squareSize + squareSize / 2;
 
-  const arrowHeadSize = 18;
+  const arrowHeadSize = squareSize / 5;
   const angle = Math.atan2(endY - startY, endX - startX);
   const arrowHeadX = endX - arrowHeadSize * Math.cos(angle);
   const arrowHeadY = endY - arrowHeadSize * Math.sin(angle);
