@@ -373,7 +373,7 @@ export function GHQBoard({
           if (moved) {
             const delayMs = moveOrder * MOVE_SPEED_MS;
             setTimeout(() => {
-              const captured = moved.args[2];
+              const captured = moved.name === "Move" && moved.args[2];
               if (captured) {
                 playCaptureSound();
               } else {
