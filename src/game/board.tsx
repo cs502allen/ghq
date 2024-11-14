@@ -316,6 +316,20 @@ export function GHQBoard({
     return movesSet;
   }, [ctx.turn]);
 
+  useEffect(() => {
+    if (G.thisTurnMoves.length === 0) {
+      return;
+    }
+
+    if (G.isOnline) {
+      if (ctx.currentPlayer !== playerID) {
+        playMoveSound();
+      }
+    } else {
+      playMoveSound();
+    }
+  }, [G.thisTurnMoves]);
+
   const pieces = useMemo(() => {
     return renderBoard.map((cols, x) => {
       return cols.map((square, y) => {
