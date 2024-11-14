@@ -332,8 +332,27 @@ export function GHQBoard({
 
   const pieces = useMemo(() => {
     return renderBoard.map((cols, x) => {
-      return cols.map((square, y) => {
-        // has piece on it
+      return cols.map((existingSquare, y) => {
+        const reinforced = state.matches("replay.animate")
+          ? renderMoves.filter(
+              (i) =>
+                i.name === "Reinforce" &&
+                i.args[1][0] === x &&
+                i.args[1][1] === y
+            )[0]
+          : undefined;
+
+        let square = existingSquare;
+        if (reinforced?.name === "Reinforce") {
+          const [unitType] = reinforced.args;
+          square = {
+            player: isPrimaryPlayer("0") ? "BLUE" : "RED", // Render the opponent's color
+            type: unitType,
+            orientation: isPrimaryPlayer("0") ? 180 : 0,
+          };
+        }
+
+        // has piece on it or it *will* have a piece on it
         if (square) {
           const add180 =
             square &&
@@ -353,7 +372,11 @@ export function GHQBoard({
 
           // if (moved) console.log("MOVED " + JSON.stringify(moved));
 
-          const moveOrder = moved ? renderMoves.indexOf(moved) : 0;
+          const moveOrReinforce = moved || reinforced;
+
+          let moveOrder = moveOrReinforce
+            ? renderMoves.indexOf(moveOrReinforce)
+            : 0;
 
           const renderX = moved ? moved.args[1]![0] : x;
           const renderY = moved ? moved.args[1]![1] : y;
@@ -384,10 +407,11 @@ export function GHQBoard({
           );
           const hidePiece = Boolean(annotations[`${x},${y}`]?.hidePiece);
 
-          if (moved) {
+          if (moveOrReinforce) {
             const delayMs = moveOrder * MOVE_SPEED_MS;
             setTimeout(() => {
-              const captured = moved.name === "Move" && moved.args[2];
+              const captured =
+                moveOrReinforce.name === "Move" && moveOrReinforce.args[2];
               if (captured) {
                 playCaptureSound();
               } else {
@@ -401,7 +425,11 @@ export function GHQBoard({
               key={`${x},${y}`}
               className={classNames(
                 "pointer-events-none absolute w-20 h-5 flex items-center justify-center",
-                { ["animate-move"]: state.matches("replay.animate") }
+                { ["animate-move"]: state.matches("replay.animate") },
+                {
+                  ["animate-fade-in"]:
+                    reinforced && state.matches("replay.animate"),
+                }
               )}
               style={{
                 left,
@@ -409,6 +437,7 @@ export function GHQBoard({
                 width: squareSize,
                 height: squareSize,
                 transitionDelay: `${moveOrder * MOVE_SPEED_MS}ms`,
+                animationDelay: `${moveOrder * MOVE_SPEED_MS}ms`,
               }}
             >
               {square && !selectingOrientation && !hidePiece ? (
@@ -434,6 +463,10 @@ export function GHQBoard({
                       "select-none",
                       { ["animate-move"]: state.matches("replay.animate") },
                       {
+                        ["animate-fade-in"]:
+                          reinforced && state.matches("replay.animate"),
+                      },
+                      {
                         ["opacity-50"]:
                           (ctx.currentPlayer === "0" &&
                             square.player === "BLUE") ||
@@ -444,6 +477,7 @@ export function GHQBoard({
                     draggable="false"
                     style={{
                       transitionDelay: `${moveOrder * MOVE_SPEED_MS}ms`,
+                      animationDelay: `${moveOrder * MOVE_SPEED_MS}ms`,
                       transform: renderedOrientation
                         ? isPrimaryPlayer("1")
                           ? `rotate(${renderedOrientation - 180}deg)`

@@ -74,9 +74,19 @@ body {
   pointer-events: none; /* Ensures the overlay doesn't interfere with clicks */
 }
 
-
 .animate-move {
   transition: left 0.2s ease-out, top 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.animate-fade-in {
+  opacity: 0;
+  animation: fadeIn 0.1s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
 }
 @layer base {
   :root {
