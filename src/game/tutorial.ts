@@ -22,8 +22,10 @@ const R: Record<string, Square> = {
   AI: { type: "ARMORED_INFANTRY", player: "RED" },
   AB: { type: "AIRBORNE_INFANTRY", player: "RED" },
   AR: { type: "ARTILLERY", player: "RED", orientation: 0 },
+  A1: { type: "ARTILLERY", player: "RED", orientation: 45 },
   AA: { type: "ARMORED_ARTILLERY", player: "RED", orientation: 0 },
   HA: { type: "HEAVY_ARTILLERY", player: "RED", orientation: 0 },
+  H1: { type: "HEAVY_ARTILLERY", player: "RED", orientation: 315 },
 };
 
 export interface TutorialSetupData {
@@ -256,6 +258,20 @@ export const boards: Record<string, TutorialSetupData> = {
       [null, null, R.IN, R.AI, null, null, null, null],
       [null, null, null, null, null, null, null, null],
       [null, null, null, null, null, null, null, R.HQ],
+    ],
+    isPuzzle: true,
+    boardArrows: [],
+  },
+  "Defend the attack": {
+    board: [
+      [B.HQ, B.AR, B.AB, B.AI, null, null, B.AR, null],
+      [B.IN, B.IN, null, null, null, null, null, null],
+      [null, null, null, null, B.AI, null, null, null],
+      [null, null, null, B.IN, B.AA, B.IN, null, null],
+      [null, null, null, null, B.H1, null, null, null],
+      [null, null, R.AI, null, null, null, R.IN, null],
+      [null, R.AI, null, R.A1, null, R.IN, null, R.IN],
+      [R.AA, R.AB, R.AI, R.AR, R.IN, R.H1, R.AR, R.HQ],
     ],
     isPuzzle: true,
     boardArrows: [],

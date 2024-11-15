@@ -222,7 +222,10 @@ const Reinforce: Move<GHQState> = (
     args: [unitType, to],
   });
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
-  G.eval = calculateEval(G.board);
+  G.eval = calculateEval({
+    ...G,
+    currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
+  });
 };
 const Move: Move<GHQState> = (
   { G, ctx, log, ...plugins },
@@ -264,7 +267,10 @@ const Move: Move<GHQState> = (
     capturePreference,
     capturedPieceType,
   });
-  G.eval = calculateEval(G.board);
+  G.eval = calculateEval({
+    ...G,
+    currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
+  });
 };
 
 const MoveAndOrient: Move<GHQState> = (
@@ -297,7 +303,10 @@ const MoveAndOrient: Move<GHQState> = (
     args: [from, to, orientation],
   });
   log.setMetadata({ pieceType: piece?.type });
-  G.eval = calculateEval(G.board);
+  G.eval = calculateEval({
+    ...G,
+    currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
+  });
 };
 const ChangeOrientation: Move<GHQState> = (
   { G, ctx, log },
@@ -323,7 +332,10 @@ const ChangeOrientation: Move<GHQState> = (
     args: [on, on, orientation],
   });
   log.setMetadata({ pieceType: piece?.type });
-  G.eval = calculateEval(G.board);
+  G.eval = calculateEval({
+    ...G,
+    currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
+  });
 };
 
 const Skip: Move<GHQState> = ({ G, ctx, events }) => {
@@ -542,7 +554,10 @@ export const GHQGame: Game<GHQState> = {
       }
 
       G.turnStartTime = Date.now();
-      G.eval = calculateEval(G.board);
+      G.eval = calculateEval({
+        ...G,
+        currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
+      });
     },
     onEnd: ({ ctx, G }) => {
       const elapsed = Date.now() - G.turnStartTime;
