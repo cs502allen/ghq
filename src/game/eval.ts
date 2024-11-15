@@ -1,5 +1,12 @@
-import { isPieceArtillery } from "./board-moves";
-import { GHQState, Player } from "./engine";
+import { getAllowedMoves, isPieceArtillery } from "./board-moves";
+import { freeInfantryCaptures } from "./capture-logic";
+import {
+  AllowedMove,
+  GHQState,
+  NonNullSquare,
+  Player,
+  ReserveFleet,
+} from "./engine";
 import { bombardedSquares } from "./move-logic";
 
 const unitScores: Record<string, number> = {
@@ -23,13 +30,70 @@ const gradient: number[][] = [
   [-0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25],
 ];
 
-export function calculateEval(board: GHQState["board"]): number {
+export interface EvalBoardState {
+  board: GHQState["board"];
+  redReserve: ReserveFleet;
+  blueReserve: ReserveFleet;
+  currentPlayerTurn: Player;
+  thisTurnMoves: AllowedMove[];
+}
+
+export function calculateEval({
+  board,
+  redReserve,
+  blueReserve,
+  currentPlayerTurn,
+  thisTurnMoves,
+}: EvalBoardState): number {
   const scores: Record<Player, number> = {
     RED: 0,
     BLUE: 0,
   };
 
-  // TODO(tyler): give points for getting to a position where you can take a piece for free
+  const allowedMoves = getAllowedMoves({
+    board,
+    redReserve,
+    blueReserve,
+    currentPlayerTurn,
+    thisTurnMoves,
+  });
+
+  // Find a list of candidate captures
+  for (const move of allowedMoves) {
+    if (move.name === "Move" && move.args.length === 3) {
+      const [from, , capture] = move.args;
+      if (!capture) {
+        continue;
+      }
+      const fromPiece = board[from[0]][from[1]];
+      if (fromPiece === null) {
+        continue;
+      }
+      const capturePiece = board[capture[0]][capture[1]];
+      if (capturePiece === null) {
+        continue;
+      }
+      const captureScore = unitScores[capturePiece.type] ?? 0;
+      if (capturePiece.player === "RED") {
+        scores.RED -= captureScore;
+      } else {
+        scores.BLUE -= captureScore;
+      }
+    }
+  }
+
+  const freeCaptured = freeInfantryCaptures(board, currentPlayerTurn);
+  for (const capture of freeCaptured) {
+    if (capture.capture) {
+      const captured = capture.capture;
+      const attackerScore = unitScores[captured.piece.type] ?? 0;
+      if (captured.piece.player === "RED") {
+        scores.RED -= attackerScore;
+      } else {
+        scores.BLUE -= attackerScore;
+      }
+    }
+  }
 
   const bombarded = bombardedSquares(board);
 
@@ -55,11 +119,13 @@ export function calculateEval(board: GHQState["board"]): number {
 
       // If a player bombards a square with an enemy piece in it, give them points
       if (bombarded[`${i},${j}`]?.RED && square.player === "BLUE") {
-        scores.RED += 0.5;
+        scores.RED += 0.25;
       }
       if (bombarded[`${i},${j}`]?.BLUE && square.player === "RED") {
-        scores.BLUE += 0.5;
+        scores.BLUE += 0.25;
       }
+
+      // Add points if this piece has some good captures
     }
   }
 
