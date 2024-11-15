@@ -316,17 +316,28 @@ export function GHQBoard({
     return movesSet;
   }, [ctx.turn]);
 
+  const [playedMoveSounds, setPlayedMoveSounds] = useState<boolean[]>([]);
   useEffect(() => {
     if (G.thisTurnMoves.length === 0) {
+      setPlayedMoveSounds([]);
       return;
     }
 
-    if (G.isOnline) {
-      if (ctx.currentPlayer !== playerID) {
+    if (G.thisTurnMoves.length === playedMoveSounds.length) {
+      return;
+    }
+
+    const lastMove = G.thisTurnMoves[G.thisTurnMoves.length - 1];
+
+    // If we're offline, play the sound immediately, otherwise only play it if it's our turn.
+    if (!G.isOnline || (G.isOnline && ctx.currentPlayer === playerID)) {
+      setPlayedMoveSounds([...playedMoveSounds, true]);
+
+      if (lastMove.name === "Move" && lastMove.args[2]) {
+        playCaptureSound();
+      } else {
         playMoveSound();
       }
-    } else {
-      playMoveSound();
     }
   }, [G.thisTurnMoves]);
 
