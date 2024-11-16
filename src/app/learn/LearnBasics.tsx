@@ -63,8 +63,8 @@ function HowToPlayCard() {
             <div className="mb-2">Choose any of:</div>
             <div className="text-sm">
               <div>(A) Reinforce a piece from your reserve</div>
-              <div>(B) Move your infantry and capture pieces</div>
-              <div>(C) Move and/or rotate your artillery</div>
+              <div>(B) Move an infantry and/or capture a piece</div>
+              <div>(C) Move and/or rotate an artillery</div>
               <div className="mt-2 text-sm">
                 Each piece can move once per turn
               </div>
@@ -77,6 +77,9 @@ function HowToPlayCard() {
             </div>
             <div>
               <strong>Any square</strong> means adjacent or diagonal.
+            </div>
+            <div>
+              <strong>Capturing</strong> means destroying an enemy piece.
             </div>
           </div>
         </div>
@@ -172,6 +175,9 @@ function HowInfantryCapture() {
             </div>
           </div>
           <div className="text-xs">Capture!</div>
+          <div className="text-sm">
+            Tip: Try to <strong>outnumber </strong>your opponent!
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -249,21 +255,21 @@ const PIECE_INFO: Record<UnitType, PieceInfo> = {
     name: "Infantry",
     image: "regular-infantry",
     moves: "1 square, any direction",
-    captures: "1 square adjacent",
+    captures: "1 square, adjacent",
     capturedBy: "2 adjacent infantry",
   },
   ARMORED_INFANTRY: {
     name: "Armored Infantry",
     image: "armored-infantry",
     moves: "2 squares, any direction",
-    captures: "1 square adjacent",
+    captures: "1 square, adjacent",
     capturedBy: "2 adjacent infantry",
   },
   AIRBORNE_INFANTRY: {
     name: "Airborne Infantry",
     image: "paratrooper-infantry",
     moves: "1 square, any direction",
-    captures: "1 square in any direction",
+    captures: "1 square, adjacent",
     capturedBy: "2 adjacent infantry",
     special: "While on home row, it can move to any square!",
   },
