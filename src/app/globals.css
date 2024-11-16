@@ -54,6 +54,17 @@ body {
   );
 }
 
+.stripe-blue-transparent-sm {
+  background: repeating-linear-gradient(
+    45deg,
+    /* Diagonal stripes */ rgb(191, 219, 254),
+    /* Start with blue */ rgb(191, 219, 254) 6px,
+    /* Wider blue stripe width */ transparent 6px,
+    /* Start of transparent */ transparent 12px
+      /* Wider transparent stripe width */
+  );
+}
+
 .target-square {
   cursor: pointer;
   width: 100%;

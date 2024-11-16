@@ -28,14 +28,7 @@ export default function Rules() {
         >
           How To Play GHQ
         </a>{" "}
-        video and{" "}
-        <a
-          className="text-blue-600 hover:text-blue-400"
-          href="https://boardgamegeek.com/file/download_redirect/b33521f1879221fd8284270e2845ff0c853160be870f0c74/GHQ+Rules+7x7+03+22+2024.pdf"
-        >
-          rule book
-        </a>
-        ).
+        video).
       </div>
 
       <div>
