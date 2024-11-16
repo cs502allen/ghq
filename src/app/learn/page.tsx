@@ -16,6 +16,7 @@ import { boardToFEN } from "@/game/notation";
 import { defaultBoard, defaultReserveFleet } from "@/game/engine";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import LearnBasics from "./LearnBasics";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -60,10 +61,14 @@ export default function Page() {
             <Loader2 className="animate-spin w-6 h-6" /> Loading...
           </div>
         )}
+
         {!loading && (
           <div className="flex flex-col gap-2">
-            <div className="flex flex-col gap-2 border rounded p-4 bg-slate-50">
-              <div className="text-2xl">Basics</div>
+            <Section heading="Basics">
+              <LearnBasics />
+            </Section>
+
+            <Section heading="Learn capturing">
               <div className="flex flex-wrap gap-1">
                 {Object.entries(boards)
                   .filter(([, boardInfo]) => !boardInfo.isPuzzle)
@@ -79,10 +84,9 @@ export default function Page() {
                     </Link>
                   ))}
               </div>
-            </div>
+            </Section>
 
-            <div className="flex flex-col gap-2 border rounded p-4 bg-slate-50">
-              <div className="text-2xl">Puzzles</div>
+            <Section heading="Puzzles">
               <div className="flex flex-wrap gap-1">
                 {Object.entries(boards)
                   .filter(([, boardInfo]) => boardInfo.isPuzzle)
@@ -98,14 +102,11 @@ export default function Page() {
                     </Link>
                   ))}
               </div>
-            </div>
+            </Section>
 
-            <div className="flex flex-col gap-2 border rounded p-4 bg-slate-50">
-              <div className="text-2xl">Analysis</div>
-              <div className="flex flex-wrap gap-1">
-                <ImportGame />
-              </div>
-            </div>
+            <Section heading="Analysis">
+              <ImportGame />
+            </Section>
           </div>
         )}
       </div>
@@ -152,6 +153,21 @@ function ImportGame() {
           <ImportIcon /> Import
         </Button>
       </div>
+    </div>
+  );
+}
+
+function Section({
+  heading,
+  children,
+}: {
+  heading: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-2 border rounded p-4 bg-slate-50 w-full">
+      <div className="text-2xl">{heading}</div>
+      {children}
     </div>
   );
 }
