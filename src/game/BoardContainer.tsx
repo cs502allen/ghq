@@ -5,16 +5,21 @@ interface MouseTrackerProps {
   children: React.ReactNode;
   className?: string;
   onRightClickDrag: (start: Coordinate, end: Coordinate) => void;
+  onLeftClick: () => void;
 }
 
 export default function BoardContainer({
   children,
   className,
   onRightClickDrag,
+  onLeftClick,
 }: MouseTrackerProps) {
   const [startCoords, setStartCoords] = useState<Coordinate | null>(null);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (e.button === 0) {
+      onLeftClick();
+    }
     if (e.button === 2) {
       const { rowIndex, colIndex } = (e.target as HTMLElement).dataset;
       if (!rowIndex || !colIndex) return;

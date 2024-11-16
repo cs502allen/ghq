@@ -250,6 +250,10 @@ export function GHQBoard({
       });
     }
   };
+  const handleLeftClick = () => {
+    setRightClicked(new Set());
+    setBoardArrows([]);
+  };
 
   const selectReserve = useCallback(
     (kind: keyof ReserveFleet) => {
@@ -894,6 +898,7 @@ export function GHQBoard({
     <BoardContainer
       className="flex flex-col md:flex-row bg-gray-100 absolute w-full h-full overflow-x-hidden overflow-y-auto"
       onRightClickDrag={handleRightClickDrag}
+      onLeftClick={handleLeftClick}
     >
       <div
         className={classNames(
