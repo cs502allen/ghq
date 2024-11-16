@@ -189,7 +189,7 @@ function HowArtilleryCapture() {
           <div className="text-xs">Controlling squares</div>
           <div className="text-sm">
             If your piece is left in a bombarded square, it will be{" "}
-            <strong>captured</strong> at the start of your opponent's turn!
+            <strong>captured</strong> at the start of your opponent&apos;s turn!
           </div>
           <div className="flex gap-1">
             <Image
