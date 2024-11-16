@@ -25,7 +25,7 @@ const BoardArrow: React.FC<BoardArrowProps> = ({
   const endX = to[1] * squareSize + squareSize / 2;
   const endY = to[0] * squareSize + squareSize / 2;
 
-  const arrowHeadSize = squareSize / 5;
+  const arrowHeadSize = squareSize / 10;
   const angle = Math.atan2(endY - startY, endX - startX);
   const arrowHeadX = endX - arrowHeadSize * Math.cos(angle);
   const arrowHeadY = endY - arrowHeadSize * Math.sin(angle);
@@ -49,7 +49,7 @@ const BoardArrow: React.FC<BoardArrowProps> = ({
         x2={endX}
         y2={endY}
         strokeWidth={strokeWidth}
-        strokeLinecap="round"
+        // strokeLinecap="round"
       />
       <polygon
         points={`${endX},${endY} ${
@@ -58,8 +58,8 @@ const BoardArrow: React.FC<BoardArrowProps> = ({
           arrowHeadX - arrowHeadSize * Math.sin(angle)
         },${arrowHeadY + arrowHeadSize * Math.cos(angle)}`}
         strokeWidth={strokeWidth}
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        // strokeLinecap="round"
+        // strokeLinejoin="round"
       />
     </svg>
   );
