@@ -592,12 +592,6 @@ export function GHQBoard({
                     annotationsForSquare?.moveTo ||
                     square?.player === (isPrimaryPlayer("0") ? "RED" : "BLUE"),
                 },
-                { ["bg-red-900"]: showTarget },
-                {
-                  ["bg-green-600/40"]: rightClicked.has(
-                    `${rowIndex},${colIndex}`
-                  ),
-                },
                 (rowIndex + colIndex) % 2 === 0 ? "bg-gray-300" : "bg-gray-200"
               )}
               style={{
@@ -610,15 +604,27 @@ export function GHQBoard({
                 height: squareSize,
               }}
             >
+              {showTarget ? (
+                <div
+                  className="absolute w-full h-full bg-red-900 top-0 left-0"
+                  style={{ pointerEvents: "none" }}
+                ></div>
+              ) : null}
               {lastTurnMoves.has(`${rowIndex},${colIndex}`) ? (
                 <div
-                  className="absolute w-full h-full bg-yellow-300 top-0"
+                  className="absolute w-full h-full bg-yellow-300 top-0 left-0"
                   style={{ pointerEvents: "none", opacity: 0.3 }}
                 ></div>
               ) : null}
               {lastTurnCaptures.has(`${rowIndex},${colIndex}`) ? (
                 <div
-                  className="absolute w-full h-full bg-red-300 top-0"
+                  className="absolute w-full h-full bg-red-300 top-0 left-0"
+                  style={{ pointerEvents: "none", opacity: 0.3 }}
+                ></div>
+              ) : null}
+              {rightClicked.has(`${rowIndex},${colIndex}`) ? (
+                <div
+                  className="absolute w-full h-full bg-green-600 top-0 left-0"
                   style={{ pointerEvents: "none", opacity: 0.3 }}
                 ></div>
               ) : null}

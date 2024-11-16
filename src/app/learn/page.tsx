@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { boardToFEN } from "@/game/notation";
 import { defaultBoard, defaultReserveFleet } from "@/game/engine";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -67,7 +68,7 @@ export default function Page() {
                 {Object.entries(boards)
                   .filter(([, boardInfo]) => !boardInfo.isPuzzle)
                   .map(([boardType]) => (
-                    <a
+                    <Link
                       key={boardType}
                       href={`/learn?boardType=${boardType}`}
                       className="py-3 px-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md min-w-96"
@@ -75,7 +76,7 @@ export default function Page() {
                       <div className="tracking-tight text-gray-900">
                         {boardType}
                       </div>
-                    </a>
+                    </Link>
                   ))}
               </div>
             </div>
@@ -86,7 +87,7 @@ export default function Page() {
                 {Object.entries(boards)
                   .filter(([, boardInfo]) => boardInfo.isPuzzle)
                   .map(([boardType]) => (
-                    <a
+                    <Link
                       key={boardType}
                       href={`/learn?boardType=${boardType}`}
                       className="py-3 px-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md min-w-96"
@@ -94,7 +95,7 @@ export default function Page() {
                       <div className="tracking-tight text-gray-900">
                         {boardType}
                       </div>
-                    </a>
+                    </Link>
                   ))}
               </div>
             </div>

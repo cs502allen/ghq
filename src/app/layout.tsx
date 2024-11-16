@@ -4,6 +4,8 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
 import { BoardArrowProvider } from "@/game/BoardArrowProvider";
+import { MatchmakingProvider } from "@/components/MatchmakingProvider";
+import MatchmakingToast from "@/components/MatchmakingToast";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -28,16 +30,19 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider dynamic>
-      <BoardArrowProvider>
-        <html lang="en">
-          <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-          >
-            {children}
-            <Toaster />
-          </body>
-        </html>
-      </BoardArrowProvider>
+      <MatchmakingProvider>
+        <BoardArrowProvider>
+          <html lang="en">
+            <body
+              className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+            >
+              {children}
+              <Toaster />
+              <MatchmakingToast />
+            </body>
+          </html>
+        </BoardArrowProvider>
+      </MatchmakingProvider>
     </ClerkProvider>
   );
 }

@@ -6,6 +6,7 @@ import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
 import { getUser, User } from "@/lib/supabase";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function Header() {
   const { user } = useClerk();
@@ -18,7 +19,7 @@ export default function Header() {
   }, [user]);
   return (
     <div className="flex justify-between">
-      <a
+      <Link
         className="text-4xl font-bold text-blue-400 flex gap-2 items-center"
         href="/"
       >
@@ -30,7 +31,7 @@ export default function Header() {
           className="cursor-pointer"
         />
         <Image src="/ghq-letters.png" alt="GHQ" width={120} height={32} />
-      </a>
+      </Link>
       <div className="p-2">
         <ClerkLoading>
           <Loader2 className="w-6 h-6 text-gray-500 animate-spin" />

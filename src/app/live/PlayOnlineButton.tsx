@@ -1,45 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Button } from "./Button";
-import MatchmakingModal from "./MatchmakingModal";
-import { useCallback, useEffect, useState } from "react";
-import { API_URL } from "./config";
 import { useAuth } from "@clerk/nextjs";
-import { ghqFetch } from "@/lib/api";
-
-interface MatchmakingData {
-  match: {
-    id: string;
-    playerId: string;
-    credentials: string;
-  };
-}
+import { useMatchmaking } from "@/components/MatchmakingProvider";
 
 export function PlayOnlineButton({
   openSignInDialog,
 }: {
   openSignInDialog: () => void;
 }) {
-  const router = useRouter();
-  const [isMatchmaking, setIsMatchmaking] = useState(false);
-  const { isSignedIn, getToken } = useAuth();
-
-  const checkMatchmaking = useCallback(async () => {
-    try {
-      const data = await ghqFetch<MatchmakingData>({
-        url: `${API_URL}/matchmaking`,
-        getToken,
-        method: "POST",
-      });
-      if (data.match) {
-        router.push(`/live/${data.match.id}`);
-        setIsMatchmaking(false);
-      }
-    } catch (error) {
-      console.error("Error polling matchmaking API:", error);
-    }
-  }, [router]);
+  const { isSignedIn } = useAuth();
+  const { startMatchmaking } = useMatchmaking();
 
   async function playOnline() {
     if (!isSignedIn) {
@@ -47,27 +18,7 @@ export function PlayOnlineButton({
       return;
     }
 
-    setIsMatchmaking(true);
-  }
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    if (isMatchmaking) {
-      checkMatchmaking();
-      interval = setInterval(() => checkMatchmaking(), 2000); // Poll every 2 seconds
-    }
-
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [isMatchmaking, checkMatchmaking]);
-
-  async function cancelMatchmaking() {
-    setIsMatchmaking(false);
-    ghqFetch({ url: `${API_URL}/matchmaking`, getToken, method: "DELETE" });
+    startMatchmaking();
   }
 
   return (
@@ -75,7 +26,6 @@ export function PlayOnlineButton({
       <Button onClick={playOnline} loadingText="Searching...">
         🌎 Play Online
       </Button>
-      {isMatchmaking && <MatchmakingModal onCancel={cancelMatchmaking} />}
     </>
   );
 }
