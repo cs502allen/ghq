@@ -29,7 +29,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider dynamic>
+    <ClerkProvider
+      dynamic
+      signUpFallbackRedirectUrl={"/"}
+      signInFallbackRedirectUrl={"/"}
+    >
       <MatchmakingProvider>
         <BoardArrowProvider>
           <html lang="en">
