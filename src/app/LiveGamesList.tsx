@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { DateTime } from "luxon";
 import classNames from "classnames";
+import Link from "next/link";
 
 interface Game {
   id: string;
@@ -59,7 +60,7 @@ export default function LiveGamesList() {
 
       <div className="flex flex-col gap-2">
         {games.map((game: Game) => (
-          <a
+          <Link
             key={game.id}
             href={`/live/${game.id}`}
             className="py-2 px-3 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md flex justify-between"
@@ -94,7 +95,7 @@ export default function LiveGamesList() {
                 {DateTime.fromISO(game.createdAt).toRelative()}
               </div>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
     </div>

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Rules() {
   return (
@@ -39,9 +40,9 @@ export default function Rules() {
 
       <div>
         See our{" "}
-        <a className="text-blue-600 hover:text-blue-400" href="/learn">
+        <Link className="text-blue-600 hover:text-blue-400" href="/learn">
           learn
-        </a>{" "}
+        </Link>{" "}
         page to play through some basic gameplay scenarios yourself!
       </div>
     </div>
