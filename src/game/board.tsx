@@ -50,6 +50,7 @@ import {
   squareSizes,
 } from "@/game/constants";
 import ShareGameDialog from "./ExportGameDialog";
+import BoardContainer from "./BoardContainer";
 
 //coordinate string x,y
 type Annotations = {
@@ -214,6 +215,41 @@ export function GHQBoard({
     setRightClicked(new Set());
     setBoardArrows([]);
   }, [G.board]);
+  const handleRightClickDrag = (
+    from: [number, number],
+    to: [number, number]
+  ): void => {
+    if (from[0] === to[0] && from[1] === to[1]) {
+      setRightClicked((prev) => {
+        const newSet = new Set(prev);
+        const key = `${from[0]},${from[1]}`;
+        if (newSet.has(key)) {
+          newSet.delete(key);
+        } else {
+          newSet.add(key);
+        }
+        return newSet;
+      });
+    } else {
+      setBoardArrows((prev) => {
+        const newArrows = [...prev];
+        const alreadyExists = newArrows.some(
+          (arrow) =>
+            arrow.from[0] === from[0] &&
+            arrow.from[1] === from[1] &&
+            arrow.to[0] === to[0] &&
+            arrow.to[1] === to[1]
+        );
+        if (!alreadyExists) {
+          newArrows.push({
+            from,
+            to: to,
+          });
+        }
+        return newArrows;
+      });
+    }
+  };
 
   const selectReserve = useCallback(
     (kind: keyof ReserveFleet) => {
@@ -569,20 +605,8 @@ export function GHQBoard({
                   });
                 }
               }}
-              onContextMenu={(e) => {
-                e.preventDefault();
-
-                setRightClicked((prev) => {
-                  const newSet = new Set(prev);
-                  const key = `${rowIndex},${colIndex}`;
-                  if (newSet.has(key)) {
-                    newSet.delete(key);
-                  } else {
-                    newSet.add(key);
-                  }
-                  return newSet;
-                });
-              }}
+              data-row-index={rowIndex}
+              data-col-index={colIndex}
               key={colIndex}
               className={classNames(
                 "relative",
@@ -867,7 +891,10 @@ export function GHQBoard({
   }, [ctx.turn, ctx.gameover]);
 
   return (
-    <div className="flex flex-col md:flex-row bg-gray-100 absolute w-full h-full overflow-x-hidden overflow-y-auto">
+    <BoardContainer
+      className="flex flex-col md:flex-row bg-gray-100 absolute w-full h-full overflow-x-hidden overflow-y-auto"
+      onRightClickDrag={handleRightClickDrag}
+    >
       <div
         className={classNames(
           "bg-white order-3 md:order-1",
@@ -978,14 +1005,14 @@ export function GHQBoard({
               squareSize={squareSize}
               from={boardArrow.from}
               to={boardArrow.to}
-              className="fill-blue-400 stroke-blue-400"
+              className="fill-green-600 stroke-green-600"
             />
           ))}
         </div>
 
         <div className=" flex">{isPrimaryPlayer("1") ? blueBank : redBank}</div>
       </div>
-    </div>
+    </BoardContainer>
   );
 }
 
