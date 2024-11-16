@@ -1,12 +1,5 @@
 import Image from "next/image";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UnitType } from "@/game/engine";
 
 export default function LearnBasics() {
@@ -15,6 +8,7 @@ export default function LearnBasics() {
       <div className="flex flex-wrap gap-2">
         <HowToWinCard />
         <HowToPlayCard />
+        <SetupCard />
       </div>
       <div className="flex flex-wrap gap-2">
         <HowInfantryCapture />
@@ -85,6 +79,26 @@ function HowToPlayCard() {
               <strong>Any square</strong> means adjacent or diagonal.
             </div>
           </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function SetupCard() {
+  return (
+    <Card className="min-w-48 w-80">
+      <CardHeader>
+        <CardTitle>Board setup</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col justify-center items-center gap-2">
+          <Image
+            src="/rules/board-setup.png"
+            alt="board-setup"
+            width={300}
+            height={300}
+          />
         </div>
       </CardContent>
     </Card>
