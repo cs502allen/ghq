@@ -1027,7 +1027,10 @@ export function GHQBoard({
               squareSize={squareSize}
               from={boardArrow.from}
               to={boardArrow.to}
-              className="fill-green-600 stroke-green-600"
+              className={classNames(
+                "fill-green-600 stroke-green-600",
+                isPrimaryPlayer("1") && "rotate-180"
+              )}
             />
           ))}
         </div>
