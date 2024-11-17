@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { BoardArrowProvider } from "@/game/BoardArrowProvider";
 import { MatchmakingProvider } from "@/components/MatchmakingProvider";
 import MatchmakingToast from "@/components/MatchmakingToast";
+import { config } from "@/lib/config";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -28,6 +29,22 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Development version without auth or matchmaking
+  if (!config.useClerk) {
+    return (
+      <BoardArrowProvider>
+        <html lang="en">
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          >
+            {children}
+            <Toaster />
+          </body>
+        </html>
+      </BoardArrowProvider>
+    );
+  }
+
   return (
     <ClerkProvider
       dynamic

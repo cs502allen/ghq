@@ -1,14 +1,7 @@
 "use client";
 
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Coordinate,
   GHQState,
   NonNullSquare,
   Orientation,
@@ -26,10 +19,7 @@ import { SelectOrientation } from "@/game/select-orientation";
 import CountdownTimer from "@/game/countdown";
 import { Check, Flag, MoveRight, Percent, Undo } from "lucide-react";
 import { colIndexToFile, rowIndexToRank } from "./notation";
-import { PlayOnlineButton } from "@/app/live/PlayOnlineButton";
-import { SoundPlayer } from "./SoundPlayer";
 import { HistoryLog } from "./HistoryLog";
-import { getCapturedPieces } from "./capture-logic";
 import { getUsernames } from "@/lib/supabase";
 import EvalBar from "./EvalBar";
 import { coordsForThisTurnMoves } from "./board-moves";
@@ -39,7 +29,7 @@ import { Button } from "@/app/live/Button";
 import { useRouter } from "next/navigation";
 import AbortGameButton from "./AbortGameButton";
 import Header from "@/components/Header";
-import BoardArrow, { BoardArrowType } from "./BoardArrow";
+import BoardArrow from "./BoardArrow";
 import { useBoardArrow } from "./BoardArrowProvider";
 import { playCaptureSound, playMoveSound } from "./audio";
 import {

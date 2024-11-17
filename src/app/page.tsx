@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { Button } from "./live/Button";
 import { PlayOnlineButton } from "./live/PlayOnlineButton";
-import { useAuth } from "@clerk/nextjs";
 import { Learn } from "@/components/Learn";
 import Header from "@/components/Header";
 import LiveGamesList from "./LiveGamesList";
@@ -12,7 +11,6 @@ import Leaderboard from "./Leaderboard";
 
 function App() {
   const router = useRouter();
-  const { isSignedIn } = useAuth();
 
   async function playLocal() {
     router.push("/local");
@@ -26,15 +24,6 @@ function App() {
     router.push("/learn");
   }
 
-  function openSignInDialog() {
-    if (!isSignedIn) {
-      const signInButton = document.getElementById("sign-in-button");
-      if (signInButton) {
-        signInButton.click();
-      }
-    }
-  }
-
   return (
     <div className="p-2 flex flex-col gap-4 lg:px-48">
       <Header />
@@ -45,7 +34,7 @@ function App() {
           <div className="flex flex-col gap-2 border rounded p-4 bg-slate-50">
             <div className="text-2xl">Play a game</div>
             <div className="flex flex-wrap gap-2 justify-center items-center">
-              <PlayOnlineButton openSignInDialog={openSignInDialog} />
+              <PlayOnlineButton />
               <Button onClick={playLocal}>👨‍💻 Pass n&apos; Play</Button>
               <Button onClick={playBot}>🤖 Play Bot</Button>
               <Button onClick={goLearn}>📚 Learn</Button>
