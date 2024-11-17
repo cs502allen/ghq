@@ -71,7 +71,7 @@ export default function Page() {
             <Section heading="Learn capturing">
               <div className="flex flex-wrap gap-1">
                 {Object.entries(boards)
-                  .filter(([, boardInfo]) => !boardInfo.isPuzzle)
+                  .filter(([, boardInfo]) => boardInfo.category === "capturing")
                   .map(([boardType]) => (
                     <Link
                       key={boardType}
@@ -89,7 +89,25 @@ export default function Page() {
             <Section heading="Puzzles">
               <div className="flex flex-wrap gap-1">
                 {Object.entries(boards)
-                  .filter(([, boardInfo]) => boardInfo.isPuzzle)
+                  .filter(([, boardInfo]) => boardInfo.category === "puzzles")
+                  .map(([boardType]) => (
+                    <Link
+                      key={boardType}
+                      href={`/learn?boardType=${boardType}`}
+                      className="py-3 px-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md min-w-96"
+                    >
+                      <div className="tracking-tight text-gray-900">
+                        {boardType}
+                      </div>
+                    </Link>
+                  ))}
+              </div>
+            </Section>
+
+            <Section heading="Endgames">
+              <div className="flex flex-wrap gap-1">
+                {Object.entries(boards)
+                  .filter(([, boardInfo]) => boardInfo.category === "endgames")
                   .map(([boardType]) => (
                     <Link
                       key={boardType}

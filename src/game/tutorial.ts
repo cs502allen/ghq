@@ -40,7 +40,7 @@ const emptyReserveFleet: ReserveFleet = {
 
 export interface TutorialSetupData {
   boardState: BoardState;
-  isPuzzle: boolean;
+  category: "capturing" | "puzzles" | "endgames";
   boardArrows: BoardArrowType[];
 }
 
@@ -60,7 +60,7 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: false,
+    category: "capturing",
     boardArrows: [{ from: [4, 4], to: [3, 4] }],
   },
   "Armored infantry capture infantry": {
@@ -78,7 +78,7 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: false,
+    category: "capturing",
     boardArrows: [{ from: [5, 2], to: [3, 2] }],
   },
   "Infantry capture artillery": {
@@ -96,7 +96,7 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: false,
+    category: "capturing",
     boardArrows: [{ from: [3, 5], to: [3, 4] }],
   },
   "Infantry capture defended artillery": {
@@ -114,7 +114,7 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: false,
+    category: "capturing",
     boardArrows: [{ from: [1, 3], to: [2, 3] }],
   },
   "Artillery capture infantry": {
@@ -132,7 +132,7 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: false,
+    category: "capturing",
     boardArrows: [{ from: [6, 4], to: [5, 4] }],
   },
   "Artillery capture artillery": {
@@ -150,7 +150,7 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: false,
+    category: "capturing",
     boardArrows: [{ from: [6, 4], to: [5, 4] }],
   },
   "Airborne capture artillery": {
@@ -168,7 +168,7 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: false,
+    category: "capturing",
     boardArrows: [{ from: [7, 3], to: [2, 3] }],
   },
   "Airborne capture infantry": {
@@ -186,7 +186,7 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: false,
+    category: "capturing",
     boardArrows: [{ from: [7, 3], to: [2, 3] }],
   },
   "Infantry capture HQ": {
@@ -204,7 +204,7 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: false,
+    category: "capturing",
     boardArrows: [
       { from: [2, 1], to: [1, 0] },
       { from: [0, 2], to: [0, 1] },
@@ -225,7 +225,7 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: false,
+    category: "capturing",
     boardArrows: [],
   },
   "Capture an artillery": {
@@ -243,7 +243,7 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: true,
+    category: "puzzles",
     boardArrows: [],
   },
   "Capture two infantry": {
@@ -261,7 +261,7 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: true,
+    category: "puzzles",
     boardArrows: [],
   },
   "Capture HQ!": {
@@ -279,7 +279,7 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: true,
+    category: "puzzles",
     boardArrows: [],
   },
   "Collapse the center line": {
@@ -297,7 +297,7 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: true,
+    category: "puzzles",
     boardArrows: [],
   },
   "Avoid being captured next turn": {
@@ -315,7 +315,7 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: true,
+    category: "puzzles",
     boardArrows: [],
   },
   "Take back the advantage": {
@@ -333,7 +333,7 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: true,
+    category: "puzzles",
     boardArrows: [],
   },
   "Defend the attack": {
@@ -351,7 +351,25 @@ export const boards: Record<string, TutorialSetupData> = {
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
     },
-    isPuzzle: true,
+    category: "puzzles",
+    boardArrows: [],
+  },
+  "Capture HQ with 2 artillery": {
+    boardState: {
+      board: [
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, R.AR, R.AR, null, null, null],
+        [null, null, B.HQ, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, R.HQ],
+      ],
+      redReserve: emptyReserveFleet,
+      blueReserve: emptyReserveFleet,
+    },
+    category: "endgames",
     boardArrows: [],
   },
 };
