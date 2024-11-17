@@ -51,6 +51,7 @@ import {
 } from "@/game/constants";
 import ShareGameDialog from "./ExportGameDialog";
 import BoardContainer from "./BoardContainer";
+import MoveCounter from "./MoveCounter";
 
 //coordinate string x,y
 type Annotations = {
@@ -847,42 +848,58 @@ export function GHQBoard({
           <div>
             {usernames[1]} ({G.elos[1]})
           </div>
-          <CountdownTimer
-            active={ctx.currentPlayer === "1" && !ctx.gameover}
-            player="BLUE"
-            elapsed={G.blueElapsed}
-            startDate={G.turnStartTime}
-            totalTimeAllowed={G.timeControl}
-          />
+          <div className="flex gap-2 justify-center items-center">
+            <MoveCounter
+              numMoves={ctx.numMoves}
+              active={ctx.currentPlayer === "1" && !ctx.gameover}
+            />
+            <CountdownTimer
+              active={ctx.currentPlayer === "1" && !ctx.gameover}
+              player="BLUE"
+              elapsed={G.blueElapsed}
+              startDate={G.turnStartTime}
+              totalTimeAllowed={G.timeControl}
+            />
+          </div>
         </div>
       </div>
     </>
   );
 
   const redBank = (
-    <div className="flex py-2 px-1">
-      <ReserveBank
-        player="RED"
-        reserve={G.redReserve}
-        selectedKind={isPrimaryPlayer("0") ? state.context.unitKind : undefined}
-        selectable={
-          isPrimaryPlayer("0") && !state.matches("activePieceSelected")
-        }
-        selectReserve={selectReserve}
-      />
-      <div className="ml-4 lg:ml-20 my-2 flex flex-col gap-1">
-        <div>
-          {usernames[0]} ({G.elos[0]})
-        </div>
-        <CountdownTimer
-          active={ctx.currentPlayer === "0" && !ctx.gameover}
+    <>
+      <div className="items-center justify-center flex py-2 px-1">
+        <ReserveBank
           player="RED"
-          elapsed={G.redElapsed}
-          startDate={G.turnStartTime}
-          totalTimeAllowed={G.timeControl}
+          reserve={G.redReserve}
+          selectedKind={
+            isPrimaryPlayer("0") ? state.context.unitKind : undefined
+          }
+          selectable={
+            isPrimaryPlayer("0") && !state.matches("activePieceSelected")
+          }
+          selectReserve={selectReserve}
         />
+        <div className="ml-4 lg:ml-20 my-2 flex flex-col gap-1">
+          <div>
+            {usernames[0]} ({G.elos[0]})
+          </div>
+          <div className="flex gap-2 justify-center items-center">
+            <MoveCounter
+              numMoves={ctx.numMoves}
+              active={ctx.currentPlayer === "0" && !ctx.gameover}
+            />
+            <CountdownTimer
+              active={ctx.currentPlayer === "0" && !ctx.gameover}
+              player="RED"
+              elapsed={G.redElapsed}
+              startDate={G.turnStartTime}
+              totalTimeAllowed={G.timeControl}
+            />
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 
   const historyEval = useMemo(() => {
@@ -982,7 +999,7 @@ export function GHQBoard({
         className="order-1 md:order-2 flex-1 flex flex-col items-center justify-center"
         ref={measureRef}
       >
-        <div className=" flex">{isPrimaryPlayer("1") ? redBank : blueBank}</div>
+        <div className="flex">{isPrimaryPlayer("1") ? redBank : blueBank}</div>
         <div
           className="border-r-2 border-gray-100 flex items-center justify-center relative"
           style={{
@@ -1078,7 +1095,9 @@ function ReserveBank(props: {
     );
   }
 
-  return <div className="grid flex-1 grid-cols-6 gap-5">{reserves}</div>;
+  return (
+    <div className="grid flex-1 grid-cols-6 gap-2 lg:gap-5">{reserves}</div>
+  );
 }
 
 function BoardCoordinateLabels({
