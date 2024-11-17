@@ -30,17 +30,19 @@ function HowToWinCard() {
         <CardTitle>How to win</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col justify-center items-center gap-2">
+        <div className="flex flex-col justify-center items-center gap-8">
           <div className="font-bold text-blue-600 text-center">
             Capture the enemy HQ
             <br />
             to win!
           </div>
-          <Image src="/hq-blue.png" alt="hq" width={64} height={64} />
+          <div className="flex gap-4 justify-center items-center">
+            <Image src="/hq-red.png" alt="hq" width={64} height={64} />
+            <Image src="/hq-blue.png" alt="hq" width={64} height={64} />
+          </div>
           <div className="text-sm text-gray-800">
-            <div>Moves: 1 square in any direction</div>
-            <div>Captures: N/A</div>
-            <div>Captured by: 2 infantry</div>
+            Use <strong>artillery</strong> and <strong>infantry</strong> to
+            defend your HQ and destroy the enemy&apos;s HQ!
           </div>
         </div>
       </CardContent>
@@ -62,7 +64,7 @@ function HowToPlayCard() {
           <div className="text-gray-800">
             <div className="mb-2">Choose any of:</div>
             <div className="text-sm">
-              <div>(A) Reinforce a piece from your reserve</div>
+              <div>(A) Deploy a piece from your reserve</div>
               <div>(B) Move an infantry and/or capture a piece</div>
               <div>(C) Move and/or rotate an artillery</div>
               <div className="mt-2 text-sm">
@@ -142,9 +144,9 @@ function HowInfantryCapture() {
             already-engaged enemy infantry.
           </div>
           <div className="flex flex-col gap-1">
-            <div className="flex gap-1">
+            <div className="flex gap-2">
               <Image
-                className="transform rotate-180"
+                className="transform rotate-90"
                 src="/regular-infantry-blue.png"
                 alt="infantry"
                 width={32}
@@ -158,7 +160,7 @@ function HowInfantryCapture() {
                 height={32}
               />
             </div>
-            <div className="flex gap-1">
+            <div className="flex gap-2">
               <Image
                 src="/regular-infantry-red.png"
                 alt="infantry"
@@ -296,6 +298,13 @@ const PIECE_INFO: Record<UnitType, PieceInfo> = {
     bombards: "3 squares, forward",
     capturedBy: "1 adjacent infantry",
     special: "Rotates any direction",
+  },
+  HQ: {
+    name: "HQ",
+    image: "hq",
+    moves: "1 square, any direction",
+    capturedBy: "2 adjacent infantry",
+    special: "Can't defend, can't attack.",
   },
 };
 
