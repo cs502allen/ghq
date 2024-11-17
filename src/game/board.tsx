@@ -348,6 +348,16 @@ export function GHQBoard({
     return movesSet;
   }, [ctx.turn]);
 
+  const thisTurnCaptures = useMemo(() => {
+    const movesSet = new Set<string>();
+    for (const move of Object.values(G.thisTurnMoves ?? {})) {
+      if (move.name === "Move" && move.args[2]) {
+        movesSet.add(`${move.args[2][0]},${move.args[2][1]}`);
+      }
+    }
+    return movesSet;
+  }, [G.thisTurnMoves]);
+
   const [playedMoveSounds, setPlayedMoveSounds] = useState<boolean[]>([]);
   useEffect(() => {
     if (G.thisTurnMoves.length === 0) {
@@ -636,6 +646,12 @@ export function GHQBoard({
                 ></div>
               ) : null}
               {lastTurnCaptures.has(`${rowIndex},${colIndex}`) ? (
+                <div
+                  className="absolute w-full h-full bg-red-300 top-0 left-0"
+                  style={{ pointerEvents: "none", opacity: 0.3 }}
+                ></div>
+              ) : null}
+              {thisTurnCaptures.has(`${rowIndex},${colIndex}`) ? (
                 <div
                   className="absolute w-full h-full bg-red-300 top-0 left-0"
                   style={{ pointerEvents: "none", opacity: 0.3 }}
