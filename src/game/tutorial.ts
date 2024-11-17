@@ -372,6 +372,24 @@ export const boards: Record<string, TutorialSetupData> = {
     category: "endgames",
     boardArrows: [],
   },
+  "Capture HQ with 1 artillery and 1 infantry": {
+    boardState: {
+      board: [
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, R.AR, R.IN, null, null, null],
+        [null, null, B.HQ, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, R.HQ],
+      ],
+      redReserve: emptyReserveFleet,
+      blueReserve: emptyReserveFleet,
+    },
+    category: "endgames",
+    boardArrows: [],
+  },
 };
 
 export type BoardType = keyof typeof boards;
