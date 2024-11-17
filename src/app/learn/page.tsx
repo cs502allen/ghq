@@ -76,7 +76,7 @@ export default function Page() {
                     <Link
                       key={boardType}
                       href={`/learn?boardType=${boardType}`}
-                      className="py-3 px-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md min-w-96"
+                      className="py-3 px-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md min-w-48 w-80"
                     >
                       <div className="tracking-tight text-gray-900">
                         {boardType}
@@ -94,7 +94,7 @@ export default function Page() {
                     <Link
                       key={boardType}
                       href={`/learn?boardType=${boardType}`}
-                      className="py-3 px-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md min-w-96"
+                      className="py-3 px-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md min-w-48 w-80"
                     >
                       <div className="tracking-tight text-gray-900">
                         {boardType}
@@ -112,7 +112,7 @@ export default function Page() {
                     <Link
                       key={boardType}
                       href={`/learn?boardType=${boardType}`}
-                      className="py-3 px-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md min-w-96"
+                      className="py-3 px-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md min-w-48 w-80"
                     >
                       <div className="tracking-tight text-gray-900">
                         {boardType}
