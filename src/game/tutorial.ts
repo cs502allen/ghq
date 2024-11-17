@@ -354,7 +354,7 @@ export const boards: Record<string, TutorialSetupData> = {
     category: "puzzles",
     boardArrows: [],
   },
-  "Capture HQ with 2 artillery": {
+  "HQ vs. HQ and 2 artillery": {
     boardState: {
       board: [
         [null, null, null, null, null, null, null, null],
@@ -372,7 +372,7 @@ export const boards: Record<string, TutorialSetupData> = {
     category: "endgames",
     boardArrows: [],
   },
-  "Capture HQ with 1 artillery and 1 infantry": {
+  "HQ vs. HQ, 1 artillery, 1 infantry": {
     boardState: {
       board: [
         [null, null, null, null, null, null, null, null],
@@ -382,6 +382,60 @@ export const boards: Record<string, TutorialSetupData> = {
         [null, null, null, R.AR, R.IN, null, null, null],
         [null, null, B.HQ, null, null, null, null, null],
         [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, R.HQ],
+      ],
+      redReserve: emptyReserveFleet,
+      blueReserve: emptyReserveFleet,
+    },
+    category: "endgames",
+    boardArrows: [],
+  },
+  "HQ, 2 infantry vs. HQ, 1 infantry": {
+    boardState: {
+      board: [
+        [null, null, null, null, null, null, null, null],
+        [null, B.HQ, null, null, null, null, null, null],
+        [null, null, B.IN, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, R.IN, R.IN, null, null],
+        [null, null, null, null, null, null, null, R.HQ],
+      ],
+      redReserve: emptyReserveFleet,
+      blueReserve: emptyReserveFleet,
+    },
+    category: "endgames",
+    boardArrows: [],
+  },
+  "HQ, 2 infantry vs. HQ, 1 artillery": {
+    boardState: {
+      board: [
+        [null, null, null, null, null, null, null, null],
+        [null, B.HQ, null, null, null, null, null, null],
+        [null, null, B.AR, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, R.IN, R.IN, null, null],
+        [null, null, null, null, null, null, null, R.HQ],
+      ],
+      redReserve: emptyReserveFleet,
+      blueReserve: emptyReserveFleet,
+    },
+    category: "endgames",
+    boardArrows: [],
+  },
+  "HQ, 2 infantry vs. HQ, 1 artillery, 1 infantry": {
+    boardState: {
+      board: [
+        [null, null, null, null, null, null, null, null],
+        [null, B.HQ, null, null, null, null, null, null],
+        [null, B.IN, B.AR, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, R.IN, R.IN, null, null],
         [null, null, null, null, null, null, null, R.HQ],
       ],
       redReserve: emptyReserveFleet,
