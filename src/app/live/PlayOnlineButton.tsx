@@ -4,13 +4,18 @@ import { Button } from "./Button";
 import { useAuth } from "@clerk/nextjs";
 import { useMatchmaking } from "@/components/MatchmakingProvider";
 
-export function PlayOnlineButton({
-  openSignInDialog,
-}: {
-  openSignInDialog: () => void;
-}) {
+export function PlayOnlineButton() {
   const { isSignedIn } = useAuth();
   const { startMatchmaking } = useMatchmaking();
+
+  function openSignInDialog() {
+    if (!isSignedIn) {
+      const signInButton = document.getElementById("sign-in-button");
+      if (signInButton) {
+        signInButton.click();
+      }
+    }
+  }
 
   async function playOnline() {
     if (!isSignedIn) {
