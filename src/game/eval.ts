@@ -1,17 +1,11 @@
 import { getAllowedMoves, isPieceArtillery } from "./board-moves";
 import { freeInfantryCaptures } from "./capture-logic";
-import {
-  AllowedMove,
-  GHQState,
-  NonNullSquare,
-  Player,
-  ReserveFleet,
-} from "./engine";
+import { AllowedMove, GHQState, Player, ReserveFleet } from "./engine";
 import { bombardedSquares } from "./move-logic";
 
 const unitScores: Record<string, number> = {
   INFANTRY: 1,
-  ARMORED_INFANTRY: 2,
+  ARMORED_INFANTRY: 3,
   AIRBORNE_INFANTRY: 5,
   ARTILLERY: 3,
   ARMORED_ARTILLERY: 5,
