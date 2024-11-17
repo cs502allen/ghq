@@ -9,6 +9,8 @@ It's difficult to share the backend due to SaaS credentials (Supabase and Clerk)
 ## Developer setup
 
 ```
+NEXT_PUBLIC_GHQ_FRONTEND_ONLY=true
+
 yarn
 yarn run dev
 yarn run dev:server # not yet available

@@ -3,5 +3,5 @@ export interface Config {
 }
 
 export const config: Config = {
-  useClerk: process.env.GHQ_FRONTEND_ONLY !== "true",
+  useClerk: process.env.NEXT_PUBLIC_GHQ_FRONTEND_ONLY !== "true",
 };
