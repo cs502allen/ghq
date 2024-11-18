@@ -128,11 +128,12 @@ export function GHQBoard({
           if (
             context.canReorient &&
             "orientation" in event &&
-            lastMove &&
             lastMove.name === "MoveAndOrient" &&
             context.canReorient[0] === context.selectedPiece!.at[0] &&
             context.canReorient[1] === context.selectedPiece!.at[1]
           ) {
+            undo();
+
             if (
               JSON.stringify(lastMove.args[0]) ===
               JSON.stringify(lastMove.args[1])
