@@ -39,7 +39,8 @@ server.app.use(cors({ credentials: true }));
 server.app.use(authMiddleware);
 
 const QUEUE_STALE_MS = 10_000;
-const queue: Map<string, number> = new Map();
+const blitzQueue: Map<string, number> = new Map();
+const rapidQueue: Map<string, number> = new Map();
 
 const DEFAULT_TIME_CONTROL = "rapid";
 
@@ -55,7 +56,6 @@ server.router.post("/matchmaking", async (ctx) => {
     return;
   }
   const timeControl = TIME_CONTROLS[mode as keyof typeof TIME_CONTROLS];
-  console.log("timeControl", timeControl);
 
   // If user is already in a match, return the match id
   const activeMatch = await getActiveMatch(userId);
@@ -64,11 +64,13 @@ server.router.post("/matchmaking", async (ctx) => {
     return;
   }
 
+  const queue = mode === "blitz" ? blitzQueue : rapidQueue;
+
   // If user isn't in the queue, or they are but we haven't heard from them in a while (stale), add them to the queue.
   const now = Date.now();
   const queuedUser = queue.get(userId);
   if (!queuedUser || queuedUser < now - QUEUE_STALE_MS) {
-    console.log("Adding user to queue", userId);
+    console.log(`Adding user to ${mode} queue`, userId);
     queue.set(userId, now);
     console.log("Users in queue", queue);
   }
@@ -131,7 +133,8 @@ server.router.delete("/matchmaking", (ctx) => {
     throw new Error("userId is required");
   }
 
-  queue.delete(userId);
+  blitzQueue.delete(userId);
+  rapidQueue.delete(userId);
 
   ctx.body = JSON.stringify({});
 });
