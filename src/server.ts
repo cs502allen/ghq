@@ -12,6 +12,7 @@ import { PostgresStore } from "bgio-postgres";
 import { calculateElo } from "./game/elo";
 import cors from "@koa/cors";
 import { authMiddleware, clerkClient } from "./server/auth";
+import { TIME_CONTROLS } from "./game/constants";
 
 const supabase = createClient(
   "https://wjucmtrnmjcaatbtktxo.supabase.co",
@@ -40,11 +41,21 @@ server.app.use(authMiddleware);
 const QUEUE_STALE_MS = 10_000;
 const queue: Map<string, number> = new Map();
 
+const DEFAULT_TIME_CONTROL = "rapid";
+
 server.router.post("/matchmaking", async (ctx) => {
   const userId = ctx.state.auth.userId;
   if (!userId) {
     throw new Error("userId is required");
   }
+
+  const mode = (ctx.request.query.mode as string) ?? DEFAULT_TIME_CONTROL;
+  if (!(mode in TIME_CONTROLS)) {
+    ctx.throw(400, "Invalid time control");
+    return;
+  }
+  const timeControl = TIME_CONTROLS[mode as keyof typeof TIME_CONTROLS];
+  console.log("timeControl", timeControl);
 
   // If user is already in a match, return the match id
   const activeMatch = await getActiveMatch(userId);
@@ -89,6 +100,8 @@ server.router.post("/matchmaking", async (ctx) => {
           "0": user0.elo,
           "1": user1.elo,
         },
+        timeControl: timeControl.time,
+        bonusTime: timeControl.bonus,
       },
       unlisted: false,
       game: ghqGame as SrcGame,

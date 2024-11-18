@@ -458,9 +458,9 @@ export const GHQGame: Game<GHQState> = {
       turnStartTime: Date.now(),
       blueElapsed: 0,
       redElapsed: 0,
-      bonusTime: 5 * 1000,
+      bonusTime: setupData?.bonusTime ?? 5 * 1000,
       lastPlayerMoves: [],
-      timeControl: 10 * 60 * 1000,
+      timeControl: setupData?.timeControl ?? 10 * 60 * 1000,
       redTurnStartBoard: defaultBoard,
       blueTurnStartBoard: defaultBoard,
       board: defaultBoard,
@@ -608,6 +608,12 @@ export function newOnlineGHQGame({
       }
       if (!setupData.matchId) {
         return "Missing match ID";
+      }
+      if (setupData?.bonusTime && setupData.bonusTime < 0) {
+        return "Invalid bonus time";
+      }
+      if (setupData?.timeControl && setupData.timeControl <= 0) {
+        return "Invalid time control";
       }
     }
   };
