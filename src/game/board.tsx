@@ -969,7 +969,9 @@ export function GHQBoard({
             <div className="flex gap-1 justify-center items-center">
               {ctx.currentPlayer === playerID || !G.isOnline ? (
                 <>
-                  <SkipButton skip={() => moves.Skip()} />
+                  {!!ctx.numMoves && ctx.numMoves > 0 && (
+                    <SkipButton skip={() => moves.Skip()} />
+                  )}
                   {G.drawOfferedBy && G.drawOfferedBy !== ctx.currentPlayer ? (
                     <AcceptDrawButton draw={() => moves.AcceptDraw()} />
                   ) : (
