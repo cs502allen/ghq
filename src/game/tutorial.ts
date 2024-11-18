@@ -444,7 +444,7 @@ export const boards: Record<string, TutorialSetupData> = {
     category: "endgames",
     boardArrows: [],
   },
-  "HQ, 2 artillery vs. HQ, 2 infantry": {
+  "HQ, 2 artillery vs. HQ, 1 infantry": {
     boardState: {
       board: [
         [null, null, null, null, null, null, null, null],

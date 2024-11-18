@@ -39,7 +39,7 @@ const BoardArrow: React.FC<BoardArrowProps> = ({
         pointerEvents: "none",
         width: "100%",
         height: "100%",
-        opacity: 0.7,
+        opacity: 0.4,
       }}
       className={className}
     >
