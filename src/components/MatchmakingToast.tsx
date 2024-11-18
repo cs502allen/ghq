@@ -5,9 +5,10 @@ import { toast } from "sonner";
 import { useMatchmaking } from "./MatchmakingProvider";
 import { Button } from "./ui/button";
 import { Circle, Maximize2, Minimize2 } from "lucide-react";
+import { TIME_CONTROLS } from "@/game/constants";
 
 export default function MatchmakingToast() {
-  const { isMatchmaking, cancelMatchmaking } = useMatchmaking();
+  const { matchmakingMode, cancelMatchmaking } = useMatchmaking();
   const [toastId, setToastId] = useState<string | number | null>(null);
   const [isMinimized, setIsMinimized] = useState(false);
 
@@ -15,12 +16,13 @@ export default function MatchmakingToast() {
     let toastId: string | number | null = null;
 
     setTimeout(() => {
-      if (!isMatchmaking) {
+      if (!matchmakingMode) {
         return;
       }
 
       toastId = toast(
         <ToastContent
+          matchmakingMode={matchmakingMode}
           cancelMatchmaking={cancelMatchmaking}
           onMinimize={() => setIsMinimized(true)}
         />,
@@ -39,7 +41,7 @@ export default function MatchmakingToast() {
         toast.dismiss(toastId);
       }
     };
-  }, [isMatchmaking]);
+  }, [matchmakingMode]);
 
   useEffect(() => {
     if (!toastId) {
@@ -75,9 +77,11 @@ export default function MatchmakingToast() {
   return null;
 }
 function ToastContent({
+  matchmakingMode,
   cancelMatchmaking,
   onMinimize,
 }: {
+  matchmakingMode: keyof typeof TIME_CONTROLS | null;
   cancelMatchmaking: () => void;
   onMinimize: () => void;
 }) {
@@ -94,8 +98,8 @@ function ToastContent({
       </div>
       <div className="flex flex-col gap-1">
         <div>
-          We&apos;re finding someone suitable for you to play. This may take a
-          moment.
+          We&apos;re finding someone suitable for you to play{" "}
+          <strong>{matchmakingMode}</strong>. This may take a moment.
         </div>
         <div>Feel free to play a bot or review lessons while you wait!</div>
       </div>

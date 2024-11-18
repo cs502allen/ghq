@@ -89,7 +89,7 @@ export default function LiveGamesList() {
             </div>
 
             <div className="flex flex-col justify-end items-end">
-              <div>{(game.status ?? "unknown").toLowerCase()}</div>
+              <div>{(game.status ?? "ongoing").toLowerCase()}</div>
 
               <div className="text-gray-500">
                 {DateTime.fromISO(game.createdAt).toRelative()}

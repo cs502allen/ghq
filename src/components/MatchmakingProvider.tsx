@@ -12,10 +12,11 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { ghqFetch } from "@/lib/api";
 import { API_URL } from "@/app/live/config";
+import { TIME_CONTROLS } from "@/game/constants";
 
 interface MatchmakingContextType {
-  isMatchmaking: boolean;
-  startMatchmaking: () => void;
+  matchmakingMode: keyof typeof TIME_CONTROLS | null;
+  startMatchmaking: (mode: keyof typeof TIME_CONTROLS) => void;
   cancelMatchmaking: () => void;
 }
 
@@ -42,30 +43,32 @@ interface MatchmakingData {
 export const MatchmakingProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [isMatchmaking, setIsMatchmaking] = useState(false);
+  const [matchmakingMode, setMatchmakingMode] = useState<
+    keyof typeof TIME_CONTROLS | null
+  >(null);
   const { isSignedIn, getToken } = useAuth();
   const router = useRouter();
 
   const checkMatchmaking = useCallback(async () => {
     try {
       const data = await ghqFetch<MatchmakingData>({
-        url: `${API_URL}/matchmaking`,
+        url: `${API_URL}/matchmaking?mode=${matchmakingMode}`,
         getToken,
         method: "POST",
       });
       if (data.match) {
         router.push(`/live/${data.match.id}`);
-        setIsMatchmaking(false);
+        setMatchmakingMode(null);
       }
     } catch (error) {
       console.error("Error polling matchmaking API:", error);
     }
-  }, [router]);
+  }, [router, matchmakingMode]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
-    if (isMatchmaking) {
+    if (matchmakingMode) {
       checkMatchmaking();
       interval = setInterval(() => checkMatchmaking(), 2000); // Poll every 2 seconds
     }
@@ -75,20 +78,24 @@ export const MatchmakingProvider: React.FC<{ children: ReactNode }> = ({
         clearInterval(interval);
       }
     };
-  }, [isMatchmaking, checkMatchmaking]);
+  }, [matchmakingMode, checkMatchmaking]);
 
-  const startMatchmaking = () => {
-    setIsMatchmaking(true);
+  const startMatchmaking = (mode: keyof typeof TIME_CONTROLS) => {
+    setMatchmakingMode(mode);
   };
 
   const cancelMatchmaking = () => {
-    setIsMatchmaking(false);
-    ghqFetch({ url: `${API_URL}/matchmaking`, getToken, method: "DELETE" });
+    ghqFetch({
+      url: `${API_URL}/matchmaking?mode=${matchmakingMode}`,
+      getToken,
+      method: "DELETE",
+    });
+    setMatchmakingMode(null);
   };
 
   return (
     <MatchmakingContext.Provider
-      value={{ isMatchmaking, startMatchmaking, cancelMatchmaking }}
+      value={{ matchmakingMode, startMatchmaking, cancelMatchmaking }}
     >
       {children}
     </MatchmakingContext.Provider>

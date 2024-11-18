@@ -3,10 +3,17 @@
 import { Button } from "./Button";
 import { useAuth } from "@clerk/nextjs";
 import { useMatchmaking } from "@/components/MatchmakingProvider";
+import { TIME_CONTROLS } from "@/game/constants";
 
-export function PlayOnlineButton() {
+export function PlayOnlineButton({
+  mode,
+}: {
+  mode: keyof typeof TIME_CONTROLS;
+}) {
   const { isSignedIn } = useAuth();
   const { startMatchmaking } = useMatchmaking();
+
+  const timeControl = TIME_CONTROLS[mode];
 
   function openSignInDialog() {
     if (!isSignedIn) {
@@ -23,14 +30,21 @@ export function PlayOnlineButton() {
       return;
     }
 
-    startMatchmaking();
+    startMatchmaking(mode);
   }
 
   return (
     <>
       <Button onClick={playOnline} loadingText="Searching...">
-        🌎 Play Online
+        🌎 Play {toTitleCase(mode)}
+        <div className="font-medium text-sm">
+          ({timeControl.time / 60 / 1000}+{timeControl.bonus / 1000})
+        </div>
       </Button>
     </>
   );
+}
+
+function toTitleCase(str: string) {
+  return str[0].toUpperCase() + str.slice(1);
 }
