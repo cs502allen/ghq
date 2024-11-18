@@ -621,7 +621,9 @@ export function GHQBoard({
                     annotationsForSquare?.moveTo ||
                     square?.player === (isPrimaryPlayer("0") ? "RED" : "BLUE"),
                 },
-                (rowIndex + colIndex) % 2 === 0 ? "bg-gray-300" : "bg-gray-200"
+                (rowIndex + colIndex) % 2 === 0
+                  ? "bg-slate-400/70"
+                  : "bg-slate-200"
               )}
               style={{
                 boxShadow:
@@ -1019,7 +1021,7 @@ export function GHQBoard({
               width: squareSize * 8,
               height: squareSize * 8,
             }}
-            className="table-fixed relative"
+            className="table-fixed relative shadow-md"
           >
             {/*flip board*/}
             <tbody>{isPrimaryPlayer("0") ? cells : cells.reverse()}</tbody>
