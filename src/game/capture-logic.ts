@@ -324,6 +324,10 @@ function isInfantry(square?: Square): boolean {
   return !!square && Units[square.type].canCapture;
 }
 
+function isHQ(square: Square): boolean {
+  return !!square && square.type === "HQ";
+}
+
 function isCapturableHQ({
   board,
   engagedInfantry,
@@ -338,6 +342,10 @@ function isCapturableHQ({
   attacker: Square;
 }): boolean {
   if (!attacker) {
+    return false;
+  }
+
+  if (!isHQ(board[coord[0]][coord[1]])) {
     return false;
   }
 
@@ -384,8 +392,8 @@ function isNonDirectArtillery(
   }
 
   // Calculate the direction vector based on the orientation
-  const radians = ((piece.orientation - 180) * Math.PI) / 180;
-  const directionX = Math.round(Math.cos(radians));
+  const radians = (piece.orientation * Math.PI) / 180;
+  const directionX = -Math.round(Math.cos(radians));
   const directionY = Math.round(Math.sin(radians));
 
   // Calculate the square directly in front of the artillery
