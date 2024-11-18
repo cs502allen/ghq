@@ -228,6 +228,24 @@ export const boards: Record<string, TutorialSetupData> = {
     category: "capturing",
     boardArrows: [],
   },
+  "Infantry capture armored artillery test": {
+    boardState: {
+      board: [
+        [B.HQ, null, null, null, null, null, null, null],
+        [null, null, R.AA, null, null, null, null, null],
+        [null, null, B.IN, null, null, null, null, null],
+        [null, B.IN, R.IN, null, null, null, null, null],
+        [null, R.IN, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, R.HQ],
+      ],
+      redReserve: emptyReserveFleet,
+      blueReserve: emptyReserveFleet,
+    },
+    category: "capturing",
+    boardArrows: [],
+  },
   "Capture an artillery": {
     boardState: {
       board: [

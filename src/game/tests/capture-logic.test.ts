@@ -12,6 +12,9 @@ const BAIR = Blue.AIRBORNE;
 const RAIR = Red.AIRBORNE;
 const BARM = Blue.ARMORED_INF;
 const BART = Blue.ARTILLERY(180);
+const BAR2 = Blue.ARTILLERY(90);
+const BAR3 = Blue.ARTILLERY(270);
+const BAR4 = Blue.ARTILLERY(0);
 const RINF = Red.INFANTRY;
 const RART = Red.ARTILLERY(0);
 const R_HQ = Red.HQ;
@@ -606,6 +609,118 @@ describe("computing allowed captures v2", () => {
         attacker: RINF,
         attackerFrom: [0, 0],
         attackerTo: [1, 0],
+        board,
+      })
+    ).toEqual([]);
+  });
+  it("allows capturing while standing behind a horizontal artillery 1 (issue #115)", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, BAR3, null, null, null],
+      [null, null, null, null, RINF, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+    ];
+    expect(
+      captureCandidatesV2({
+        attacker: RINF,
+        attackerFrom: [5, 4],
+        attackerTo: [4, 5],
+        board,
+      })
+    ).toEqual([[4, 4]]);
+    expect(
+      captureCandidatesV2({
+        attacker: RINF,
+        attackerFrom: [5, 4],
+        attackerTo: [4, 3],
+        board,
+      })
+    ).toEqual([]);
+  });
+  it("allows capturing while standing behind a horizontal artillery 2 (issue #115)", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, BAR2, null, null, null],
+      [null, null, null, null, RINF, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+    ];
+    expect(
+      captureCandidatesV2({
+        attacker: RINF,
+        attackerFrom: [5, 4],
+        attackerTo: [4, 5],
+        board,
+      })
+    ).toEqual([]);
+    expect(
+      captureCandidatesV2({
+        attacker: RINF,
+        attackerFrom: [5, 4],
+        attackerTo: [4, 3],
+        board,
+      })
+    ).toEqual([[4, 4]]);
+  });
+  it("allows capturing while standing behind a horizontal artillery 3 (issue #115)", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, RINF, BAR4, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+    ];
+    expect(
+      captureCandidatesV2({
+        attacker: RINF,
+        attackerFrom: [4, 3],
+        attackerTo: [3, 4],
+        board,
+      })
+    ).toEqual([]);
+    expect(
+      captureCandidatesV2({
+        attacker: RINF,
+        attackerFrom: [4, 3],
+        attackerTo: [5, 4],
+        board,
+      })
+    ).toEqual([[4, 4]]);
+  });
+  it("allows capturing while standing behind a horizontal artillery 4 (issue #115)", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, RINF, BART, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+    ];
+    expect(
+      captureCandidatesV2({
+        attacker: RINF,
+        attackerFrom: [4, 3],
+        attackerTo: [3, 4],
+        board,
+      })
+    ).toEqual([[4, 4]]);
+    expect(
+      captureCandidatesV2({
+        attacker: RINF,
+        attackerFrom: [4, 3],
+        attackerTo: [5, 4],
         board,
       })
     ).toEqual([]);
