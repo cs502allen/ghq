@@ -338,8 +338,11 @@ const ChangeOrientation: Move<GHQState> = (
   });
 };
 
-const Skip: Move<GHQState> = ({ G, ctx, events }) => {
-  events.endTurn();
+const Skip: Move<GHQState> = {
+  noLimit: true,
+  move: ({ events }) => {
+    events.endTurn();
+  },
 };
 
 const Resign: Move<GHQState> = ({ G, ctx, events }) => {
@@ -485,6 +488,7 @@ export const GHQGame: Game<GHQState> = {
     };
   },
   turn: {
+    minMoves: 1,
     maxMoves: 3,
     onBegin: ({ ctx, G, random, log, ...plugins }) => {
       G.lastPlayerMoves = G.thisTurnMoves;
