@@ -123,32 +123,31 @@ export function GHQBoard({
         },
         changeOrientation: ({ context, event }) => {
           // unstage last move.
+          const lastMove = G.thisTurnMoves[G.thisTurnMoves.length - 1];
+
           if (
             context.canReorient &&
             "orientation" in event &&
+            lastMove &&
+            lastMove.name === "MoveAndOrient" &&
             context.canReorient[0] === context.selectedPiece!.at[0] &&
             context.canReorient[1] === context.selectedPiece!.at[1]
           ) {
-            const lastMove = G.thisTurnMoves[G.thisTurnMoves.length - 1];
-            if (lastMove.name === "MoveAndOrient") {
-              undo();
-
-              if (
-                JSON.stringify(lastMove.args[0]) ===
-                JSON.stringify(lastMove.args[1])
-              ) {
-                moves.ChangeOrientation(
-                  context.selectedPiece!.at,
-                  event.orientation
-                );
-              } else {
-                // aim and reposition
-                moves.MoveAndOrient(
-                  lastMove.args[0],
-                  lastMove.args[1],
-                  event.orientation
-                );
-              }
+            if (
+              JSON.stringify(lastMove.args[0]) ===
+              JSON.stringify(lastMove.args[1])
+            ) {
+              moves.ChangeOrientation(
+                context.selectedPiece!.at,
+                event.orientation
+              );
+            } else {
+              // aim and reposition
+              moves.MoveAndOrient(
+                lastMove.args[0],
+                lastMove.args[1],
+                event.orientation
+              );
             }
           } else if ("orientation" in event) {
             moves.ChangeOrientation(
