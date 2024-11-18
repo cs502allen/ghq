@@ -29,6 +29,7 @@ export const turnStateMachine = createMachine(
     types: {} as {
       context: {
         disabledPieces: Coordinate[];
+        canReorient?: Coordinate;
         player: Player;
         renderMoves: number;
 
@@ -145,6 +146,15 @@ export const turnStateMachine = createMachine(
           },
           SELECT_ACTIVE_PIECE: {
             guard: ({ context, event }) => {
+              if (
+                context.canReorient &&
+                context.canReorient[0] === event.at[0] &&
+                context.canReorient[1] === event.at[1] &&
+                event.piece.player === context.player
+              ) {
+                return true;
+              }
+
               return (
                 // can't have been moved before
                 !context.disabledPieces?.some(
@@ -156,12 +166,19 @@ export const turnStateMachine = createMachine(
               );
             },
             actions: assign(({ context, event }) => {
+              const restrictToReorientation =
+                context.canReorient &&
+                context.canReorient[0] === event.at[0] &&
+                context.canReorient[1] === event.at[1];
+
               return {
                 selectedPiece: {
                   piece: event.piece,
                   at: event.at,
                 },
-                allowedMoves: movesForActivePiece(event.at, event.currentBoard),
+                allowedMoves: restrictToReorientation
+                  ? []
+                  : movesForActivePiece(event.at, event.currentBoard),
               };
             }),
             target: "activePieceSelected",
@@ -243,6 +260,7 @@ export const turnStateMachine = createMachine(
                 actions: [
                   "moveAndOrient",
                   assign(({ event, context }) => ({
+                    canReorient: context.stagedMove!,
                     disabledPieces: [
                       ...context.disabledPieces,
                       context.stagedMove!,
@@ -290,6 +308,7 @@ export const turnStateMachine = createMachine(
             actions: [
               "changeOrientation",
               assign(({ event, context }) => ({
+                canReorient: context.selectedPiece!.at,
                 disabledPieces: [
                   ...context.disabledPieces,
                   context.selectedPiece!.at,
@@ -308,6 +327,7 @@ export const turnStateMachine = createMachine(
             actions: [
               "movePiece",
               assign(({ event, context }) => ({
+                canReorient: undefined,
                 disabledPieces: [...context.disabledPieces, event.at],
               })),
             ],
@@ -330,6 +350,7 @@ export const turnStateMachine = createMachine(
             },
             actions: [
               assign(({ event, context }) => ({
+                canReorient: undefined,
                 captureEnemyAt: (context.allowedCaptures || [])[0],
                 disabledPieces: [
                   ...context.disabledPieces,
@@ -350,6 +371,7 @@ export const turnStateMachine = createMachine(
             },
             actions: [
               assign(({ event, context }) => ({
+                canReorient: undefined,
                 captureEnemyAt: event.at,
                 disabledPieces: [
                   ...context.disabledPieces,
@@ -401,6 +423,7 @@ export const turnStateMachine = createMachine(
             actions: [
               "spawnPiece",
               assign(({ event, context }) => ({
+                canReorient: undefined,
                 disabledPieces: [...context.disabledPieces, event.at],
               })),
             ],
