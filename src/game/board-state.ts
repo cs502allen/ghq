@@ -276,40 +276,68 @@ export const turnStateMachine = createMachine(
                       canReorient: event.at,
                       disabledPieces: [...context.disabledPieces, event.at!],
                     })),
-                    "moveAndOrient",
+                    // "moveAndOrient",
                   ],
 
-                  target: "#turn-machine.ready",
+                  target: "selectOrientation",
                 },
               ],
             },
           },
           selectOrientation: {
             on: {
-              CHANGE_ORIENTATION: {
-                guard: ({ context, event }) => {
-                  // is artillery
-                  return (
-                    typeof Units[context.selectedPiece!.piece.type]
-                      .artilleryRange !== "undefined"
-                  );
-                },
-                actions: [
-                  "changeOrientation",
-                  assign(({ event, context }) => ({
-                    canReorient: context.stagedMove
-                      ? context.stagedMove
-                      : context.selectedPiece!.at,
-                    disabledPieces: [
-                      ...context.disabledPieces,
-                      context.stagedMove
+              CHANGE_ORIENTATION: [
+                {
+                  guard: ({ context, event }) => {
+                    // is artillery, and has not been moved
+                    return (
+                      !context.stagedMove &&
+                      typeof Units[context.selectedPiece!.piece.type]
+                        .artilleryRange !== "undefined"
+                    );
+                  },
+                  actions: [
+                    "changeOrientation",
+                    assign(({ event, context }) => ({
+                      canReorient: context.stagedMove
                         ? context.stagedMove
                         : context.selectedPiece!.at,
-                    ],
-                  })),
-                ],
-                target: "#turn-machine.ready",
-              },
+                      disabledPieces: [
+                        ...context.disabledPieces,
+                        context.stagedMove
+                          ? context.stagedMove
+                          : context.selectedPiece!.at,
+                      ],
+                    })),
+                  ],
+                  target: "#turn-machine.ready",
+                },
+                {
+                  guard: ({ context, event }) => {
+                    // is artillery
+                    return (
+                      !!context.stagedMove &&
+                      typeof Units[context.selectedPiece!.piece.type]
+                        .artilleryRange !== "undefined"
+                    );
+                  },
+                  actions: [
+                    "moveAndOrient",
+                    assign(({ event, context }) => ({
+                      canReorient: context.stagedMove
+                        ? context.stagedMove
+                        : context.selectedPiece!.at,
+                      disabledPieces: [
+                        ...context.disabledPieces,
+                        context.stagedMove
+                          ? context.stagedMove
+                          : context.selectedPiece!.at,
+                      ],
+                    })),
+                  ],
+                  target: "#turn-machine.ready",
+                },
+              ],
             },
           },
         },

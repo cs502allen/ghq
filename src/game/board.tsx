@@ -170,7 +170,9 @@ export function GHQBoard({
             moves.MoveAndOrient(
               context.selectedPiece!.at,
               context.stagedMove,
-              context.selectedPiece!.piece.orientation
+              "orientation" in event
+                ? event.orientation
+                : context.selectedPiece!.piece.orientation
             );
           }
         },
@@ -318,7 +320,20 @@ export function GHQBoard({
     }
 
     const aiming = state.matches("activePieceSelected.selectOrientation");
-    if (aiming && state.context.selectedPiece) {
+
+    if (aiming && state.context.stagedMove) {
+      const [x, y] = state.context.stagedMove!;
+      annotate[`${x},${y}`] = {
+        ...annotate[`${x},${y}`],
+        showAim: true,
+        hidePiece: true,
+      };
+      const [fromX, fromY] = state.context.selectedPiece!.at;
+      annotate[`${fromX},${fromY}`] = {
+        ...annotate[`${fromX},${fromY}`],
+        hidePiece: true,
+      };
+    } else if (aiming && state.context.selectedPiece) {
       const [x, y] = state.context.selectedPiece.at;
       annotate[`${x},${y}`] = {
         ...annotate[`${x},${y}`],
@@ -777,16 +792,6 @@ export function GHQBoard({
                     height={pieceSize * 0.7}
                     className="select-none"
                     draggable="false"
-                    // style={{
-                    //   transform: state.context.selectedPiece.piece.orientation
-                    //     ? isPrimaryPlayer("1")
-                    //       ? `rotate(${
-                    //           180 -
-                    //           state.context.selectedPiece.piece.orientation
-                    //         }deg)`
-                    //       : `rotate(${state.context.selectedPiece.piece.orientation}deg)`
-                    //     : `rotate(${add180 ? 180 : 0}deg)`,
-                    // }}
                     alt={
                       Units[state.context.selectedPiece.piece.type]
                         .imagePathPrefix
