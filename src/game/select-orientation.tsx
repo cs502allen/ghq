@@ -66,29 +66,19 @@ export function SelectOrientation(
     }, [stagedOrientation, props.onChange])
   );
 
-  const angles: { [key: string]: Orientation } = {
-    topLeft: asBlue ? 135 : 315,
-    top: asBlue ? 180 : 0,
-    topRight: asBlue ? 225 : 45,
-    left: asBlue ? 90 : 270,
-    right: asBlue ? 270 : 90,
-    bottomLeft: asBlue ? 45 : 225,
-    bottom: asBlue ? 0 : 180,
-    bottomRight: asBlue ? 315 : 135,
-  };
-
   return (
     <div
       // @ts-ignore
       ref={ref}
       className={classNames(
-        "top-0 absolute overflow-hidden opacity-80 flex items-center justify-center",
+        "top-0 absolute overflow-hidden opacity-80 flex items-center justify-center select-none",
         color
       )}
       style={{ width: props.squareSize, height: props.squareSize }}
     >
       <div
-        className=""
+        className="select-none"
+        key={stagedOrientation}
         style={{
           transform: `rotate(${
             (stagedOrientation + (asBlue ? -180 : 0) + 360) % 360
@@ -142,10 +132,10 @@ function useAnyClick(handler: (event: MouseEvent) => void) {
       handler(event);
     };
 
-    document.addEventListener("click", handleClick);
+    document.addEventListener("mouseup", handleClick);
 
     return () => {
-      document.removeEventListener("click", handleClick);
+      document.removeEventListener("mouseup", handleClick);
     };
   }, [handler]);
 }

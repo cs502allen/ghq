@@ -127,6 +127,7 @@ export function GHQBoard({
           const lastMove = G.thisTurnMoves[G.thisTurnMoves.length - 1];
 
           if (
+            lastMove &&
             context.canReorient &&
             "orientation" in event &&
             lastMove.name === "MoveAndOrient" &&
@@ -646,6 +647,7 @@ export function GHQBoard({
               key={colIndex}
               className={classNames(
                 "relative",
+                "select-none",
                 bombardmentClass,
                 {
                   ["cursor-pointer"]:
@@ -775,16 +777,16 @@ export function GHQBoard({
                     height={pieceSize * 0.7}
                     className="select-none"
                     draggable="false"
-                    style={{
-                      transform: state.context.selectedPiece.piece.orientation
-                        ? isPrimaryPlayer("1")
-                          ? `rotate(${
-                              180 -
-                              state.context.selectedPiece.piece.orientation
-                            }deg)`
-                          : `rotate(${state.context.selectedPiece.piece.orientation}deg)`
-                        : `rotate(${add180 ? 180 : 0}deg)`,
-                    }}
+                    // style={{
+                    //   transform: state.context.selectedPiece.piece.orientation
+                    //     ? isPrimaryPlayer("1")
+                    //       ? `rotate(${
+                    //           180 -
+                    //           state.context.selectedPiece.piece.orientation
+                    //         }deg)`
+                    //       : `rotate(${state.context.selectedPiece.piece.orientation}deg)`
+                    //     : `rotate(${add180 ? 180 : 0}deg)`,
+                    // }}
                     alt={
                       Units[state.context.selectedPiece.piece.type]
                         .imagePathPrefix
