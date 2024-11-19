@@ -42,6 +42,7 @@ import {
 import ShareGameDialog from "./ExportGameDialog";
 import BoardContainer from "./BoardContainer";
 import MoveCounter from "./MoveCounter";
+import LongPressTD from "@/components/LongPressDiv";
 
 //coordinate string x,y
 type Annotations = {
@@ -126,6 +127,7 @@ export function GHQBoard({
           const lastMove = G.thisTurnMoves[G.thisTurnMoves.length - 1];
 
           if (
+            lastMove &&
             context.canReorient &&
             "orientation" in event &&
             lastMove.name === "MoveAndOrient" &&
@@ -138,10 +140,7 @@ export function GHQBoard({
               JSON.stringify(lastMove.args[0]) ===
               JSON.stringify(lastMove.args[1])
             ) {
-              moves.ChangeOrientation(
-                context.selectedPiece!.at,
-                event.orientation
-              );
+              moves.ChangeOrientation(lastMove.args[0], event.orientation);
             } else {
               // aim and reposition
               moves.MoveAndOrient(
@@ -162,11 +161,18 @@ export function GHQBoard({
             moves.Reinforce(context.unitKind, event.at);
         },
         moveAndOrient: ({ context, event }) => {
-          if ("orientation" in event) {
+          if (!context.stagedMove && "orientation" in event) {
+            moves.ChangeOrientation(
+              context.selectedPiece!.at,
+              event.orientation
+            );
+          } else {
             moves.MoveAndOrient(
               context.selectedPiece!.at,
               context.stagedMove,
-              event.orientation
+              "orientation" in event
+                ? event.orientation
+                : context.selectedPiece!.piece.orientation
             );
           }
         },
@@ -314,13 +320,24 @@ export function GHQBoard({
     }
 
     const aiming = state.matches("activePieceSelected.selectOrientation");
-    if (aiming && state.context.stagedMove) {
-      const [x, y] = state.context.stagedMove;
-      annotate[`${x},${y}`] = { ...annotate[`${x},${y}`], showAim: true };
 
-      const [oldX, oldY] = state.context.selectedPiece!.at;
-      annotate[`${oldX},${oldY}`] = {
-        ...annotate[`${oldX},${oldY}`],
+    if (aiming && state.context.stagedMove) {
+      const [x, y] = state.context.stagedMove!;
+      annotate[`${x},${y}`] = {
+        ...annotate[`${x},${y}`],
+        showAim: true,
+        hidePiece: true,
+      };
+      const [fromX, fromY] = state.context.selectedPiece!.at;
+      annotate[`${fromX},${fromY}`] = {
+        ...annotate[`${fromX},${fromY}`],
+        hidePiece: true,
+      };
+    } else if (aiming && state.context.selectedPiece) {
+      const [x, y] = state.context.selectedPiece.at;
+      annotate[`${x},${y}`] = {
+        ...annotate[`${x},${y}`],
+        showAim: true,
         hidePiece: true,
       };
     }
@@ -482,11 +499,6 @@ export function GHQBoard({
           //     square.orientation
           //   );
 
-          const selectingOrientation = Boolean(
-            square &&
-              Units[square.type].artilleryRange &&
-              annotationsForSquare?.selectedPiece
-          );
           const hidePiece = Boolean(annotations[`${x},${y}`]?.hidePiece);
 
           if (moveOrReinforce) {
@@ -522,7 +534,7 @@ export function GHQBoard({
                 animationDelay: `${moveOrder * MOVE_SPEED_MS}ms`,
               }}
             >
-              {square && !selectingOrientation && !hidePiece ? (
+              {square && !hidePiece ? (
                 <div
                   className={classNames(
                     "flex items-center justify-center select-none font-bold text-3xl",
@@ -608,12 +620,6 @@ export function GHQBoard({
                 : ""
               : "";
 
-          const selectingOrientation = Boolean(
-            square &&
-              Units[square.type].artilleryRange &&
-              annotationsForSquare?.selectedPiece
-          );
-
           const aiming = Boolean(
             annotations[`${rowIndex},${colIndex}`]?.showAim
           );
@@ -622,7 +628,19 @@ export function GHQBoard({
           );
 
           return (
-            <td
+            <LongPressTD
+              durationMS={350}
+              onLongPress={() => {
+                // @todo aidan seems like this is retained weirdly between renders
+                if (!state.matches("selectEnemyToCapture") && square) {
+                  send({
+                    type: "AIM_ACTIVE_PIECE",
+                    at: [rowIndex, colIndex],
+                    piece: square,
+                    currentBoard: G.board,
+                  });
+                }
+              }}
               onClick={() => {
                 if (state.matches("selectEnemyToCapture") || !square) {
                   send({
@@ -644,6 +662,7 @@ export function GHQBoard({
               key={colIndex}
               className={classNames(
                 "relative",
+                "select-none",
                 bombardmentClass,
                 {
                   ["cursor-pointer"]:
@@ -666,7 +685,7 @@ export function GHQBoard({
             >
               {showTarget ? (
                 <div
-                  className="absolute w-full h-full bg-red-900 top-0 left-0"
+                  className="absolute  w-full h-full bg-red-900 top-0 left-0"
                   style={{ pointerEvents: "none" }}
                 ></div>
               ) : null}
@@ -699,44 +718,6 @@ export function GHQBoard({
                 colIndex={colIndex}
                 rowIndex={rowIndex}
               />
-              {/*{square && !selectingOrientation && !hidePiece ? (*/}
-              {/*  <div*/}
-              {/*    className={classNames(*/}
-              {/*      "flex items-center justify-center select-none font-bold text-3xl",*/}
-              {/*      square.player === "RED" ? "text-red-600" : "text-blue-600",*/}
-              {/*      {*/}
-              {/*        // @todo this is really only for infantry. Adjust when we do orientation*/}
-              {/*        // ["rotate-180"]:*/}
-              {/*        //   (isPrimaryPlayer("0") && square.player === "BLUE") ||*/}
-              {/*        //   (isPrimaryPlayer("1") && square.player === "RED"),*/}
-              {/*      }*/}
-              {/*    )}*/}
-              {/*  >*/}
-              {/*    <img*/}
-              {/*      src={`/${*/}
-              {/*        Units[square.type].imagePathPrefix*/}
-              {/*      }-${square.player.toLowerCase()}.png`}*/}
-              {/*      width="52"*/}
-              {/*      height="52"*/}
-              {/*      className={classNames("select-none", {*/}
-              {/*        ["opacity-50"]:*/}
-              {/*          (ctx.currentPlayer === "0" &&*/}
-              {/*            square.player === "BLUE") ||*/}
-              {/*          (ctx.currentPlayer === "1" && square.player === "RED"),*/}
-              {/*      })}*/}
-              {/*      draggable="false"*/}
-              {/*      style={{*/}
-              {/*        transform: square.orientation*/}
-              {/*          ? isPrimaryPlayer("1")*/}
-              {/*            ? `rotate(${square.orientation - 180}deg)`*/}
-              {/*            : `rotate(${square.orientation}deg)`*/}
-              {/*          : `rotate(${add180 ? 180 : 0}deg)`,*/}
-              {/*      }}*/}
-              {/*      alt={Units[square.type].imagePathPrefix}*/}
-              {/*    />*/}
-              {/*  </div>*/}
-              {/*) : null}*/}
-
               {annotationsForSquare?.showProxyPiece ? (
                 <div
                   className={classNames(
@@ -779,38 +760,6 @@ export function GHQBoard({
                   />
                 </div>
               ) : null}
-
-              {square && selectingOrientation && !hidePiece ? (
-                <SelectOrientation
-                  squareSize={squareSize}
-                  initialOrientation={square.orientation!}
-                  player={square.player}
-                  onChange={(orientation: Orientation) => {
-                    send({
-                      type: "CHANGE_ORIENTATION",
-                      orientation: orientation,
-                    });
-                  }}
-                >
-                  <img
-                    src={`/${
-                      Units[square.type].imagePathPrefix
-                    }-${square.player.toLowerCase()}.png`}
-                    width={pieceSize * 0.7}
-                    height={pieceSize * 0.7}
-                    className="select-none"
-                    draggable="false"
-                    style={{
-                      transform: square.orientation
-                        ? isPrimaryPlayer("1")
-                          ? `rotate(${180 - square.orientation}deg)`
-                          : `rotate(${square.orientation}deg)`
-                        : `rotate(${add180 ? 180 : 0}deg)`,
-                    }}
-                    alt={Units[square.type].imagePathPrefix}
-                  />
-                </SelectOrientation>
-              ) : null}
               {annotationsForSquare?.moveTo &&
               !aiming &&
               !state.matches("selectEnemyToCapture") ? (
@@ -843,16 +792,6 @@ export function GHQBoard({
                     height={pieceSize * 0.7}
                     className="select-none"
                     draggable="false"
-                    style={{
-                      transform: state.context.selectedPiece.piece.orientation
-                        ? isPrimaryPlayer("1")
-                          ? `rotate(${
-                              180 -
-                              state.context.selectedPiece.piece.orientation
-                            }deg)`
-                          : `rotate(${state.context.selectedPiece.piece.orientation}deg)`
-                        : `rotate(${add180 ? 180 : 0}deg)`,
-                    }}
                     alt={
                       Units[state.context.selectedPiece.piece.type]
                         .imagePathPrefix
@@ -860,7 +799,7 @@ export function GHQBoard({
                   />
                 </SelectOrientation>
               ) : null}
-            </td>
+            </LongPressTD>
           );
         })}
       </tr>
@@ -1156,26 +1095,32 @@ function BoardCoordinateLabels({
   return (
     <>
       <div
-        className={classNames("absolute top-0 left-1 text-xs font-bold", color)}
+        className={classNames(
+          "absolute top-0 left-1 select-none text-xs font-bold",
+          color
+        )}
       >
         {isPrimaryPlayer("0") && colIndex === 0 && rowIndexToRank(rowIndex)}
       </div>
       <div
         className={classNames(
-          "absolute bottom-0 left-1 text-xs font-bold",
+          "absolute bottom-0 left-1 select-none text-xs font-bold",
           color
         )}
       >
         {isPrimaryPlayer("0") && rowIndex === 7 && colIndexToFile(colIndex)}
       </div>
       <div
-        className={classNames("absolute top-0 left-1 text-xs font-bold", color)}
+        className={classNames(
+          "absolute select-none top-0 left-1 text-xs font-bold",
+          color
+        )}
       >
         {isPrimaryPlayer("1") && colIndex === 7 && rowIndexToRank(rowIndex)}
       </div>
       <div
         className={classNames(
-          "absolute bottom-0 left-1 text-xs font-bold",
+          "absolute bottom-0 left-1 select-none text-xs font-bold",
           color
         )}
       >

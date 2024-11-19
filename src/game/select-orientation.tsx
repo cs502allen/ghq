@@ -44,8 +44,6 @@ export function SelectOrientation(
     };
     const orientation = getClosestOrientation((angle as number) - 45 / 2);
 
-    // console.log(orientation);
-
     if (asBlue) {
       if (orientation === 0) setStagedOrientation(180);
       else if (orientation === 45) setStagedOrientation(225);
@@ -68,122 +66,26 @@ export function SelectOrientation(
     }, [stagedOrientation, props.onChange])
   );
 
-  const angles: { [key: string]: Orientation } = {
-    topLeft: asBlue ? 135 : 315,
-    top: asBlue ? 180 : 0,
-    topRight: asBlue ? 225 : 45,
-    left: asBlue ? 90 : 270,
-    right: asBlue ? 270 : 90,
-    bottomLeft: asBlue ? 45 : 225,
-    bottom: asBlue ? 0 : 180,
-    bottomRight: asBlue ? 315 : 135,
-  };
-
   return (
     <div
       // @ts-ignore
       ref={ref}
       className={classNames(
-        "top-0 absolute overflow-hidden opacity-80 flex flex-col",
+        "top-0 absolute overflow-hidden opacity-80 flex items-center justify-center select-none",
         color
       )}
       style={{ width: props.squareSize, height: props.squareSize }}
     >
-      <div className="grid grid-cols-7 gap-2 w-full">
-        <div
-          className="col-span-2 hover:bg-amber-500  bg-slate-400 -rotate-45"
-          onMouseOver={() => setStagedOrientation(angles.topLeft)}
-          onClick={(e) => {
-            e.stopPropagation();
-            props.onChange(angles.topLeft);
-          }}
-        >
-          ▲
-        </div>
-        <div
-          className="col-span-3  hover:bg-amber-500 bg-slate-400"
-          onMouseOver={() => setStagedOrientation(angles.top)}
-          onClick={(e) => {
-            e.stopPropagation();
-            props.onChange(angles.top);
-          }}
-        >
-          ▲
-        </div>
-        <div
-          className="col-span-2 hover:bg-amber-500  bg-slate-400 rotate-45"
-          onMouseOver={() => setStagedOrientation(angles.topRight)}
-          onClick={(e) => {
-            e.stopPropagation();
-            props.onChange(angles.topRight);
-          }}
-        >
-          ▲
-        </div>
-      </div>
-      <div className="grid grid-cols-7 flex-1 items-center ">
-        <div
-          className="col-span-2 hover:bg-amber-500  bg-slate-400 -rotate-90 "
-          onMouseOver={() => setStagedOrientation(angles.left)}
-          onClick={(e) => {
-            e.stopPropagation();
-            props.onChange(angles.left);
-          }}
-        >
-          ▲
-        </div>
-        <div
-          className="col-span-3"
-          style={{
-            transform: `rotate(${
-              (stagedOrientation + (asBlue ? -180 : 0) + 360) % 360
-            }deg)`,
-          }}
-        >
-          {props.children}
-        </div>
-        <div
-          className="col-span-2 hover:bg-amber-500  bg-slate-400 rotate-90"
-          onMouseOver={() => setStagedOrientation(angles.right)}
-          onClick={(e) => {
-            e.stopPropagation();
-            props.onChange(angles.right);
-          }}
-        >
-          ▲
-        </div>
-      </div>
-      <div className="grid grid-cols-7 gap-2 ">
-        <div
-          className="col-span-2 hover:bg-amber-500  bg-slate-400 rotate-[-135deg]"
-          onMouseOver={() => setStagedOrientation(angles.bottomLeft)}
-          onClick={(e) => {
-            e.stopPropagation();
-            props.onChange(angles.bottomLeft);
-          }}
-        >
-          ▲
-        </div>
-        <div
-          className="col-span-3  hover:bg-amber-500 bg-slate-400 rotate-180"
-          onMouseOver={() => setStagedOrientation(angles.bottom)}
-          onClick={(e) => {
-            e.stopPropagation();
-            props.onChange(angles.bottom);
-          }}
-        >
-          ▲
-        </div>
-        <div
-          className="col-span-2 hover:bg-amber-500  bg-slate-400 rotate-[135deg]"
-          onMouseOver={() => setStagedOrientation(angles.bottomRight)}
-          onClick={(e) => {
-            e.stopPropagation();
-            props.onChange(angles.bottomRight);
-          }}
-        >
-          ▲
-        </div>
+      <div
+        className="select-none"
+        key={stagedOrientation}
+        style={{
+          transform: `rotate(${
+            (stagedOrientation + (asBlue ? -180 : 0) + 360) % 360
+          }deg)`,
+        }}
+      >
+        {props.children}
       </div>
     </div>
   );
@@ -230,10 +132,10 @@ function useAnyClick(handler: (event: MouseEvent) => void) {
       handler(event);
     };
 
-    document.addEventListener("click", handleClick);
+    document.addEventListener("mouseup", handleClick);
 
     return () => {
-      document.removeEventListener("click", handleClick);
+      document.removeEventListener("mouseup", handleClick);
     };
   }, [handler]);
 }
