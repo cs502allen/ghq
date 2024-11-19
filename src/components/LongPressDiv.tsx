@@ -17,7 +17,7 @@ function LongPressTD(
     if (onLongPress) {
       onLongPress();
     }
-  }, [setTimer]);
+  }, [setTimer, onLongPress]);
 
   // Start the timer when the mouse/touch is down
   const startPressTimer = () => {

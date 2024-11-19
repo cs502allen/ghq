@@ -152,13 +152,8 @@ export const turnStateMachine = createMachine(
           },
           AIM_ACTIVE_PIECE: {
             guard: ({ context, event }) => {
-              console.log("GOT HERE");
-              console.log("AIMING", context, event);
               const isArtillery =
                 typeof Units[event.piece!.type].artilleryRange !== "undefined";
-
-              console.log("HERE", isArtillery);
-              console.log("HERE 2", context.canReorient, event.at);
 
               if (
                 isArtillery &&
@@ -182,26 +177,18 @@ export const turnStateMachine = createMachine(
               );
             },
             actions: assign(({ context, event }) => {
-              const restrictToReorientation =
-                context.canReorient &&
-                context.canReorient[0] === event.at[0] &&
-                context.canReorient[1] === event.at[1];
-
               return {
                 selectedPiece: {
                   piece: event.piece,
                   at: event.at,
                 },
-                allowedMoves: restrictToReorientation
-                  ? []
-                  : movesForActivePiece(event.at, event.currentBoard),
+                allowedMoves: [],
               };
             }),
             target: "activePieceSelected.selectOrientation",
           },
           SELECT_ACTIVE_PIECE: {
             guard: ({ context, event }) => {
-              console.log("world", context);
               return (
                 // can't have been moved before
                 !context.disabledPieces?.some(
@@ -301,7 +288,6 @@ export const turnStateMachine = createMachine(
             on: {
               CHANGE_ORIENTATION: {
                 guard: ({ context, event }) => {
-                  console.log("I AM HERE ", context, event);
                   // is artillery
                   return (
                     typeof Units[context.selectedPiece!.piece.type]
@@ -309,7 +295,7 @@ export const turnStateMachine = createMachine(
                   );
                 },
                 actions: [
-                  "moveAndOrient",
+                  "changeOrientation",
                   assign(({ event, context }) => ({
                     canReorient: context.stagedMove
                       ? context.stagedMove
@@ -375,7 +361,6 @@ export const turnStateMachine = createMachine(
           },
           SELECT_SQUARE: {
             guard: ({ context, event }) => {
-              console.log("WEIRD HERE");
               return !!context.allowedMoves?.some(
                 (placement) =>
                   placement[0] === event.at[0] && placement[1] === event.at[1]

@@ -139,10 +139,7 @@ export function GHQBoard({
               JSON.stringify(lastMove.args[0]) ===
               JSON.stringify(lastMove.args[1])
             ) {
-              moves.ChangeOrientation(
-                context.selectedPiece!.at,
-                event.orientation
-              );
+              moves.ChangeOrientation(lastMove.args[0], event.orientation);
             } else {
               // aim and reposition
               moves.MoveAndOrient(
@@ -179,8 +176,6 @@ export function GHQBoard({
       },
     })
   );
-
-  console.log(JSON.stringify(state?.value));
 
   const renderBoard = ctx.gameover
     ? G.board
@@ -620,7 +615,6 @@ export function GHQBoard({
             <LongPressTD
               durationMS={350}
               onLongPress={() => {
-                console.log("GOT A ONG PRESS");
                 // @todo aidan seems like this is retained weirdly between renders
                 if (!state.matches("selectEnemyToCapture") && square) {
                   send({
