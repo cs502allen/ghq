@@ -42,7 +42,7 @@ export function SelectOrientation(
         return currDiff < prevDiff ? curr : prev;
       }) as Orientation;
     };
-    const orientation = getClosestOrientation((angle as number) - 45 / 2);
+    const orientation = getClosestOrientation(angle as number);
 
     if (asBlue) {
       if (orientation === 0) setStagedOrientation(180);
