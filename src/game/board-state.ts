@@ -342,30 +342,6 @@ export const turnStateMachine = createMachine(
           },
         },
         on: {
-          // change the piece we're selecting
-          SELECT_ACTIVE_PIECE: {
-            guard: ({ context, event }) => {
-              return (
-                // can't have been moved before
-                !context.disabledPieces?.some(
-                  (placement) =>
-                    placement[0] === event.at[0] && placement[1] === event.at[1]
-                ) &&
-                // my piece
-                event.piece.player === context.player
-              );
-            },
-            actions: assign(({ context, event }) => {
-              return {
-                selectedPiece: {
-                  piece: event.piece,
-                  at: event.at,
-                },
-                allowedMoves: movesForActivePiece(event.at, event.currentBoard),
-              };
-            }),
-            target: "activePieceSelected",
-          },
           CHANGE_ORIENTATION: {
             guard: ({ context, event }) => {
               // is artillery
