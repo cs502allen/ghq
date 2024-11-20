@@ -286,6 +286,7 @@ export const turnStateMachine = createMachine(
           },
           selectOrientation: {
             on: {
+              SELECT_SQUARE: {},
               CHANGE_ORIENTATION: [
                 {
                   guard: ({ context, event }) => {
