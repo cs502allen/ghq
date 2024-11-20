@@ -7,8 +7,22 @@
   --red: #ff7c7c;
 }
 
+.game-canvas {
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+  touch-action: none;
+}
+
+.no-action {
+  touch-action: none;
+}
 body {
   font-family: Arial, Helvetica, sans-serif;
+  touch-action: none; /* Prevent default scrolling and other gestures */
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: none;
 }
 
 .scale-animate {

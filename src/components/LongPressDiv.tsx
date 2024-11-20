@@ -38,7 +38,7 @@ function LongPressTD(
 
   return (
     <td
-      className="bg-green-50"
+      className="bg-green-50 no-action "
       onMouseDown={startPressTimer}
       onMouseUp={cancelPressTimer}
       onMouseLeave={cancelPressTimer}

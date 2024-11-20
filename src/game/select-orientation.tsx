@@ -96,15 +96,15 @@ const useMouseAngle = () => {
   const ref = useRef(null);
 
   useEffect(() => {
-    const handleMouseMove = (event: any) => {
+    const handleMove = (clientX: number, clientY: number) => {
       if (ref.current) {
         // @ts-ignore
         const rect = ref.current.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
 
-        const deltaX = event.clientX - centerX;
-        const deltaY = event.clientY - centerY;
+        const deltaX = clientX - centerX;
+        const deltaY = clientY - centerY;
 
         let radian = Math.atan2(deltaY, deltaX); // Calculate angle in radians
         let degrees = radian * (180 / Math.PI); // Convert to degrees
@@ -116,26 +116,45 @@ const useMouseAngle = () => {
       }
     };
 
+    const handleMouseMove = (event: MouseEvent) => {
+      handleMove(event.clientX, event.clientY);
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      if (event.touches.length > 0) {
+        const touch = event.touches[0];
+        handleMove(touch.clientX, touch.clientY);
+      }
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("touchmove", handleTouchMove);
     };
   }, []);
 
   return [angle, ref];
 };
 
-function useAnyClick(handler: (event: MouseEvent) => void) {
+function useAnyClick(handler: (event: MouseEvent | TouchEvent) => void) {
   useEffect(() => {
-    const handleClick = (event: MouseEvent) => {
+    const handleMouseClick = (event: MouseEvent) => {
       handler(event);
     };
 
-    document.addEventListener("mouseup", handleClick);
+    const handleTouchClick = (event: TouchEvent) => {
+      handler(event);
+    };
+
+    document.addEventListener("mouseup", handleMouseClick);
+    document.addEventListener("touchend", handleTouchClick);
 
     return () => {
-      document.removeEventListener("mouseup", handleClick);
+      document.removeEventListener("mouseup", handleMouseClick);
+      document.removeEventListener("touchend", handleTouchClick);
     };
   }, [handler]);
 }

@@ -517,6 +517,7 @@ export function GHQBoard({
           return (
             <div
               key={`${x},${y}`}
+              id="game-canvas"
               className={classNames(
                 "pointer-events-none absolute w-20 h-5 flex items-center justify-center",
                 { ["animate-move"]: state.matches("replay.animate") },
