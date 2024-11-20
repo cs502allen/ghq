@@ -21,7 +21,15 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "GHQ",
-  description: "Play General Headquarters",
+  description: "Play GHQ online",
+  openGraph: {
+    title: "GHQ",
+    siteName: "GHQ",
+    description: "Play GHQ online",
+    type: "website",
+    locale: "en_US",
+    url: "https://www.playghq.com",
+  },
 };
 
 export default function RootLayout({
