@@ -975,7 +975,7 @@ export function GHQBoard({
       </div>
 
       <div
-        className="order-1 md:order-2 flex-1 flex flex-col items-center justify-center"
+        className="order-1 md:order-2 flex-1 flex flex-col items-center justify-center no-action"
         ref={measureRef}
       >
         <div className="flex">{isPrimaryPlayer("1") ? redBank : blueBank}</div>

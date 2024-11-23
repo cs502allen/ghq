@@ -74,7 +74,11 @@ export function SelectOrientation(
         "top-0 absolute overflow-hidden opacity-80 flex items-center justify-center select-none",
         color
       )}
-      style={{ width: props.squareSize, height: props.squareSize }}
+      style={{
+        width: props.squareSize,
+        height: props.squareSize,
+        touchAction: "none",
+      }}
     >
       <div
         className="select-none"
