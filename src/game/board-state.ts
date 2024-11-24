@@ -225,6 +225,64 @@ export const turnStateMachine = createMachine(
         states: {
           selectSquare: {
             on: {
+              SELECT_ACTIVE_PIECE: {
+                guard: ({ context, event }) => {
+                  return (
+                    // can't have been moved before
+                    !context.disabledPieces?.some(
+                      (placement) =>
+                        placement[0] === event.at[0] &&
+                        placement[1] === event.at[1]
+                    ) &&
+                    // my piece
+                    event.piece.player === context.player
+                  );
+                },
+                actions: assign(({ context, event }) => {
+                  const restrictToReorientation =
+                    context.canReorient &&
+                    context.canReorient[0] === event.at[0] &&
+                    context.canReorient[1] === event.at[1];
+
+                  return {
+                    selectedPiece: {
+                      piece: event.piece,
+                      at: event.at,
+                    },
+                    allowedMoves: restrictToReorientation
+                      ? []
+                      : movesForActivePiece(event.at, event.currentBoard),
+                  };
+                }),
+                target: "#turn-machine.activePieceSelected",
+              },
+              SELECT_RESERVE_PIECE: {
+                // has a reserve here
+                guard: ({ context, event }) => {
+                  const spawnPosition = spawnPositionsForPlayer(
+                    event.currentBoard,
+                    context.player
+                  );
+
+                  return (
+                    event.reserve[event.kind] > 0 && spawnPosition.length > 0
+                  );
+                },
+                actions: assign(({ context, event }) => {
+                  return {
+                    // selectedPiece: {
+                    //   piece: event.piece,
+                    //   at: event.at,
+                    // },
+                    unitKind: event.kind,
+                    allowedMoves: spawnPositionsForPlayer(
+                      event.currentBoard,
+                      context.player
+                    ),
+                  };
+                }),
+                target: "#turn-machine.reservePieceSelected",
+              },
               SELECT_SQUARE: [
                 {
                   guard: ({ context, event }) => {
@@ -435,6 +493,36 @@ export const turnStateMachine = createMachine(
       //move types
       reservePieceSelected: {
         on: {
+          SELECT_ACTIVE_PIECE: {
+            guard: ({ context, event }) => {
+              return (
+                // can't have been moved before
+                !context.disabledPieces?.some(
+                  (placement) =>
+                    placement[0] === event.at[0] && placement[1] === event.at[1]
+                ) &&
+                // my piece
+                event.piece.player === context.player
+              );
+            },
+            actions: assign(({ context, event }) => {
+              const restrictToReorientation =
+                context.canReorient &&
+                context.canReorient[0] === event.at[0] &&
+                context.canReorient[1] === event.at[1];
+
+              return {
+                selectedPiece: {
+                  piece: event.piece,
+                  at: event.at,
+                },
+                allowedMoves: restrictToReorientation
+                  ? []
+                  : movesForActivePiece(event.at, event.currentBoard),
+              };
+            }),
+            target: "#turn-machine.activePieceSelected",
+          },
           SELECT_RESERVE_PIECE: {
             // has a reserve here
             guard: ({ context, event }) => {
