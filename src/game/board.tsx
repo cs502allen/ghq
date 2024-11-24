@@ -151,6 +151,10 @@ export function GHQBoard({
               );
             }
           } else if ("orientation" in event) {
+            // don't count as move if it's to the same direction
+            if (context.selectedPiece?.piece.orientation === event.orientation)
+              return;
+
             moves.ChangeOrientation(
               context.selectedPiece!.at,
               event.orientation
