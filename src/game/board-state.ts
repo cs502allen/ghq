@@ -87,6 +87,7 @@ export const turnStateMachine = createMachine(
           disabledPieces: event.disabledPieces,
           player: event.player,
           renderMoves: event.renderMoves,
+          canReorient: undefined,
         })),
         target: ".replay",
       },
