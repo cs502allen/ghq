@@ -518,7 +518,7 @@ export function getBoardInfo(
 ): TutorialSetupData | null {
   if (fen) {
     const boardState = FENtoBoardState(fen);
-    return { boardState, isPuzzle: false, boardArrows: [] };
+    return { boardState, category: "puzzles", boardArrows: [] };
   }
 
   if (boardType) {
@@ -527,3 +527,6 @@ export function getBoardInfo(
 
   return null;
 }
+
+// https://www.playghq.com/learn?jfen=q1i5/2r%E2%86%99i3r%E2%86%93/6f1/i2r%E2%86%931fh%E2%86%931/I1i1f2I/1R%E2%86%91F5/3R%E2%86%913I/2P1F1R%E2%86%91Q%20II%20IIII
+// https://www.playghq.com/learn?jfen=qpi1f1f1/i1r%E2%86%99i1f2/2r%E2%86%931h%E2%86%933/2i1t%E2%86%983/1F1T%E2%86%914/I2R%E2%86%972I1/2I2I1I/1R%E2%86%912PFR%E2%86%91Q%20IIF%20IIIIR

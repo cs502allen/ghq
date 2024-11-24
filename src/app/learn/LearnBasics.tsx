@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UnitType } from "@/game/engine";
+import { PIECE_INFO, PieceInfo } from "@/lib/game-info";
 
 export default function LearnBasics() {
   return (
@@ -241,72 +241,6 @@ function HowArtilleryCapture() {
     </Card>
   );
 }
-
-interface PieceInfo {
-  name: string;
-  image: string;
-  moves: string;
-  captures?: string;
-  bombards?: string;
-  capturedBy: string;
-  special?: string;
-}
-
-const PIECE_INFO: Record<UnitType, PieceInfo> = {
-  INFANTRY: {
-    name: "Infantry",
-    image: "regular-infantry",
-    moves: "1 square, any direction",
-    captures: "1 square, adjacent",
-    capturedBy: "2 adjacent infantry",
-  },
-  ARMORED_INFANTRY: {
-    name: "Armored Infantry",
-    image: "armored-infantry",
-    moves: "2 squares, any direction",
-    captures: "1 square, adjacent",
-    capturedBy: "2 adjacent infantry",
-  },
-  AIRBORNE_INFANTRY: {
-    name: "Airborne Infantry",
-    image: "paratrooper-infantry",
-    moves: "1 square, any direction",
-    captures: "1 square, adjacent",
-    capturedBy: "2 adjacent infantry",
-    special: "While on home row, it can move to any square!",
-  },
-  ARTILLERY: {
-    name: "Artillery",
-    image: "regular-artillery",
-    moves: "1 square, any direction",
-    bombards: "2 squares, forward",
-    capturedBy: "1 adjacent infantry",
-    special: "Rotates any direction",
-  },
-  ARMORED_ARTILLERY: {
-    name: "Armored Artillery",
-    image: "armored-artillery",
-    moves: "2 squares, any direction",
-    bombards: "2 squares, forward",
-    capturedBy: "1 adjacent infantry",
-    special: "Rotates any direction",
-  },
-  HEAVY_ARTILLERY: {
-    name: "Heavy Artillery",
-    image: "heavy-artillery",
-    moves: "1 square, any direction",
-    bombards: "3 squares, forward",
-    capturedBy: "1 adjacent infantry",
-    special: "Rotates any direction",
-  },
-  HQ: {
-    name: "HQ",
-    image: "hq",
-    moves: "1 square, any direction",
-    capturedBy: "2 adjacent infantry",
-    special: "Can't defend, can't attack.",
-  },
-};
 
 function PieceCard({ piece }: { piece: PieceInfo }) {
   return (
