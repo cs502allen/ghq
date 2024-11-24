@@ -9,6 +9,7 @@ import LiveGamesList from "./LiveGamesList";
 import LatestMessage from "@/components/LatestMessage";
 import Leaderboard from "./Leaderboard";
 import LearnPage from "./learn/page";
+import { Community } from "@/components/Community";
 function App() {
   const router = useRouter();
 
@@ -44,12 +45,15 @@ function App() {
             </div>
           </div>
 
-          <div className="border rounded p-4 min-h-[400px] bg-slate-50 flex flex-col gap-2">
+          <div className="border rounded p-4 bg-slate-50 flex flex-col gap-2">
             <Learn />
           </div>
         </div>
 
         <div className="col-span-1 flex flex-col gap-2">
+          <div className="border rounded p-4 bg-slate-50 flex flex-col gap-2">
+            <Community />
+          </div>
           <div className="border rounded p-4 bg-slate-50">
             <Leaderboard />
           </div>
