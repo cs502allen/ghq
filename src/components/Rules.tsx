@@ -30,14 +30,6 @@ export default function Rules() {
         </a>{" "}
         video).
       </div>
-
-      <div>
-        See our{" "}
-        <Link className="text-blue-600 hover:text-blue-400" href="/learn">
-          learn
-        </Link>{" "}
-        page to play through some basic gameplay scenarios yourself!
-      </div>
     </div>
   );
 }

@@ -8,7 +8,7 @@ import Header from "@/components/Header";
 import LiveGamesList from "./LiveGamesList";
 import LatestMessage from "@/components/LatestMessage";
 import Leaderboard from "./Leaderboard";
-
+import LearnPage from "./learn/page";
 function App() {
   const router = useRouter();
 
@@ -58,6 +58,7 @@ function App() {
           </div>
         </div>
       </div>
+      <LearnPage />
     </div>
   );
 }

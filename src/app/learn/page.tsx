@@ -53,9 +53,7 @@ export default function Page() {
 
   if (!App) {
     return (
-      <div className="p-2 flex flex-col gap-4 lg:px-48">
-        <Header />
-
+      <div className=" flex flex-col gap-4">
         {loading && (
           <div className="flex gap-1">
             <Loader2 className="animate-spin w-6 h-6" /> Loading...
