@@ -17,9 +17,9 @@
 .no-action {
   touch-action: none;
 }
+
 body {
   font-family: Arial, Helvetica, sans-serif;
-  touch-action: none; /* Prevent default scrolling and other gestures */
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
