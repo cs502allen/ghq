@@ -43,6 +43,7 @@ import ShareGameDialog from "./ExportGameDialog";
 import BoardContainer from "./BoardContainer";
 import MoveCounter from "./MoveCounter";
 import LongPressTD from "@/components/LongPressDiv";
+import HowToPlayView from "./HowToPlayView";
 
 //coordinate string x,y
 type Annotations = {
@@ -971,7 +972,9 @@ export function GHQBoard({
           </div>
         )}
 
-        <div className="flex justify-center mt-2"></div>
+        <div className="mt-4">
+          <HowToPlayView />
+        </div>
       </div>
 
       <div
