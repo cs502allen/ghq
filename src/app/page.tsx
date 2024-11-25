@@ -8,8 +8,9 @@ import Header from "@/components/Header";
 import LiveGamesList from "./LiveGamesList";
 import LatestMessage from "@/components/LatestMessage";
 import Leaderboard from "./Leaderboard";
-import LearnPage from "./learn/page";
+import LearnPage, { Section } from "./learn/page";
 import { Community } from "@/components/Community";
+import LearnBasics from "./learn/LearnBasics";
 function App() {
   const router = useRouter();
 
@@ -46,14 +47,14 @@ function App() {
           </div>
 
           <div className="border rounded p-4 bg-slate-50 flex flex-col gap-2">
+            <Community />
+          </div>
+          <div className="border rounded p-4 bg-slate-50 flex flex-col gap-2">
             <Learn />
           </div>
         </div>
 
         <div className="col-span-1 flex flex-col gap-2">
-          <div className="border rounded p-4 bg-slate-50 flex flex-col gap-2">
-            <Community />
-          </div>
           <div className="border rounded p-4 bg-slate-50">
             <Leaderboard />
           </div>
@@ -62,7 +63,9 @@ function App() {
           </div>
         </div>
       </div>
-      <LearnPage />
+      <Section heading="Basics">
+        <LearnBasics />
+      </Section>
     </div>
   );
 }

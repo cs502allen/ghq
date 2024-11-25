@@ -39,6 +39,10 @@ export default function Leaderboard() {
     <div className="flex flex-col gap-2">
       <div className="text-2xl">Leaderboard</div>
 
+      {!isSignedIn && (
+        <div className="text-gray-600">Sign in to see the top players!</div>
+      )}
+
       {loading && (
         <div className="flex flex-col gap-2">
           <div className="py-2 px-3 bg-gray-300 animate-pulse border border-gray-200 rounded-lg h-8"></div>

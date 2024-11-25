@@ -75,8 +75,6 @@ export default function LiveGamesList() {
                   {game.player1}
                 </div>{" "}
                 ({game.player1Elo})<span className="text-gray-500"> vs.</span>
-              </div>
-              <div className="flex gap-1">
                 <div
                   className={classNames(
                     game.player2 === game.winner && "text-green-700"
@@ -88,7 +86,7 @@ export default function LiveGamesList() {
               </div>
             </div>
 
-            <div className="flex flex-col justify-end items-end">
+            <div className="flex gap-1 items-center text-sm">
               <div>{(game.status ?? "ongoing").toLowerCase()}</div>
 
               <div className="text-gray-500">
