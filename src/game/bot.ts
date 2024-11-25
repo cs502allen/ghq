@@ -9,7 +9,8 @@ export function newBotGame(): Game<GHQState> {
     if (!oldSetup) throw new Error("No setup function found");
     const state = oldSetup({ ctx, ...plugins }, setupData);
     state.isOnline = true;
-    state.timeControl = 100 * 60 * 1000;
+    state.timeControl = 0;
+    state.bonusTime = 0;
     return state;
   };
 

@@ -45,6 +45,8 @@ const CountdownTimer = ({
   }, [startDate, totalTimeAllowed, elapsed, active]);
 
   const formatTime = (timeInMs: number) => {
+    if (totalTimeAllowed === 0) return "∞";
+
     const totalSeconds = Math.floor(timeInMs / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;

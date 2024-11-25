@@ -1,10 +1,10 @@
 import { GameoverState, GHQState, Player } from "./engine";
 
 export function getGameoverState(G: GHQState): GameoverState | undefined {
-  if (G.redElapsed > G.timeControl) {
+  if (G.timeControl > 0 && G.redElapsed > G.timeControl) {
     return newWinner("BLUE", "on time");
   }
-  if (G.blueElapsed > G.timeControl) {
+  if (G.timeControl > 0 && G.blueElapsed > G.timeControl) {
     return newWinner("RED", "on time");
   }
 
