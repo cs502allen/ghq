@@ -21,11 +21,12 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "GHQ",
-  description: "Play GHQ online",
+  description: "Play GHQ online, learn to play, and join the community.",
   openGraph: {
     title: "GHQ",
     siteName: "GHQ",
-    description: "Play GHQ online",
+    description: "Play GHQ online, learn to play, and join the community.",
+    images: ["/ogimage.png"],
     type: "website",
     locale: "en_US",
     url: "https://www.playghq.com",
