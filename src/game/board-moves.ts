@@ -5,9 +5,12 @@ import {
   Coordinate,
   GHQState,
   NonNullSquare,
+  Orientation,
   orientations,
   Player,
   ReserveFleet,
+  Square,
+  Units,
 } from "./engine";
 import { movesForActivePiece, spawnPositionsForPlayer } from "./move-logic";
 
@@ -174,4 +177,54 @@ function moveToNotation(move: AllowedMove): string {
     case "Skip":
       return "Skip";
   }
+}
+
+export function isBombardedBy(
+  board: GHQState["board"],
+  fromCoordinate: Coordinate,
+  toCoordinate: Coordinate,
+  orientation: Orientation | undefined,
+  target: Coordinate
+): boolean {
+  const square = board[fromCoordinate[0]][fromCoordinate[1]];
+  if (!square || orientation === undefined) {
+    return false;
+  }
+
+  const orientationVectors = {
+    0: [-1, 0], // Up
+    45: [-1, 1], // Top-Right
+    90: [0, 1], // Right
+    135: [1, 1], // Bottom-Right
+    180: [1, 0], // Down
+    225: [1, -1], // Bottom-Left
+    270: [0, -1], // Left
+    315: [-1, -1], // Top-Left
+  };
+
+  const range = Units[square.type].artilleryRange!;
+
+  let currentX = toCoordinate[0];
+  let currentY = toCoordinate[1];
+  const orientationVector = orientationVectors[orientation];
+
+  for (let i = 0; i < range; i++) {
+    currentX += orientationVector[0];
+    currentY += orientationVector[1];
+
+    // off board, stop
+    if (!(currentX >= 0 && currentX < 8 && currentY >= 0 && currentY < 8)) {
+      break;
+    }
+
+    if (currentX === target[0] && currentY === target[1]) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+export function getOpponent(player: Player): Player {
+  return player === "RED" ? "BLUE" : "RED";
 }

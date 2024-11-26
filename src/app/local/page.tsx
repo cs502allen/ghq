@@ -3,12 +3,12 @@
 import { Client } from "boardgame.io/react";
 import { GHQGame } from "@/game/engine";
 import { useState } from "react";
-import { GHQBoard } from "@/game/board";
 import ReplayCapability from "@/game/ReplayCapability";
+import { GHQBoardV2 } from "@/game/boardv2";
 
 const App = Client({
   game: GHQGame,
-  board: GHQBoard,
+  board: GHQBoardV2,
 });
 
 export default function Page() {

@@ -1027,7 +1027,7 @@ export function GHQBoard({
   );
 }
 
-function ReserveBank(props: {
+export function ReserveBank(props: {
   player: Player;
   reserve: ReserveFleet;
   selectable: boolean;
@@ -1055,12 +1055,14 @@ function ReserveBank(props: {
         className={classNames(
           "col-span-1 select-none flex font-bold text-xl p-1 flex-col items-center justify-end",
           props.player === "RED" ? "text-red-600" : "text-blue-600",
-          { ["cursor-pointer"]: props.selectable },
           {
-            ["hover:bg-gray-100 "]:
+            ["cursor-pointer"]: props.selectable && kind !== props.selectedKind,
+          },
+          {
+            ["hover:bg-gray-200 "]:
               props.selectable && props.selectedKind !== kind,
           },
-          { ["bg-gray-200 "]: props.selectedKind === kind }
+          { ["bg-gray-300 "]: props.selectedKind === kind }
         )}
       >
         <img
