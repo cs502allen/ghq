@@ -147,8 +147,10 @@ export function getSquareState({
   if (G.thisTurnMoves.length > 0) {
     const mostRecentMove = G.thisTurnMoves[G.thisTurnMoves.length - 1];
     if (
-      mostRecentMove.name === "Move" &&
-      areCoordsEqual(mostRecentMove.args[1], [rowIndex, colIndex])
+      (mostRecentMove.name === "Move" &&
+        areCoordsEqual(mostRecentMove.args[1], [rowIndex, colIndex])) ||
+      (mostRecentMove.name === "MoveAndOrient" &&
+        areCoordsEqual(mostRecentMove.args[1], [rowIndex, colIndex]))
     ) {
       shouldAnimateFrom = mostRecentMove.args[0];
     }
@@ -193,27 +195,27 @@ export default function Square({
   >(null);
 
   function getTransform(square: NonNullSquare, isStartOfAnimation: boolean) {
-    const isFlipped = shouldFlipSquare(square);
-    const rotation = square.orientation ?? (isFlipped ? 180 : 0);
-    let transform = `rotate(${rotation}deg)`;
-
     if (shouldAnimateFrom) {
       const [fromRow, fromCol] = shouldAnimateFrom;
       const [toRow, toCol] = [rowIndex, colIndex];
-      const deltaX = (fromCol - toCol) * squareSize * (isFlipped ? -1 : 1);
-      const deltaY = (fromRow - toRow) * squareSize * (isFlipped ? -1 : 1);
+      const deltaX = (fromCol - toCol) * squareSize;
+      const deltaY = (fromRow - toRow) * squareSize;
 
       if (isStartOfAnimation) {
-        transform += ` translate(${deltaX}px, ${deltaY}px)`;
+        return `translate(${deltaX}px, ${deltaY}px)`;
       } else {
-        transform += ` translate(0px, 0px)`;
+        return `translate(0px, 0px)`;
       }
     }
 
-    return transform;
+    return "";
   }
 
   useEffect(() => {
+    if (animationState === "started" || animationState === "ongoing") {
+      return;
+    }
+
     if (imageRef.current && displaySquare) {
       imageRef.current.style.position = "absolute";
       imageRef.current.style.zIndex = "50";
@@ -237,6 +239,10 @@ export default function Square({
         imageRef.current.style.zIndex = "1";
       }
     }, 50);
+
+    setTimeout(() => {
+      setAnimationState("ended");
+    }, 250);
   }, [imageRef.current, squareState.shouldAnimateFrom, animationState]);
 
   return (
@@ -254,23 +260,35 @@ export default function Square({
     >
       <SquareBackground squareState={squareState} />
       {displaySquare && (
-        <img
-          ref={imageRef}
-          className={classNames("pointer-events-none", {
-            "opacity-25": squareState.isMidMove,
-            "opacity-75": squareState.stagedSquare,
-          })}
-          src={`/${
-            Units[displaySquare.type].imagePathPrefix
-          }-${displaySquare.player.toLowerCase()}.png`}
-          width={pieceSize}
-          height={pieceSize}
-          draggable="false"
-          alt={Units[displaySquare.type].imagePathPrefix}
-        />
+        <div ref={imageRef} className="pointer-events-none">
+          <img
+            className={classNames("pointer-events-none", {
+              "opacity-25": squareState.isMidMove,
+              "opacity-75": squareState.stagedSquare,
+            })}
+            src={`/${
+              Units[displaySquare.type].imagePathPrefix
+            }-${displaySquare.player.toLowerCase()}.png`}
+            width={pieceSize}
+            height={pieceSize}
+            draggable="false"
+            style={{
+              transform: `rotate(${getRotationForPiece(displaySquare)}deg)`,
+            }}
+            alt={Units[displaySquare.type].imagePathPrefix}
+          />
+        </div>
       )}
     </div>
   );
+}
+
+function getRotationForPiece(square: NonNullSquare): number {
+  if (isPieceArtillery(square)) {
+    return square.orientation ?? 0;
+  }
+
+  return square.player === "BLUE" ? 180 : 0;
 }
 
 function SquareBackground({ squareState }: { squareState: SquareState }) {

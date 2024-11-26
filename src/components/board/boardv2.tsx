@@ -76,6 +76,10 @@ export function GHQBoardV2(props: BoardProps<GHQState>) {
     () => playerIdToPlayer(ctx.currentPlayer),
     [ctx.currentPlayer]
   );
+  const currentPlayer = useMemo(
+    () => (playerID === null ? currentPlayerTurn : playerIdToPlayer(playerID)),
+    [currentPlayerTurn, playerID]
+  );
   const usernames = ["Player 1", "Player 2"];
   const possibleAllowedMoves = useMemo(
     () =>
@@ -94,7 +98,7 @@ export function GHQBoardV2(props: BoardProps<GHQState>) {
       <Reserve
         G={G}
         ctx={ctx}
-        player={getOpponent(currentPlayerTurn)}
+        player={getOpponent(currentPlayer)}
         currentPlayerTurn={currentPlayerTurn}
         usernames={usernames}
         userActionState={userActionState}
@@ -113,7 +117,7 @@ export function GHQBoardV2(props: BoardProps<GHQState>) {
       <Reserve
         G={G}
         ctx={ctx}
-        player={currentPlayerTurn}
+        player={currentPlayer}
         currentPlayerTurn={currentPlayerTurn}
         usernames={usernames}
         userActionState={userActionState}

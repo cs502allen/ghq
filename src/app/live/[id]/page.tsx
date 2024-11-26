@@ -3,6 +3,7 @@
 import { Client } from "boardgame.io/react";
 import { GHQGame, newOnlineGHQGame } from "@/game/engine";
 import { GHQBoard } from "@/game/board";
+import { GHQBoardV2 } from "@/components/board/boardv2";
 import { SocketIO } from "boardgame.io/multiplayer";
 import { useCallback, useEffect, useState } from "react";
 import { API_URL } from "../config";
@@ -12,7 +13,7 @@ import { useAuth } from "@clerk/nextjs";
 
 const GameClient = Client({
   game: newOnlineGHQGame({}),
-  board: GHQBoard,
+  board: GHQBoardV2,
   multiplayer: SocketIO({ server: API_URL }),
   debug: false,
 });
