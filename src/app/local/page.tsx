@@ -4,7 +4,7 @@ import { Client } from "boardgame.io/react";
 import { GHQGame } from "@/game/engine";
 import { useState } from "react";
 import ReplayCapability from "@/game/ReplayCapability";
-import { GHQBoardV2 } from "@/game/boardv2";
+import { GHQBoardV2 } from "@/components/board/boardv2";
 
 const App = Client({
   game: GHQGame,
