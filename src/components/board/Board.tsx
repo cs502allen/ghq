@@ -8,18 +8,11 @@ import { bombardedSquares } from "@/game/move-logic";
 import { useMeasure } from "@uidotdev/usehooks";
 import { pieceSizes, squareSizes } from "@/game/constants";
 import BoardContainer from "../../game/BoardContainer";
-import {
-  updateClick,
-  updateHover,
-  updateRightClick,
-  UserActionState,
-} from "./state";
+import { updateClick, updateHover, UserActionState } from "./state";
 import Square, { getSquareState } from "./Square";
 import { areCoordsEqual } from "@/game/capture-logic";
 
-function playerIdToPlayer(playerId: string): Player {
-  return playerId === "0" ? "RED" : "BLUE";
-}
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function Board({
   ctx,
@@ -51,14 +44,24 @@ export default function Board({
 
   // Change the board state when the current turn changes or it's game over.
   useEffect(() => {
-    setBoard(G.board);
+    if (currentPlayerTurn !== currentPlayer) {
+      return;
+    }
+
+    for (const [i, board] of G.lastTurnBoards.entries()) {
+      sleep(i * 250).then(() => {
+        setBoard(board);
+        setMostRecentMove(G.lastPlayerMoves[i]);
+      });
+    }
+    sleep(750).then(() => setBoard(G.board));
   }, [currentPlayerTurn, ctx.gameover]);
 
   // Also change the board state when the current player makes a move.
   useEffect(() => {
     if (currentPlayerTurn === currentPlayer && G.thisTurnMoves.length > 0) {
       setMostRecentMove(G.thisTurnMoves[G.thisTurnMoves.length - 1]);
-      setTimeout(() => setBoard(G.board), 250);
+      sleep(250).then(() => setBoard(G.board));
     }
   }, [G.thisTurnMoves]);
 
