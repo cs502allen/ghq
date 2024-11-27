@@ -19,6 +19,11 @@ import { isBombardedBy, isPieceArtillery } from "../../game/board-moves";
 import { areCoordsEqual } from "../../game/capture-logic";
 import { UserActionState } from "./state";
 
+interface AnimateTo {
+  coordinate: Coordinate;
+  orientation?: Orientation;
+}
+
 export interface SquareState {
   rowIndex: number;
   colIndex: number;
@@ -36,7 +41,7 @@ export interface SquareState {
   isRightClicked: boolean;
   isHovered: boolean;
   isMidMove: boolean;
-  shouldAnimateTo: Coordinate | undefined;
+  shouldAnimateTo: AnimateTo | undefined;
 }
 export function getSquareState({
   board,
@@ -151,7 +156,7 @@ export function getSquareState({
       colIndex,
     ]);
 
-  let shouldAnimateTo: Coordinate | undefined = undefined;
+  let shouldAnimateTo: AnimateTo | undefined = undefined;
   if (mostRecentMove) {
     if (
       (mostRecentMove &&
@@ -160,7 +165,13 @@ export function getSquareState({
       (mostRecentMove.name === "MoveAndOrient" &&
         areCoordsEqual(mostRecentMove.args[0], [rowIndex, colIndex]))
     ) {
-      shouldAnimateTo = mostRecentMove.args[1];
+      shouldAnimateTo = {
+        coordinate: mostRecentMove.args[1],
+      };
+
+      if (mostRecentMove.name === "MoveAndOrient") {
+        shouldAnimateTo.orientation = mostRecentMove.args[2];
+      }
     }
   }
 
@@ -216,15 +227,17 @@ export default function Square({
 
   function getTransform() {
     if (shouldAnimateTo) {
-      const [toRow, toCol] = shouldAnimateTo;
+      const [toRow, toCol] = shouldAnimateTo.coordinate;
       const [fromRow, fromCol] = [rowIndex, colIndex];
       const deltaX = (toCol - fromCol) * squareSize;
       const deltaY = (toRow - fromRow) * squareSize;
 
-      return `translate(${deltaX}px, ${deltaY}px)`;
+      return `translate(${deltaX}px, ${deltaY}px) rotate(${
+        shouldAnimateTo.orientation ?? 0
+      }deg)`;
     }
 
-    return "translate(0px, 0px)";
+    return `translate(0px, 0px) rotate(${displaySquare?.orientation ?? 0}deg)`;
   }
 
   useEffect(() => {
