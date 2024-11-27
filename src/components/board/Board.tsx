@@ -63,6 +63,10 @@ export default function Board({
 
   const handleLeftClick = useCallback(
     ([rowIndex, colIndex]: Coordinate) => {
+      if (ctx.gameover) {
+        return;
+      }
+
       const square = board[rowIndex][colIndex];
       setUserActionState((userActionState) =>
         updateClick(
@@ -78,7 +82,7 @@ export default function Board({
 
       clearRightClick();
     },
-    [board, possibleAllowedMoves]
+    [board, possibleAllowedMoves, ctx.gameover]
   );
 
   const handleMouseOver = useCallback(([rowIndex, colIndex]: Coordinate) => {
