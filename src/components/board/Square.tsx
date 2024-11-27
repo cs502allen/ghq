@@ -251,10 +251,10 @@ export default function Square({
 
       animation.onfinish = () => {
         setIsAnimating(false);
-        // if (animationRef.current) {
-        //   animationRef.current.style.position = "relative";
-        //   animationRef.current.style.zIndex = "1";
-        // }
+        if (animationRef.current) {
+          animationRef.current.style.position = "relative";
+          animationRef.current.style.zIndex = "1";
+        }
       };
     }
   }, [shouldAnimateTo]);

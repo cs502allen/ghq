@@ -8,8 +8,14 @@ import { bombardedSquares } from "@/game/move-logic";
 import { useMeasure } from "@uidotdev/usehooks";
 import { pieceSizes, squareSizes } from "@/game/constants";
 import BoardContainer from "../../game/BoardContainer";
-import { updateClick, updateHover, UserActionState } from "./state";
+import {
+  updateClick,
+  updateHover,
+  updateRightClick,
+  UserActionState,
+} from "./state";
 import Square, { getSquareState } from "./Square";
+import { areCoordsEqual } from "@/game/capture-logic";
 
 function playerIdToPlayer(playerId: string): Player {
   return playerId === "0" ? "RED" : "BLUE";
@@ -27,25 +33,28 @@ export default function Board({
   userActionState,
   setUserActionState,
   possibleAllowedMoves,
+  currentPlayer,
+  currentPlayerTurn,
 }: BoardProps<GHQState> & {
+  currentPlayer: Player;
+  currentPlayerTurn: Player;
   userActionState: UserActionState;
   setUserActionState: React.Dispatch<React.SetStateAction<UserActionState>>;
   possibleAllowedMoves: AllowedMove[];
 }) {
-  const currentPlayerTurn = useMemo(
-    () => playerIdToPlayer(ctx.currentPlayer),
-    [ctx.currentPlayer]
-  );
-  const currentPlayer = useMemo(
-    () => (playerID === null ? currentPlayerTurn : playerIdToPlayer(playerID)),
-    [currentPlayerTurn, playerID]
-  );
+  const { measureRef, squareSize, pieceSize } = useBoardDimensions();
 
   const [mostRecentMove, setMostRecentMove] = useState<
     AllowedMove | undefined
   >();
   const [board, setBoard] = useState<GHQState["board"]>(G.board);
 
+  // Change the board state when the current turn changes or it's game over.
+  useEffect(() => {
+    setBoard(G.board);
+  }, [currentPlayerTurn, ctx.gameover]);
+
+  // Also change the board state when the current player makes a move.
   useEffect(() => {
     if (currentPlayerTurn === currentPlayer && G.thisTurnMoves.length > 0) {
       setMostRecentMove(G.thisTurnMoves[G.thisTurnMoves.length - 1]);
@@ -53,9 +62,13 @@ export default function Board({
     }
   }, [G.thisTurnMoves]);
 
+  // Actually make the move that's been chosen by the user.
   useEffect(() => {
-    setBoard(G.board);
-  }, [currentPlayerTurn, ctx.gameover]);
+    if (userActionState.chosenMove) {
+      const { name, args } = userActionState.chosenMove;
+      moves[name](...args);
+    }
+  }, [userActionState.chosenMove]);
 
   const bombarded = useMemo(() => bombardedSquares(board), [board]);
   const recentMoves = useMemo(
@@ -66,26 +79,6 @@ export default function Board({
     () => [...G.lastTurnCaptures["0"], ...G.lastTurnCaptures["1"]],
     [ctx.turn]
   );
-
-  const [measureRef, { width, height }] = useMeasure();
-
-  const [squareSize, pieceSize] = useMemo(() => {
-    const smallestDim: number = Math.min(width || 0, height || 0);
-    if (smallestDim && smallestDim - squareSizes.large * 8 >= 0) {
-      return [squareSizes.large, pieceSizes.large];
-    } else {
-      return [squareSizes.small, pieceSizes.small];
-    }
-  }, [width, height]);
-
-  useEffect(() => {
-    if (!userActionState.chosenMove) {
-      return;
-    }
-
-    const { name, args } = userActionState.chosenMove;
-    moves[name](...args);
-  }, [userActionState.chosenMove]);
 
   const handleRightClickDrag = (
     from: [number, number],
@@ -148,4 +141,19 @@ export default function Board({
       ))}
     </BoardContainer>
   );
+}
+
+function useBoardDimensions() {
+  const [measureRef, { width, height }] = useMeasure();
+
+  const [squareSize, pieceSize] = useMemo(() => {
+    const smallestDim: number = Math.min(width || 0, height || 0);
+    if (smallestDim && smallestDim - squareSizes.large * 8 >= 0) {
+      return [squareSizes.large, pieceSizes.large];
+    } else {
+      return [squareSizes.small, pieceSizes.small];
+    }
+  }, [width, height]);
+
+  return { measureRef, squareSize, pieceSize };
 }

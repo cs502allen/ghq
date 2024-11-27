@@ -113,6 +113,8 @@ export default function PlayArea(props: BoardProps<GHQState>) {
         userActionState={userActionState}
         setUserActionState={setUserActionState}
         possibleAllowedMoves={possibleAllowedMoves}
+        currentPlayer={currentPlayer}
+        currentPlayerTurn={currentPlayerTurn}
       />
       <Reserve
         G={G}
