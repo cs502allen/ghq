@@ -1,45 +1,33 @@
 import React, { useState, useCallback } from "react";
 import { Coordinate } from "./engine";
-import classNames from "classnames";
 
 interface MouseTrackerProps {
   children: React.ReactNode;
+  className?: string;
   onRightClickDrag: (start: Coordinate, end: Coordinate) => void;
-  onLeftClick: (coordinate: Coordinate) => void;
-  onMouseOver: (coordinate: Coordinate) => void;
-  ref: (instance: Element | null) => void;
-  flipped: boolean;
+  onLeftClick: () => void;
 }
 
 export default function BoardContainer({
   children,
+  className,
   onRightClickDrag,
   onLeftClick,
-  onMouseOver,
-  ref,
-  flipped,
 }: MouseTrackerProps) {
   const [startCoords, setStartCoords] = useState<Coordinate | null>(null);
 
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      if (e.button === 0) {
-        const { rowIndex, colIndex } = (e.target as HTMLElement).dataset;
-        if (!rowIndex || !colIndex) return;
-        const row = parseInt(rowIndex, 10);
-        const col = parseInt(colIndex, 10);
-        onLeftClick([row, col]);
-      }
-      if (e.button === 2) {
-        const { rowIndex, colIndex } = (e.target as HTMLElement).dataset;
-        if (!rowIndex || !colIndex) return;
-        const row = parseInt(rowIndex, 10);
-        const col = parseInt(colIndex, 10);
-        setStartCoords([row, col]);
-      }
-    },
-    [onLeftClick]
-  );
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (e.button === 0) {
+      onLeftClick();
+    }
+    if (e.button === 2) {
+      const { rowIndex, colIndex } = (e.target as HTMLElement).dataset;
+      if (!rowIndex || !colIndex) return;
+      const row = parseInt(rowIndex, 10);
+      const col = parseInt(colIndex, 10);
+      setStartCoords([row, col]);
+    }
+  }, []);
 
   const handleMouseUp = useCallback(
     (e: React.MouseEvent) => {
@@ -55,30 +43,12 @@ export default function BoardContainer({
     [startCoords, onRightClickDrag]
   );
 
-  const handleMouseOver = useCallback(
-    (e: React.MouseEvent) => {
-      const { rowIndex, colIndex } = (e.target as HTMLElement).dataset;
-      if (!rowIndex || !colIndex) return;
-      const row = parseInt(rowIndex, 10);
-      const col = parseInt(colIndex, 10);
-      onMouseOver([row, col]);
-    },
-    [onMouseOver]
-  );
-
   return (
     <div
-      onMouseOver={handleMouseOver}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onContextMenu={(e) => e.preventDefault()}
-      className={classNames(
-        "w-[360px] h-[360px] lg:w-[600px] lg:h-[600px] cursor-pointer relative",
-        {
-          "rotate-180": flipped,
-        }
-      )}
-      ref={ref}
+      className={className}
     >
       {children}
     </div>

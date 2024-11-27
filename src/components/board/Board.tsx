@@ -7,7 +7,6 @@ import { bombardedSquares } from "@/game/move-logic";
 
 import { useMeasure } from "@uidotdev/usehooks";
 import { pieceSizes, squareSizes } from "@/game/constants";
-import BoardContainer from "../../game/BoardContainer";
 import { updateClick, updateHover, UserActionState } from "./state";
 import Square, { getSquareState } from "./Square";
 import { playCaptureSound, playMoveSound } from "@/game/audio";
@@ -15,6 +14,7 @@ import { useBoardArrow } from "@/game/BoardArrowProvider";
 import BoardArrow from "@/game/BoardArrow";
 import classNames from "classnames";
 import useControls from "./Controls";
+import BoardContainer from "./BoardContainer";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
