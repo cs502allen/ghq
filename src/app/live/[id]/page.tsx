@@ -10,10 +10,11 @@ import { API_URL } from "../config";
 import MultiplayerReplayCapability from "@/game/MultiplayerReplayCapability";
 import { ghqFetch } from "@/lib/api";
 import { useAuth } from "@clerk/nextjs";
+import { shouldUseBoardV2 } from "@/components/board/board-switcher";
 
 const GameClient = Client({
   game: newOnlineGHQGame({}),
-  board: GHQBoardV2,
+  board: shouldUseBoardV2() ? GHQBoardV2 : GHQBoard,
   multiplayer: SocketIO({ server: API_URL }),
   debug: false,
 });
