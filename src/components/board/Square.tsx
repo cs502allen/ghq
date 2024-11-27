@@ -3,6 +3,7 @@
 
 import React, { Ref, useEffect, useRef, useState } from "react";
 import {
+  AllowedMove,
   Coordinate,
   GHQState,
   NonNullSquare,
@@ -39,14 +40,20 @@ export interface SquareState {
   shouldAnimateFrom: Coordinate | undefined;
 }
 export function getSquareState({
-  G,
+  board,
+  mostRecentMove,
+  recentMoves,
+  recentCaptures,
   square,
   rowIndex,
   colIndex,
   bombarded,
   userActionState,
 }: {
-  G: GHQState;
+  board: GHQState["board"];
+  mostRecentMove: AllowedMove | undefined;
+  recentMoves: Coordinate[];
+  recentCaptures: Coordinate[];
   rowIndex: number;
   colIndex: number;
   square: Square;
@@ -107,7 +114,7 @@ export function getSquareState({
     ) {
       isSelected = true;
       const [row, col] = move.args[0];
-      stagedSquare = structuredClone(G.board[row][col]);
+      stagedSquare = structuredClone(board[row][col]);
 
       if (
         stagedSquare &&
@@ -123,7 +130,7 @@ export function getSquareState({
 
     if (
       move.name === "MoveAndOrient" &&
-      isBombardedBy(G.board, move.args[0], move.args[1], move.args[2], [
+      isBombardedBy(board, move.args[0], move.args[1], move.args[2], [
         rowIndex,
         colIndex,
       ])
@@ -144,15 +151,29 @@ export function getSquareState({
     ]);
 
   let shouldAnimateFrom: Coordinate | undefined = undefined;
-  if (G.thisTurnMoves.length > 0) {
-    const mostRecentMove = G.thisTurnMoves[G.thisTurnMoves.length - 1];
+  if (mostRecentMove) {
     if (
-      (mostRecentMove.name === "Move" &&
+      (mostRecentMove &&
+        mostRecentMove.name === "Move" &&
         areCoordsEqual(mostRecentMove.args[1], [rowIndex, colIndex])) ||
       (mostRecentMove.name === "MoveAndOrient" &&
         areCoordsEqual(mostRecentMove.args[1], [rowIndex, colIndex]))
     ) {
       shouldAnimateFrom = mostRecentMove.args[0];
+    }
+  }
+
+  let wasRecentlyMovedTo = false;
+  for (const coord of recentMoves) {
+    if (areCoordsEqual(coord, [rowIndex, colIndex])) {
+      wasRecentlyMovedTo = true;
+    }
+  }
+
+  let wasRecentlyCaptured = false;
+  for (const coord of recentCaptures) {
+    if (areCoordsEqual(coord, [rowIndex, colIndex])) {
+      wasRecentlyCaptured = true;
     }
   }
 
@@ -165,8 +186,8 @@ export function getSquareState({
     isBlueBombarded: bombarded[`${rowIndex},${colIndex}`]?.BLUE ?? false,
     isSelected,
     showTarget: false,
-    wasRecentlyCaptured: false,
-    wasRecentlyMovedTo: false,
+    wasRecentlyCaptured,
+    wasRecentlyMovedTo,
     isMovable,
     isCaptureCandidate,
     isBombardCandidate,
@@ -189,61 +210,54 @@ export default function Square({
   const { rowIndex, colIndex, square, stagedSquare, shouldAnimateFrom } =
     squareState;
   const displaySquare = stagedSquare ?? square;
-  const imageRef: Ref<HTMLImageElement> = useRef(null);
-  const [animationState, setAnimationState] = useState<
-    "started" | "ongoing" | "ended" | null
-  >(null);
+  const animationRef: Ref<HTMLImageElement> = useRef(null);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  function getTransform(square: NonNullSquare, isStartOfAnimation: boolean) {
+  function getTransform() {
     if (shouldAnimateFrom) {
       const [fromRow, fromCol] = shouldAnimateFrom;
       const [toRow, toCol] = [rowIndex, colIndex];
       const deltaX = (fromCol - toCol) * squareSize;
       const deltaY = (fromRow - toRow) * squareSize;
 
-      if (isStartOfAnimation) {
-        return `translate(${deltaX}px, ${deltaY}px)`;
-      } else {
-        return `translate(0px, 0px)`;
-      }
+      return `translate(${deltaX}px, ${deltaY}px)`;
     }
 
-    return "";
+    return "translate(0px, 0px)";
   }
 
   useEffect(() => {
-    if (animationState === "started" || animationState === "ongoing") {
-      return;
+    if (
+      !isAnimating &&
+      animationRef.current &&
+      displaySquare &&
+      shouldAnimateFrom
+    ) {
+      setIsAnimating(true);
+      animationRef.current.style.position = "absolute";
+      animationRef.current.style.zIndex = "50";
+      const animation = animationRef.current.animate(
+        [
+          { transform: getTransform() },
+          {
+            transform: "translate(0px, 0px)",
+          },
+        ],
+        {
+          duration: 250,
+          easing: "ease-out",
+        }
+      );
+
+      animation.onfinish = () => {
+        setIsAnimating(false);
+        if (animationRef.current) {
+          animationRef.current.style.position = "relative";
+          animationRef.current.style.zIndex = "1";
+        }
+      };
     }
-
-    if (imageRef.current && displaySquare) {
-      imageRef.current.style.position = "absolute";
-      imageRef.current.style.zIndex = "50";
-      imageRef.current.style.transform = getTransform(displaySquare, true);
-      setAnimationState("started");
-    }
-  }, [imageRef.current, displaySquare]);
-
-  useEffect(() => {
-    if (animationState !== "started") {
-      return;
-    }
-
-    setAnimationState("ongoing");
-
-    setTimeout(() => {
-      if (imageRef.current && displaySquare) {
-        imageRef.current.style.transition = "transform 0.2s ease-out";
-        imageRef.current.style.transform = getTransform(displaySquare, false);
-        imageRef.current.style.position = "relative";
-        imageRef.current.style.zIndex = "1";
-      }
-    }, 50);
-
-    setTimeout(() => {
-      setAnimationState("ended");
-    }, 250);
-  }, [imageRef.current, squareState.shouldAnimateFrom, animationState]);
+  }, [shouldAnimateFrom]);
 
   return (
     <div
@@ -260,7 +274,7 @@ export default function Square({
     >
       <SquareBackground squareState={squareState} />
       {displaySquare && (
-        <div ref={imageRef} className="pointer-events-none">
+        <div ref={animationRef} className="pointer-events-none">
           <img
             className={classNames("pointer-events-none", {
               "opacity-25": squareState.isMidMove,
@@ -274,6 +288,7 @@ export default function Square({
             draggable="false"
             style={{
               transform: `rotate(${getRotationForPiece(displaySquare)}deg)`,
+              transition: "transform 0.1s",
             }}
             alt={Units[displaySquare.type].imagePathPrefix}
           />
@@ -318,6 +333,12 @@ function SquareBackground({ squareState }: { squareState: SquareState }) {
           />
           <Crosshair className="absolute z-10 text-red-200 w-1/2 h-1/2 pointer-events-none" />
         </>
+      )}
+      {squareState.wasRecentlyMovedTo && (
+        <SquareBackgroundColor className="bg-yellow-300/30" />
+      )}
+      {squareState.wasRecentlyCaptured && (
+        <SquareBackgroundColor className="bg-red-300/30" />
       )}
       {squareState.isSelected && (
         <SquareBackgroundColor className="bg-green-800/50" />

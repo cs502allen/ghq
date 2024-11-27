@@ -41,7 +41,30 @@ export default function Board({
     [currentPlayerTurn, playerID]
   );
   const bombarded = useMemo(() => bombardedSquares(G.board), [G.board]);
-  const board = useMemo(() => G.board, [G.board]);
+
+  const board = useMemo(() => {
+    // If it's the opponent's turn, show the board as it was at the start of their turn.
+    if (currentPlayerTurn !== currentPlayer) {
+      if (currentPlayer === "RED") return G.redTurnStartBoard;
+      if (currentPlayer === "BLUE") return G.blueTurnStartBoard;
+    }
+
+    // Otherwise, show the live board
+    return G.board;
+  }, [G.board, currentPlayerTurn, ctx.gameover]);
+
+  const mostRecentMove = useMemo(
+    () => G.thisTurnMoves[G.thisTurnMoves.length - 1],
+    [G.thisTurnMoves]
+  );
+  const recentMoves = useMemo(
+    () => [...G.lastTurnMoves["0"], ...G.lastTurnMoves["1"]],
+    [ctx.turn]
+  );
+  const recentCaptures = useMemo(
+    () => [...G.lastTurnCaptures["0"], ...G.lastTurnCaptures["1"]],
+    [ctx.turn]
+  );
 
   const [measureRef, { width, height }] = useMeasure();
 
@@ -100,7 +123,7 @@ export default function Board({
       onMouseOver={handleMouseOver}
       flipped={currentPlayer === "BLUE"}
     >
-      {G.board.map((row, rowIndex) => (
+      {board.map((row, rowIndex) => (
         <div key={rowIndex} style={{ display: "flex" }}>
           {row.map((square, colIndex) => (
             <Square
@@ -108,7 +131,10 @@ export default function Board({
               squareSize={squareSize}
               pieceSize={pieceSize}
               squareState={getSquareState({
-                G,
+                board,
+                mostRecentMove,
+                recentMoves,
+                recentCaptures,
                 rowIndex,
                 colIndex,
                 square,
