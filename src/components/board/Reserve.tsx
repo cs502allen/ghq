@@ -37,6 +37,7 @@ export default function Reserve({
   selectReserve: (kind: keyof ReserveFleet) => void;
 }) {
   const playerIndex = player === "RED" ? 0 : 1;
+
   return (
     <>
       <div className="items-center justify-center flex py-2 px-1">
@@ -53,9 +54,11 @@ export default function Reserve({
         />
         <div className="ml-4 lg:ml-20 my-2 flex flex-col gap-1">
           <div className="flex gap-2 items-center">
-            <ConnectionStatus
-              isConnected={matchData?.[playerIndex]?.isConnected ?? false}
-            />
+            {matchData?.[playerIndex]?.isConnected !== undefined && (
+              <ConnectionStatus
+                isConnected={matchData[playerIndex].isConnected}
+              />
+            )}
             {usernames[playerIndex]} ({G.elos[playerIndex]})
           </div>
           <div className="flex gap-2 justify-center items-center">

@@ -4,8 +4,8 @@
 import React, { Ref, useEffect, useRef, useState } from "react";
 import {
   AllowedMove,
+  Board,
   Coordinate,
-  GHQState,
   NonNullSquare,
   Orientation,
   type Square,
@@ -18,6 +18,7 @@ import { isBombardedBy, isPieceArtillery } from "../../game/board-moves";
 
 import { areCoordsEqual } from "../../game/capture-logic";
 import { UserActionState } from "./state";
+import BoardCoordinateLabels from "./BoardCoordinateLabels";
 
 interface AnimateTo {
   coordinate: Coordinate;
@@ -43,6 +44,7 @@ export interface SquareState {
   isMidMove: boolean;
   shouldAnimateTo: AnimateTo | undefined;
 }
+
 export function getSquareState({
   board,
   mostRecentMove,
@@ -55,7 +57,7 @@ export function getSquareState({
   userActionState,
   rightClicked,
 }: {
-  board: GHQState["board"];
+  board: Board;
   mostRecentMove: AllowedMove | undefined;
   recentMoves: Coordinate[];
   recentCaptures: Coordinate[];
@@ -66,128 +68,21 @@ export function getSquareState({
   userActionState: UserActionState | null;
   rightClicked: Set<string>;
 }): SquareState {
-  let isMovable = false;
-  let isCaptureCandidate = false;
-
-  // #perf-improvement-possible
-  for (const move of userActionState?.candidateMoves ?? []) {
-    if (
-      move.name === "Move" &&
-      areCoordsEqual([rowIndex, colIndex], move.args[1])
-    ) {
-      isMovable = true;
-    } else if (
-      move.name === "MoveAndOrient" &&
-      areCoordsEqual([rowIndex, colIndex], move.args[1])
-    ) {
-      isMovable = true;
-    } else if (
-      move.name === "Reinforce" &&
-      areCoordsEqual([rowIndex, colIndex], move.args[1])
-    ) {
-      isMovable = true;
-    }
-
-    if (
-      move.name === "Move" &&
-      areCoordsEqual([rowIndex, colIndex], move.args[2] ?? [-1, -1])
-    ) {
-      isCaptureCandidate = true;
-    }
-  }
-
-  let isSelected = areCoordsEqual(
-    [rowIndex, colIndex],
-    userActionState?.selectedPiece?.coordinate ?? [-1, -1]
+  const coord: Coordinate = [rowIndex, colIndex];
+  const hoveredCoord = userActionState?.hoveredCoordinate ?? [-1, -1];
+  const { isMovable, isCaptureCandidate } = getMoveAndCaptureCandidates(
+    coord,
+    userActionState?.candidateMoves
   );
-  let isMidMove = false;
-  let stagedSquare = null;
-  let isBombardCandidate = false;
-
-  // #perf-improvement-possible
-  for (const move of userActionState?.chosenMoves ?? []) {
-    if (
-      (move.name === "Move" || move.name === "MoveAndOrient") &&
-      areCoordsEqual([rowIndex, colIndex], move.args[0])
-    ) {
-      isMidMove = true;
-      isSelected = false;
-    }
-
-    if (
-      (move.name === "Move" || move.name === "MoveAndOrient") &&
-      areCoordsEqual([rowIndex, colIndex], move.args[1])
-    ) {
-      isSelected = true;
-      const [row, col] = move.args[0];
-      stagedSquare = structuredClone(board[row][col]);
-
-      if (
-        stagedSquare &&
-        move.name === "MoveAndOrient" &&
-        userActionState?.hoveredCoordinate
-      ) {
-        stagedSquare.orientation = getOrientationBetween(
-          [rowIndex, colIndex],
-          userActionState.hoveredCoordinate
-        );
-      }
-    }
-
-    if (
-      move.name === "MoveAndOrient" &&
-      isBombardedBy(board, move.args[0], move.args[1], move.args[2], [
-        rowIndex,
-        colIndex,
-      ])
-    ) {
-      isBombardCandidate = true;
-    }
-  }
-
-  // Piece is actively hovered or is a move preference.
-  const isHovered =
-    areCoordsEqual(userActionState?.hoveredCoordinate ?? [-1, -1], [
-      rowIndex,
-      colIndex,
-    ]) ||
-    areCoordsEqual(userActionState?.movePreference ?? [-1, -1], [
-      rowIndex,
-      colIndex,
-    ]);
-
-  let shouldAnimateTo: AnimateTo | undefined = undefined;
-  if (mostRecentMove) {
-    if (
-      (mostRecentMove &&
-        mostRecentMove.name === "Move" &&
-        areCoordsEqual(mostRecentMove.args[0], [rowIndex, colIndex])) ||
-      (mostRecentMove.name === "MoveAndOrient" &&
-        areCoordsEqual(mostRecentMove.args[0], [rowIndex, colIndex]))
-    ) {
-      shouldAnimateTo = {
-        coordinate: mostRecentMove.args[1],
-      };
-
-      if (mostRecentMove.name === "MoveAndOrient") {
-        shouldAnimateTo.orientation = mostRecentMove.args[2];
-      }
-    }
-  }
-
-  let wasRecentlyMovedTo = false;
-  for (const coord of recentMoves) {
-    if (areCoordsEqual(coord, [rowIndex, colIndex])) {
-      wasRecentlyMovedTo = true;
-    }
-  }
-
-  let wasRecentlyCaptured = false;
-  for (const coord of recentCaptures) {
-    if (areCoordsEqual(coord, [rowIndex, colIndex])) {
-      wasRecentlyCaptured = true;
-    }
-  }
+  const { isSelected, isMidMove, stagedSquare, isBombardCandidate } =
+    getChosenCandidates(coord, userActionState, board);
+  const wasRecentlyMovedTo = recentMoves.some((moveCoord) =>
+    areCoordsEqual(coord, moveCoord)
+  );
+  const wasRecentlyCaptured = recentCaptures.some((capCoord) =>
+    areCoordsEqual(coord, capCoord)
+  );
+  const { shouldAnimateTo } = getAnimation(coord, mostRecentMove);
 
   return {
     rowIndex,
@@ -204,7 +99,7 @@ export function getSquareState({
     isCaptureCandidate,
     isBombardCandidate,
     isRightClicked: rightClicked.has(`${rowIndex},${colIndex}`),
-    isHovered,
+    isHovered: areCoordsEqual(coord, hoveredCoord),
     isMidMove,
     shouldAnimateTo,
   };
@@ -214,10 +109,12 @@ export default function Square({
   squareSize,
   pieceSize,
   squareState,
+  isFlipped,
 }: {
   squareSize: number;
   pieceSize: number;
   squareState: SquareState;
+  isFlipped: boolean; // In general, the square shouldn't care whether it's flipped. We only need to know this for the coordinate labels.
 }) {
   const { rowIndex, colIndex, square, stagedSquare, shouldAnimateTo } =
     squareState;
@@ -287,6 +184,11 @@ export default function Square({
       )}
     >
       <SquareBackground squareState={squareState} />
+      <BoardCoordinateLabels
+        isFlipped={isFlipped}
+        colIndex={colIndex}
+        rowIndex={rowIndex}
+      />
       {displaySquare && (
         <div ref={animationRef} className="pointer-events-none">
           <img
@@ -408,4 +310,132 @@ function getOrientationBetween(from: Coordinate, to: Coordinate): Orientation {
   } else {
     return 315;
   }
+}
+
+function getMoveDestination(move: AllowedMove): Coordinate | undefined {
+  if (["Move", "MoveAndOrient", "Reinforce"].includes(move.name)) {
+    return move.args[1];
+  }
+
+  return undefined;
+}
+
+function getCaptureLocation(move: AllowedMove): Coordinate | undefined {
+  // TODO(tyler): update this later to allow reinforcement captures
+  return move.name === "Move" ? move.args[2] : undefined;
+}
+
+function getMoveAndCaptureCandidates(
+  coord: Coordinate,
+  candidateMoves: AllowedMove[] = []
+) {
+  let isMovable = false;
+  let isCaptureCandidate = false;
+
+  // #perf-improvement-possible: candidateMoves could be a set
+  for (const move of candidateMoves) {
+    const moveDestination = getMoveDestination(move);
+    const captureLocation = getCaptureLocation(move);
+
+    if (moveDestination && areCoordsEqual(coord, moveDestination)) {
+      isMovable = true;
+    }
+    if (captureLocation && areCoordsEqual(coord, captureLocation)) {
+      isCaptureCandidate = true;
+    }
+  }
+
+  return { isMovable, isCaptureCandidate };
+}
+
+function getMoveOrigin(move: AllowedMove): Coordinate | undefined {
+  if (move.name === "Move" || move.name === "MoveAndOrient") {
+    return move.args[0];
+  }
+
+  return undefined;
+}
+
+function getChosenCandidates(
+  coord: Coordinate,
+  userActionState: UserActionState | null,
+  board: Board
+) {
+  const selectedCoord = userActionState?.selectedPiece?.coordinate ?? [-1, -1];
+
+  let isSelected = areCoordsEqual(coord, selectedCoord);
+  let isMidMove = false;
+  let stagedSquare = null;
+  let isBombardCandidate = false;
+
+  // #perf-improvement-possible: chosenMoves could be a set
+  for (const move of userActionState?.chosenMoves ?? []) {
+    const moveOrigin = getMoveOrigin(move);
+
+    // If the square is the origin of the move, then it's considered "mid-move" and becomes de-emphasized.
+    if (moveOrigin && areCoordsEqual(coord, moveOrigin)) {
+      isMidMove = true;
+      isSelected = false;
+    }
+
+    // If the square is the destination of the move, then it's considered "selected" and becomes emphasized.
+    const moveDestination = getMoveDestination(move);
+    if (
+      moveOrigin &&
+      moveDestination &&
+      areCoordsEqual(coord, moveDestination)
+    ) {
+      isSelected = true;
+      const [row, col] = moveOrigin;
+      stagedSquare = structuredClone(board[row][col]);
+
+      // Figure out orientation based on the hovered coordinate.
+      if (
+        stagedSquare &&
+        move.name === "MoveAndOrient" &&
+        userActionState?.hoveredCoordinate
+      ) {
+        stagedSquare.orientation = getOrientationBetween(
+          coord,
+          userActionState.hoveredCoordinate
+        );
+      }
+    }
+
+    // If the current move would bombard this square, let's display that.
+    if (
+      move.name === "MoveAndOrient" &&
+      isBombardedBy(board, move.args[0], move.args[1], move.args[2], coord)
+    ) {
+      isBombardCandidate = true;
+    }
+  }
+
+  return { isSelected, isMidMove, stagedSquare, isBombardCandidate };
+}
+
+function getAnimation(
+  coord: Coordinate,
+  mostRecentMove: AllowedMove | undefined
+) {
+  let shouldAnimateTo: AnimateTo | undefined = undefined;
+  if (mostRecentMove) {
+    if (
+      (mostRecentMove &&
+        mostRecentMove.name === "Move" &&
+        areCoordsEqual(mostRecentMove.args[0], coord)) ||
+      (mostRecentMove.name === "MoveAndOrient" &&
+        areCoordsEqual(mostRecentMove.args[0], coord))
+    ) {
+      shouldAnimateTo = {
+        coordinate: mostRecentMove.args[1],
+      };
+
+      if (mostRecentMove.name === "MoveAndOrient") {
+        shouldAnimateTo.orientation = mostRecentMove.args[2];
+      }
+    }
+  }
+
+  return { shouldAnimateTo };
 }

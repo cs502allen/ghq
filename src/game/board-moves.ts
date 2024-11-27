@@ -9,7 +9,6 @@ import {
   orientations,
   Player,
   ReserveFleet,
-  Square,
   Units,
 } from "./engine";
 import { movesForActivePiece, spawnPositionsForPlayer } from "./move-logic";
@@ -164,7 +163,7 @@ export function isMoveAllowed(G: GHQState, ctx: Ctx, move: AllowedMove) {
   return false;
 }
 
-function moveToNotation(move: AllowedMove): string {
+export function moveToNotation(move: AllowedMove): string {
   switch (move.name) {
     case "Move":
       return `${move.args[0]} -> ${move.args[1]}${

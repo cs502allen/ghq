@@ -10,7 +10,6 @@ export const pieceSizes = {
   large: 52,
 };
 export const TIME_CONTROLS = {
-  // rapid: { time: 10 * 60 * 1000, bonus: 5 * 1000 },
-  rapid: { time: 0, bonus: 0 },
+  rapid: { time: 10 * 60 * 1000, bonus: 5 * 1000 },
   blitz: { time: 3 * 60 * 1000, bonus: 6 * 1000 },
 };

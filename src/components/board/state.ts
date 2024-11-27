@@ -10,14 +10,40 @@ import { isBombardedBy, PlayerPiece } from "../../game/board-moves";
 
 import { areCoordsEqual } from "../../game/capture-logic";
 
+/**
+ * The state of the user's actions on the board.
+ *
+ * 1. User selects a piece on the board or a reserve piece (selectedPiece or selectedReserve)
+ *    Once they have a selected piece, we can show the "candidateMoves" for that piece.
+ *    The "candidateMoves" are the "first level" of moves, such as moving a piece to a new location.
+ *
+ * 2. User selects a move from the candidate moves.
+ *    Once they have chosen one of the candidate moves, we can show the "chosenMoves" for that piece.
+ *    The "chosenMoves" are the "second level" of moves, such as rotating a piece or capturing.
+ *
+ * 3. User selects a single chosen move, which is passed to the game state..
+ *
+ */
 export interface UserActionState {
+  // The piece at a given coordinate that the user has selected that they want to move.
   selectedPiece?: PlayerPiece;
+
+  // The reserve piece that the user has selected that they want to place.
   selectedReserve?: keyof ReserveFleet;
+
+  // The coordinate that the user is currently hovering over. This is largely used for rendering purposes.
   hoveredCoordinate?: Coordinate;
-  movePreference?: Coordinate;
+
+  // The possible moves that the user can make with the selected piece.
+  // This is the "first level" of moves, such as moving a piece to a new location.
   candidateMoves?: AllowedMove[];
-  chosenMove?: AllowedMove;
+
+  // This is the subset of candidate moves that the user has chosen to make.
+  // This is the "second level" of moves, such as rotating a piece or capturing.
   chosenMoves?: AllowedMove[];
+
+  // The final move that the user has chosen to make, which is the move that will be passed to the game state.
+  chosenMove?: AllowedMove;
 }
 
 export function updateClick(
@@ -34,7 +60,7 @@ export function updateClick(
     return self;
   }
 
-  // If we have chosen candidates already, let's lock in the final move.
+  // If we have chosen candidates already, then the user is attempting to finalize their move, let's lock it in.
   const chosenMove = self.chosenMoves?.find(
     (move) =>
       (move.name === "Move" &&
@@ -74,7 +100,7 @@ export function updateClick(
     };
   }
 
-  // If there are multiple moves, then we need to provide the user with a choice.
+  // If there are multiple possible moves, then we need to provide the user with a choice.
   if (self.selectedPiece && choseCandidateMoves.length > 1) {
     return {
       ...self,
@@ -82,7 +108,7 @@ export function updateClick(
     };
   }
 
-  // If the square contains a piece, and it's the current player's piece, then we should show the possible moves.
+  // If the clicked square contains a piece, and it's the current player's piece, then we should show the possible moves.
   if (square && square.player === currentPlayer) {
     const coordinate: Coordinate = [rowIndex, colIndex];
     const candidateMoves =
@@ -93,8 +119,11 @@ export function updateClick(
             areCoordsEqual(coordinate, move.args[0]))
       ) ?? [];
 
-    // If there are no candidate moves, then we should clear the state.
-    if (candidateMoves.length === 0) {
+    // If this is the currently selected piece, then we should clear the state.
+    if (
+      self.selectedPiece &&
+      areCoordsEqual(self.selectedPiece.coordinate, coordinate)
+    ) {
       return {};
     }
 

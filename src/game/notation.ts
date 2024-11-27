@@ -1,4 +1,5 @@
 import {
+  AllowedMove,
   GHQState,
   NonNullSquare,
   Orientation,
