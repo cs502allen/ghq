@@ -7,10 +7,18 @@ import MoveCounter from "../../game/MoveCounter";
 import { Ctx } from "boardgame.io";
 import { ReserveBank } from "../../game/board";
 import { UserActionState } from "./state";
+import { BoardProps } from "boardgame.io/react";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import classNames from "classnames";
 
 export default function Reserve({
   G,
   ctx,
+  matchData,
   player,
   currentPlayer,
   currentPlayerTurn,
@@ -20,6 +28,7 @@ export default function Reserve({
 }: {
   G: GHQState;
   ctx: Ctx;
+  matchData: BoardProps<GHQState>["matchData"];
   player: Player;
   currentPlayer: Player;
   currentPlayerTurn: Player;
@@ -27,6 +36,7 @@ export default function Reserve({
   usernames: string[];
   selectReserve: (kind: keyof ReserveFleet) => void;
 }) {
+  const playerIndex = player === "RED" ? 0 : 1;
   return (
     <>
       <div className="items-center justify-center flex py-2 px-1">
@@ -42,8 +52,11 @@ export default function Reserve({
           selectReserve={selectReserve}
         />
         <div className="ml-4 lg:ml-20 my-2 flex flex-col gap-1">
-          <div>
-            {usernames[1]} ({G.elos[1]})
+          <div className="flex gap-2 items-center">
+            <ConnectionStatus
+              isConnected={matchData?.[playerIndex]?.isConnected ?? false}
+            />
+            {usernames[playerIndex]} ({G.elos[playerIndex]})
           </div>
           <div className="flex gap-2 justify-center items-center">
             <MoveCounter
@@ -61,5 +74,21 @@ export default function Reserve({
         </div>
       </div>
     </>
+  );
+}
+
+function ConnectionStatus({ isConnected }: { isConnected: boolean }) {
+  return (
+    <HoverCard>
+      <HoverCardTrigger
+        className={classNames(
+          "w-3 h-3 rounded-full",
+          isConnected ? "bg-green-600" : "bg-red-600"
+        )}
+      ></HoverCardTrigger>
+      <HoverCardContent className="text-sm">
+        Player is currently {isConnected ? "connected" : "disconnected"}.
+      </HoverCardContent>
+    </HoverCard>
   );
 }

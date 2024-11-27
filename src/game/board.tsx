@@ -1143,7 +1143,7 @@ function BoardCoordinateLabels({
   );
 }
 
-function SkipButton({ skip }: { skip: () => void }) {
+export function SkipButton({ skip }: { skip: () => void }) {
   return (
     <button
       onClick={skip}
@@ -1155,7 +1155,7 @@ function SkipButton({ skip }: { skip: () => void }) {
   );
 }
 
-function ResignButton({ resign }: { resign: () => void }) {
+export function ResignButton({ resign }: { resign: () => void }) {
   const [confirm, setConfirm] = React.useState(false);
   if (confirm) {
     return (
@@ -1186,7 +1186,7 @@ function ResignButton({ resign }: { resign: () => void }) {
   );
 }
 
-function OfferDrawButton({ draw }: { draw: (offer: boolean) => void }) {
+export function OfferDrawButton({ draw }: { draw: (offer: boolean) => void }) {
   const [offered, setOffered] = React.useState(false);
   return (
     <button
@@ -1205,7 +1205,7 @@ function OfferDrawButton({ draw }: { draw: (offer: boolean) => void }) {
   );
 }
 
-function AcceptDrawButton({ draw }: { draw: () => void }) {
+export function AcceptDrawButton({ draw }: { draw: () => void }) {
   return (
     <button
       onClick={draw}

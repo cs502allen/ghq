@@ -14,6 +14,7 @@ import { playCaptureSound, playMoveSound } from "@/game/audio";
 import { useBoardArrow } from "@/game/BoardArrowProvider";
 import BoardArrow from "@/game/BoardArrow";
 import classNames from "classnames";
+import useControls from "./Controls";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -39,6 +40,7 @@ export default function Board({
   possibleAllowedMoves: AllowedMove[];
 }) {
   const { measureRef, squareSize, pieceSize } = useBoardDimensions();
+  useControls({ undo, redo, cancel: () => setUserActionState({}) });
 
   const [mostRecentMove, setMostRecentMove] = useState<
     AllowedMove | undefined
@@ -51,6 +53,7 @@ export default function Board({
       return;
     }
 
+    // Slowly re-apply the state to allow for animations.
     for (const [i, board] of G.lastTurnBoards.entries()) {
       sleep(i * 250).then(() => {
         setBoard(board);
@@ -70,9 +73,12 @@ export default function Board({
 
   // Also change the board state when the current player makes a move.
   useEffect(() => {
-    if (currentPlayerTurn === currentPlayer && G.thisTurnMoves.length > 0) {
-      setMostRecentMove(G.thisTurnMoves[G.thisTurnMoves.length - 1]);
-      sleep(250).then(() => setBoard(G.board));
+    if (currentPlayerTurn === currentPlayer && G.thisTurnMoves.length >= 0) {
+      // setMostRecentMove(G.thisTurnMoves[G.thisTurnMoves.length - 1]);
+      // sleep(250).then(() => setBoard(G.board));
+
+      setMostRecentMove(undefined);
+      setBoard(G.board);
     }
   }, [G.thisTurnMoves]);
 
