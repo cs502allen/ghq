@@ -21,7 +21,7 @@ const GameClient = Client({
 
 const OfflineGameClient = Client({
   game: GHQGame,
-  board: GHQBoard,
+  board: shouldUseBoardV2() ? GHQBoardV2 : GHQBoard,
 });
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {

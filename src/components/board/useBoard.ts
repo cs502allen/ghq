@@ -58,6 +58,10 @@ export default function useBoard({
 
   // Change the board state when the current turn changes or it's game over.
   useEffect(() => {
+    if (G.isReplayMode) {
+      return;
+    }
+
     animateOpponentsTurnToLatestBoardState();
   }, [currentPlayerTurn, ctx.gameover]);
 
@@ -66,6 +70,10 @@ export default function useBoard({
 
   // Also change the board state when the current player makes a move.
   useEffect(() => {
+    if (G.isReplayMode) {
+      return;
+    }
+
     if (currentPlayerTurn === currentPlayer && G.thisTurnMoves.length >= 0) {
       // TODO(tyler): Animate moves forward, but not during undo.
       // setMostRecentMove(G.thisTurnMoves[G.thisTurnMoves.length - 1]);
@@ -76,6 +84,13 @@ export default function useBoard({
       setBoard(G.board);
     }
   }, [G.thisTurnMoves]);
+
+  // In replay mode, don't animate the board state when the game state changes, just set it immediately.
+  useEffect(() => {
+    if (G.isReplayMode) {
+      setBoard(G.board);
+    }
+  }, [G.board]);
 
   // Actually make the move that's been chosen by the user.
   useEffect(() => {
