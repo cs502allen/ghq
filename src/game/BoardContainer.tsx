@@ -73,7 +73,7 @@ export default function BoardContainer({
       onMouseUp={handleMouseUp}
       onContextMenu={(e) => e.preventDefault()}
       className={classNames(
-        "w-[360px] h-[360px] lg:w-[600px] lg:h-[600px] cursor-pointer",
+        "w-[360px] h-[360px] lg:w-[600px] lg:h-[600px] cursor-pointer relative",
         {
           "rotate-180": flipped,
         }

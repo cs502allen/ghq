@@ -246,6 +246,7 @@ export function GHQBoard({
     setRightClicked(new Set());
     setBoardArrows([]);
   }, [G.board]);
+
   const handleRightClickDrag = (
     from: [number, number],
     to: [number, number]

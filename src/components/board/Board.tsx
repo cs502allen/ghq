@@ -10,7 +10,10 @@ import { pieceSizes, squareSizes } from "@/game/constants";
 import BoardContainer from "../../game/BoardContainer";
 import { updateClick, updateHover, UserActionState } from "./state";
 import Square, { getSquareState } from "./Square";
-import { areCoordsEqual } from "@/game/capture-logic";
+import { playCaptureSound, playMoveSound } from "@/game/audio";
+import { useBoardArrow } from "@/game/BoardArrowProvider";
+import BoardArrow from "@/game/BoardArrow";
+import classNames from "classnames";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -51,7 +54,15 @@ export default function Board({
     for (const [i, board] of G.lastTurnBoards.entries()) {
       sleep(i * 250).then(() => {
         setBoard(board);
-        setMostRecentMove(G.lastPlayerMoves[i]);
+
+        const lastMove = G.lastPlayerMoves[i];
+        setMostRecentMove(lastMove);
+
+        if (lastMove.name === "Move" && lastMove.args[2]) {
+          playCaptureSound();
+        } else {
+          playMoveSound();
+        }
       });
     }
     sleep(750).then(() => setBoard(G.board));
@@ -70,6 +81,12 @@ export default function Board({
     if (userActionState.chosenMove) {
       const { name, args } = userActionState.chosenMove;
       moves[name](...args);
+
+      if (name === "Move" && args[2]) {
+        playCaptureSound();
+      } else {
+        playMoveSound();
+      }
     }
   }, [userActionState.chosenMove]);
 
@@ -83,10 +100,51 @@ export default function Board({
     [ctx.turn]
   );
 
+  const { boardArrows, setBoardArrows } = useBoardArrow();
+  const [rightClicked, setRightClicked] = React.useState<Set<string>>(
+    new Set()
+  );
+
+  useEffect(() => {
+    setRightClicked(new Set());
+    setBoardArrows([]);
+  }, [G.board]);
+
   const handleRightClickDrag = (
     from: [number, number],
     to: [number, number]
-  ): void => {};
+  ): void => {
+    if (from[0] === to[0] && from[1] === to[1]) {
+      setRightClicked((prev) => {
+        const newSet = new Set(prev);
+        const key = `${from[0]},${from[1]}`;
+        if (newSet.has(key)) {
+          newSet.delete(key);
+        } else {
+          newSet.add(key);
+        }
+        return newSet;
+      });
+    } else {
+      setBoardArrows((prev) => {
+        const newArrows = [...prev];
+        const alreadyExists = newArrows.some(
+          (arrow) =>
+            arrow.from[0] === from[0] &&
+            arrow.from[1] === from[1] &&
+            arrow.to[0] === to[0] &&
+            arrow.to[1] === to[1]
+        );
+        if (!alreadyExists) {
+          newArrows.push({
+            from,
+            to: to,
+          });
+        }
+        return newArrows;
+      });
+    }
+  };
 
   const handleLeftClick = useCallback(
     ([rowIndex, colIndex]: Coordinate) => {
@@ -102,6 +160,9 @@ export default function Board({
           currentPlayerTurn
         )
       );
+
+      setRightClicked(new Set());
+      setBoardArrows([]);
     },
     [board, possibleAllowedMoves]
   );
@@ -137,10 +198,20 @@ export default function Board({
                 square,
                 bombarded,
                 userActionState,
+                rightClicked,
               })}
             />
           ))}
         </div>
+      ))}
+      {boardArrows.map((boardArrow) => (
+        <BoardArrow
+          key={`${boardArrow.from[0]},${boardArrow.from[1]}-${boardArrow.to[0]},${boardArrow.to[1]}`}
+          squareSize={squareSize}
+          from={boardArrow.from}
+          to={boardArrow.to}
+          className={classNames("fill-green-600 stroke-green-600")}
+        />
       ))}
     </BoardContainer>
   );

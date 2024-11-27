@@ -18,7 +18,6 @@ import { isBombardedBy, isPieceArtillery } from "../../game/board-moves";
 
 import { areCoordsEqual } from "../../game/capture-logic";
 import { UserActionState } from "./state";
-import { playMoveSound } from "@/game/audio";
 
 export interface SquareState {
   rowIndex: number;
@@ -49,6 +48,7 @@ export function getSquareState({
   colIndex,
   bombarded,
   userActionState,
+  rightClicked,
 }: {
   board: GHQState["board"];
   mostRecentMove: AllowedMove | undefined;
@@ -59,6 +59,7 @@ export function getSquareState({
   square: Square;
   bombarded: Bombarded;
   userActionState: UserActionState | null;
+  rightClicked: Set<string>;
 }): SquareState {
   let isMovable = false;
   let isCaptureCandidate = false;
@@ -191,7 +192,7 @@ export function getSquareState({
     isMovable,
     isCaptureCandidate,
     isBombardCandidate,
-    isRightClicked: false,
+    isRightClicked: rightClicked.has(`${rowIndex},${colIndex}`),
     isHovered,
     isMidMove,
     shouldAnimateTo,
@@ -343,6 +344,9 @@ function SquareBackground({ squareState }: { squareState: SquareState }) {
       {squareState.isSelected && (
         <SquareBackgroundColor className="bg-green-800/50" />
       )}
+      {squareState.isRightClicked && (
+        <SquareBackgroundColor className="bg-green-600/50" />
+      )}
       {squareState.isMovable &&
         (squareState.isHovered ? (
           <SquareBackgroundColor className="bg-green-800/50" />
@@ -351,11 +355,11 @@ function SquareBackground({ squareState }: { squareState: SquareState }) {
         ))}
       {squareState.isBombardCandidate &&
         (squareState.isHovered ? (
-          <SquareBackgroundColor className="bg-yellow-600/80" />
+          <SquareBackgroundColor className="bg-yellow-600/80 z-10" />
         ) : (
           <div
             className={
-              "absolute rounded-full bg-yellow-400/80 w-1/3 h-1/3 pointer-events-none"
+              "absolute rounded-full bg-yellow-400/80 w-1/3 h-1/3 pointer-events-none z-10"
             }
           ></div>
         ))}
@@ -372,14 +376,6 @@ function SquareBackgroundColor({ className }: { className: string }) {
       )}
     ></div>
   );
-}
-
-function shouldFlipSquare(square: NonNullSquare): boolean {
-  if (!isPieceArtillery(square)) {
-    return square.player === "BLUE";
-  }
-
-  return false;
 }
 
 function getOrientationBetween(from: Coordinate, to: Coordinate): Orientation {
