@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AllowedMove, Coordinate, GHQState, Player } from "@/game/engine";
 import { BoardProps } from "boardgame.io/react";
 import { bombardedSquares } from "@/game/move-logic";
@@ -40,23 +40,24 @@ export default function Board({
     () => (playerID === null ? currentPlayerTurn : playerIdToPlayer(playerID)),
     [currentPlayerTurn, playerID]
   );
-  const bombarded = useMemo(() => bombardedSquares(G.board), [G.board]);
 
-  const board = useMemo(() => {
-    // If it's the opponent's turn, show the board as it was at the start of their turn.
-    if (currentPlayerTurn !== currentPlayer) {
-      if (currentPlayer === "RED") return G.redTurnStartBoard;
-      if (currentPlayer === "BLUE") return G.blueTurnStartBoard;
+  const [mostRecentMove, setMostRecentMove] = useState<
+    AllowedMove | undefined
+  >();
+  const [board, setBoard] = useState<GHQState["board"]>(G.board);
+
+  useEffect(() => {
+    if (currentPlayerTurn === currentPlayer && G.thisTurnMoves.length > 0) {
+      setMostRecentMove(G.thisTurnMoves[G.thisTurnMoves.length - 1]);
+      setTimeout(() => setBoard(G.board), 250);
     }
+  }, [G.thisTurnMoves]);
 
-    // Otherwise, show the live board
-    return G.board;
-  }, [G.board, currentPlayerTurn, ctx.gameover]);
+  useEffect(() => {
+    setBoard(G.board);
+  }, [currentPlayerTurn, ctx.gameover]);
 
-  const mostRecentMove = useMemo(
-    () => G.thisTurnMoves[G.thisTurnMoves.length - 1],
-    [G.thisTurnMoves]
-  );
+  const bombarded = useMemo(() => bombardedSquares(board), [board]);
   const recentMoves = useMemo(
     () => [...G.lastTurnMoves["0"], ...G.lastTurnMoves["1"]],
     [ctx.turn]

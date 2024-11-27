@@ -12,6 +12,7 @@ export default function Reserve({
   G,
   ctx,
   player,
+  currentPlayer,
   currentPlayerTurn,
   userActionState,
   usernames,
@@ -20,6 +21,7 @@ export default function Reserve({
   G: GHQState;
   ctx: Ctx;
   player: Player;
+  currentPlayer: Player;
   currentPlayerTurn: Player;
   userActionState: UserActionState;
   usernames: string[];
@@ -36,7 +38,7 @@ export default function Reserve({
               ? userActionState.selectedReserve
               : undefined
           }
-          selectable={player === currentPlayerTurn}
+          selectable={player === currentPlayerTurn && player === currentPlayer}
           selectReserve={selectReserve}
         />
         <div className="ml-4 lg:ml-20 my-2 flex flex-col gap-1">

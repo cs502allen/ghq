@@ -37,7 +37,7 @@ export interface SquareState {
   isRightClicked: boolean;
   isHovered: boolean;
   isMidMove: boolean;
-  shouldAnimateFrom: Coordinate | undefined;
+  shouldAnimateTo: Coordinate | undefined;
 }
 export function getSquareState({
   board,
@@ -150,16 +150,16 @@ export function getSquareState({
       colIndex,
     ]);
 
-  let shouldAnimateFrom: Coordinate | undefined = undefined;
+  let shouldAnimateTo: Coordinate | undefined = undefined;
   if (mostRecentMove) {
     if (
       (mostRecentMove &&
         mostRecentMove.name === "Move" &&
-        areCoordsEqual(mostRecentMove.args[1], [rowIndex, colIndex])) ||
+        areCoordsEqual(mostRecentMove.args[0], [rowIndex, colIndex])) ||
       (mostRecentMove.name === "MoveAndOrient" &&
-        areCoordsEqual(mostRecentMove.args[1], [rowIndex, colIndex]))
+        areCoordsEqual(mostRecentMove.args[0], [rowIndex, colIndex]))
     ) {
-      shouldAnimateFrom = mostRecentMove.args[0];
+      shouldAnimateTo = mostRecentMove.args[1];
     }
   }
 
@@ -194,7 +194,7 @@ export function getSquareState({
     isRightClicked: false,
     isHovered,
     isMidMove,
-    shouldAnimateFrom,
+    shouldAnimateTo,
   };
 }
 
@@ -207,18 +207,18 @@ export default function Square({
   pieceSize: number;
   squareState: SquareState;
 }) {
-  const { rowIndex, colIndex, square, stagedSquare, shouldAnimateFrom } =
+  const { rowIndex, colIndex, square, stagedSquare, shouldAnimateTo } =
     squareState;
   const displaySquare = stagedSquare ?? square;
   const animationRef: Ref<HTMLImageElement> = useRef(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
   function getTransform() {
-    if (shouldAnimateFrom) {
-      const [fromRow, fromCol] = shouldAnimateFrom;
-      const [toRow, toCol] = [rowIndex, colIndex];
-      const deltaX = (fromCol - toCol) * squareSize;
-      const deltaY = (fromRow - toRow) * squareSize;
+    if (shouldAnimateTo) {
+      const [toRow, toCol] = shouldAnimateTo;
+      const [fromRow, fromCol] = [rowIndex, colIndex];
+      const deltaX = (toCol - fromCol) * squareSize;
+      const deltaY = (toRow - fromRow) * squareSize;
 
       return `translate(${deltaX}px, ${deltaY}px)`;
     }
@@ -231,17 +231,17 @@ export default function Square({
       !isAnimating &&
       animationRef.current &&
       displaySquare &&
-      shouldAnimateFrom
+      shouldAnimateTo
     ) {
       setIsAnimating(true);
       animationRef.current.style.position = "absolute";
       animationRef.current.style.zIndex = "50";
       const animation = animationRef.current.animate(
         [
-          { transform: getTransform() },
           {
             transform: "translate(0px, 0px)",
           },
+          { transform: getTransform() },
         ],
         {
           duration: 250,
@@ -251,13 +251,13 @@ export default function Square({
 
       animation.onfinish = () => {
         setIsAnimating(false);
-        if (animationRef.current) {
-          animationRef.current.style.position = "relative";
-          animationRef.current.style.zIndex = "1";
-        }
+        // if (animationRef.current) {
+        //   animationRef.current.style.position = "relative";
+        //   animationRef.current.style.zIndex = "1";
+        // }
       };
     }
-  }, [shouldAnimateFrom]);
+  }, [shouldAnimateTo]);
 
   return (
     <div

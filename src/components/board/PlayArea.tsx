@@ -98,6 +98,7 @@ export default function PlayArea(props: BoardProps<GHQState>) {
         G={G}
         ctx={ctx}
         player={getOpponent(currentPlayer)}
+        currentPlayer={currentPlayer}
         currentPlayerTurn={currentPlayerTurn}
         usernames={usernames}
         userActionState={userActionState}
@@ -117,6 +118,7 @@ export default function PlayArea(props: BoardProps<GHQState>) {
         G={G}
         ctx={ctx}
         player={currentPlayer}
+        currentPlayer={currentPlayer}
         currentPlayerTurn={currentPlayerTurn}
         usernames={usernames}
         userActionState={userActionState}

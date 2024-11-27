@@ -1049,7 +1049,9 @@ export function ReserveBank(props: {
     return (
       <div
         onClick={() => {
-          props.selectReserve(kind);
+          if (props.selectable) {
+            props.selectReserve(kind);
+          }
         }}
         key={kind}
         className={classNames(
