@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AllowedMove, GHQState, Player } from "@/game/engine";
 import { BoardProps } from "boardgame.io/react";
 import { UserActionState } from "./state";
@@ -50,7 +50,10 @@ export default function useBoard({
       }
 
       // Wait for all the animations to finish before setting the final board state.
-      sleep(G.lastTurnBoards.length * 250).then(() => setBoard(G.board));
+      sleep(G.lastTurnBoards.length * 250).then(() => {
+        setMostRecentMove(undefined);
+        setBoard(G.board);
+      });
     }
   }, [currentPlayerTurn, currentPlayer, G.lastTurnBoards, G.board]);
 
@@ -63,25 +66,17 @@ export default function useBoard({
     animateOpponentsTurnToLatestBoardState();
   }, [currentPlayerTurn, ctx.gameover]);
 
-  // TODO(tyler): figure out why board doesn't update against bots
-  // TODO(tyler): move history to game state not plugin so that log isn't wrong against bots and random sounds dont appear
-
-  // Also change the board state when the current player makes a move.
   useEffect(() => {
-    if (G.isReplayMode) {
-      return;
-    }
-
+    // Animate when it's our turn (i.e. we just made move 1 or 2, or hit undo to go to move 0)
     if (currentPlayerTurn === currentPlayer && G.thisTurnMoves.length >= 0) {
-      // TODO(tyler): Animate moves forward, but not during undo.
-      // setMostRecentMove(G.thisTurnMoves[G.thisTurnMoves.length - 1]);
-      // sleep(250).then(() => setBoard(G.board));
-
-      // Don't animate our own moves for now, just set the board state immediately.
-      setMostRecentMove(undefined);
       setBoard(G.board);
     }
-  }, [G.thisTurnMoves]);
+
+    // Also if it's our opponents turn and they have made 0 moves (i.e. we just made our move)
+    if (currentPlayerTurn !== currentPlayer && G.thisTurnMoves.length === 0) {
+      setBoard(G.board);
+    }
+  }, [currentPlayerTurn, G.thisTurnMoves]);
 
   // In replay mode, don't animate the board state when the game state changes, just set it immediately.
   useEffect(() => {
