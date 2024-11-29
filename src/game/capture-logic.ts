@@ -402,7 +402,10 @@ function isNonDirectArtillery(
   return !areCoordsEqual(front, attackerCoords);
 }
 
-function areCoordsEqual(coord1: Coordinate, coord2: Coordinate): boolean {
+export function areCoordsEqual(
+  coord1: Coordinate,
+  coord2: Coordinate
+): boolean {
   return coord1[0] === coord2[0] && coord1[1] === coord2[1];
 }
 

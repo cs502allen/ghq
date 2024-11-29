@@ -246,6 +246,7 @@ export function GHQBoard({
     setRightClicked(new Set());
     setBoardArrows([]);
   }, [G.board]);
+
   const handleRightClickDrag = (
     from: [number, number],
     to: [number, number]
@@ -1027,7 +1028,7 @@ export function GHQBoard({
   );
 }
 
-function ReserveBank(props: {
+export function ReserveBank(props: {
   player: Player;
   reserve: ReserveFleet;
   selectable: boolean;
@@ -1049,18 +1050,22 @@ function ReserveBank(props: {
     return (
       <div
         onClick={() => {
-          props.selectReserve(kind);
+          if (props.selectable) {
+            props.selectReserve(kind);
+          }
         }}
         key={kind}
         className={classNames(
           "col-span-1 select-none flex font-bold text-xl p-1 flex-col items-center justify-end",
           props.player === "RED" ? "text-red-600" : "text-blue-600",
-          { ["cursor-pointer"]: props.selectable },
           {
-            ["hover:bg-gray-100 "]:
+            ["cursor-pointer"]: props.selectable && kind !== props.selectedKind,
+          },
+          {
+            ["hover:bg-gray-200 "]:
               props.selectable && props.selectedKind !== kind,
           },
-          { ["bg-gray-200 "]: props.selectedKind === kind }
+          { ["bg-gray-300 "]: props.selectedKind === kind }
         )}
       >
         <img
@@ -1138,7 +1143,7 @@ function BoardCoordinateLabels({
   );
 }
 
-function SkipButton({ skip }: { skip: () => void }) {
+export function SkipButton({ skip }: { skip: () => void }) {
   return (
     <button
       onClick={skip}
@@ -1150,7 +1155,7 @@ function SkipButton({ skip }: { skip: () => void }) {
   );
 }
 
-function ResignButton({ resign }: { resign: () => void }) {
+export function ResignButton({ resign }: { resign: () => void }) {
   const [confirm, setConfirm] = React.useState(false);
   if (confirm) {
     return (
@@ -1181,7 +1186,7 @@ function ResignButton({ resign }: { resign: () => void }) {
   );
 }
 
-function OfferDrawButton({ draw }: { draw: (offer: boolean) => void }) {
+export function OfferDrawButton({ draw }: { draw: (offer: boolean) => void }) {
   const [offered, setOffered] = React.useState(false);
   return (
     <button
@@ -1200,7 +1205,7 @@ function OfferDrawButton({ draw }: { draw: (offer: boolean) => void }) {
   );
 }
 
-function AcceptDrawButton({ draw }: { draw: () => void }) {
+export function AcceptDrawButton({ draw }: { draw: () => void }) {
   return (
     <button
       onClick={draw}

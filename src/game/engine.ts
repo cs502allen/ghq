@@ -108,6 +108,17 @@ export interface SkipMove {
   args: [];
 }
 
+export type Board = [
+  [Square, Square, Square, Square, Square, Square, Square, Square],
+  [Square, Square, Square, Square, Square, Square, Square, Square],
+  [Square, Square, Square, Square, Square, Square, Square, Square],
+  [Square, Square, Square, Square, Square, Square, Square, Square],
+  [Square, Square, Square, Square, Square, Square, Square, Square],
+  [Square, Square, Square, Square, Square, Square, Square, Square],
+  [Square, Square, Square, Square, Square, Square, Square, Square],
+  [Square, Square, Square, Square, Square, Square, Square, Square]
+];
+
 export interface GHQState {
   isOnline?: boolean;
   isReplayMode?: boolean;
@@ -120,38 +131,13 @@ export interface GHQState {
     "0": number;
     "1": number;
   };
-  board: [
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square]
-  ];
-  redTurnStartBoard: [
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square]
-  ];
-  blueTurnStartBoard: [
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square],
-    [Square, Square, Square, Square, Square, Square, Square, Square]
-  ];
+  board: Board;
+  redTurnStartBoard: Board;
+  blueTurnStartBoard: Board;
   lastPlayerMoves: AllowedMove[];
   thisTurnMoves: AllowedMove[];
+  lastTurnBoards: Board[];
+  thisTurnBoards: Board[];
   eval: number;
   redReserve: ReserveFleet;
   blueReserve: ReserveFleet;
@@ -222,6 +208,7 @@ const Reinforce: Move<GHQState> = (
     args: [unitType, to],
   });
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
+  G.thisTurnBoards.push(JSON.parse(JSON.stringify(G.board)));
   G.eval = calculateEval({
     ...G,
     currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
@@ -243,6 +230,7 @@ const Move: Move<GHQState> = (
   ) {
     return INVALID_MOVE;
   }
+  G.thisTurnBoards.push(JSON.parse(JSON.stringify(G.board)));
 
   G.board[from[0]][from[1]] = null;
   G.board[to[0]][to[1]] = piece;
@@ -292,6 +280,7 @@ const MoveAndOrient: Move<GHQState> = (
   ) {
     return INVALID_MOVE;
   }
+  G.thisTurnBoards.push(JSON.parse(JSON.stringify(G.board)));
 
   piece!.orientation = orientation;
   G.board[from[0]][from[1]] = null;
@@ -323,6 +312,7 @@ const ChangeOrientation: Move<GHQState> = (
   ) {
     return INVALID_MOVE;
   }
+  G.thisTurnBoards.push(JSON.parse(JSON.stringify(G.board)));
 
   piece!.orientation = orientation;
   G.board[on[0]][on[1]] = piece;
@@ -465,6 +455,8 @@ export const GHQGame: Game<GHQState> = {
       blueTurnStartBoard: defaultBoard,
       board: defaultBoard,
       thisTurnMoves: [],
+      lastTurnBoards: [],
+      thisTurnBoards: [],
       eval: 0,
       redReserve: structuredClone(defaultReserveFleet),
       blueReserve: structuredClone(defaultReserveFleet),
@@ -493,6 +485,8 @@ export const GHQGame: Game<GHQState> = {
     onBegin: ({ ctx, G, random, log, ...plugins }) => {
       G.lastPlayerMoves = G.thisTurnMoves;
       G.thisTurnMoves = [];
+      G.lastTurnBoards = G.thisTurnBoards;
+      G.thisTurnBoards = [];
       G.lastTurnMoves[ctx.currentPlayer as "0" | "1"] = [];
       G.lastTurnCaptures[ctx.currentPlayer as "0" | "1"] = [];
 

@@ -169,7 +169,7 @@ export function spawnPositionsForPlayer(
 }
 
 // keys will be 'x,y'
-type Bombarded = { [key: string]: { RED?: true; BLUE?: true } };
+export type Bombarded = { [key: string]: { RED?: true; BLUE?: true } };
 
 export function bombardedSquares(board: GHQState["board"]): Bombarded {
   const orientationVectors = {

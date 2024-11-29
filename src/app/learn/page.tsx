@@ -2,7 +2,6 @@
 
 import { Client } from "boardgame.io/react";
 import { useEffect, useState } from "react";
-import { GHQBoard } from "@/game/board";
 import ReplayCapability from "@/game/ReplayCapability";
 import { BoardType, getBoardInfo, newTutorialGHQGame } from "@/game/tutorial";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -17,6 +16,9 @@ import { defaultBoard, defaultReserveFleet } from "@/game/engine";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import LearnBasics from "./LearnBasics";
+import { GHQBoardV2 } from "@/components/board/boardv2";
+import { shouldUseBoardV2 } from "@/components/board/board-switcher";
+import { GHQBoard } from "@/game/board";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -43,7 +45,7 @@ export default function Page() {
 
     const DynamicApp = Client({
       game: newTutorialGHQGame({ boardState: boardInfo.boardState }),
-      board: GHQBoard,
+      board: shouldUseBoardV2() ? GHQBoardV2 : GHQBoard,
     });
     setApp(() => {
       setLoading(false);
