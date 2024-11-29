@@ -9,7 +9,7 @@ export function HistoryLog({
   systemMessages,
   log,
 }: {
-  systemMessages: HistoryItem[];
+  systemMessages?: HistoryItem[];
   log: BoardProps<GHQState>["log"];
 }) {
   const filteredLog: LogEntry[] = [];
@@ -78,50 +78,58 @@ export function HistoryLog({
       };
     });
 
-  const systemCaptureMessages = systemMessages.flatMap(
-    ({ turn, isCapture, playerId, captured, message, capturedByInfantry }) => {
-      if (message) {
-        return { turn, message, isCapture };
-      }
+  const systemCaptureMessages =
+    systemMessages?.flatMap(
+      ({
+        turn,
+        isCapture,
+        playerId,
+        captured,
+        message,
+        capturedByInfantry,
+      }) => {
+        if (message) {
+          return { turn, message, isCapture };
+        }
 
-      if (isCapture && captured) {
-        const player = playerId === "0" ? "Red" : "Blue";
-        const clearedSquares = captured.map(({ coordinate }) => coordinate);
+        if (isCapture && captured) {
+          const player = playerId === "0" ? "Red" : "Blue";
+          const clearedSquares = captured.map(({ coordinate }) => coordinate);
 
-        if (capturedByInfantry) {
-          return capturedByInfantry.map((infantry, i) => {
-            const attackerPieceType =
-              typeof infantry.piece.type === "string"
-                ? infantry.piece.type.toLowerCase()
-                : "piece";
-            const capturedPieceType =
-              typeof captured[i]?.square?.type === "string"
-                ? captured[i]?.square?.type?.toLowerCase()
-                : "piece";
+          if (capturedByInfantry) {
+            return capturedByInfantry.map((infantry, i) => {
+              const attackerPieceType =
+                typeof infantry.piece.type === "string"
+                  ? infantry.piece.type.toLowerCase()
+                  : "piece";
+              const capturedPieceType =
+                typeof captured[i]?.square?.type === "string"
+                  ? captured[i]?.square?.type?.toLowerCase()
+                  : "piece";
+              return {
+                turn,
+                isCapture,
+                message: `${player} ${attackerPieceType} captured ${capturedPieceType} at ${coordinateToAlgebraic(
+                  clearedSquares[i]
+                )}`,
+              };
+            });
+          } else {
             return {
               turn,
               isCapture,
-              message: `${player} ${attackerPieceType} captured ${capturedPieceType} at ${coordinateToAlgebraic(
-                clearedSquares[i]
-              )}`,
+              message: `${player} artillery destroyed piece${
+                clearedSquares.length > 1 ? "s" : ""
+              } at ${clearedSquares
+                .map((coord) => coordinateToAlgebraic(coord))
+                .join(", ")}`,
             };
-          });
-        } else {
-          return {
-            turn,
-            isCapture,
-            message: `${player} artillery destroyed piece${
-              clearedSquares.length > 1 ? "s" : ""
-            } at ${clearedSquares
-              .map((coord) => coordinateToAlgebraic(coord))
-              .join(", ")}`,
-          };
+          }
         }
-      }
 
-      return { turn, isCapture, message: "" };
-    }
-  );
+        return { turn, isCapture, message: "" };
+      }
+    ) ?? [];
 
   const combinedMessages = [...systemCaptureMessages, ...playerMessages].sort(
     (a, b) => a.turn - b.turn

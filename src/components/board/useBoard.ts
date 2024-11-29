@@ -101,7 +101,7 @@ export default function useBoard({
 
   // Play capture sounds when a start-of-turn capture has occurred.
   useEffect(() => {
-    const startOfTurnCaptures = G.historyLog.find(
+    const startOfTurnCaptures = G.historyLog?.find(
       ({ turn, isCapture }) => turn === ctx.turn && isCapture
     );
     if (startOfTurnCaptures) {

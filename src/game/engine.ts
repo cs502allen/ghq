@@ -162,7 +162,7 @@ export interface GHQState {
   // displaying moves from most recent turn
   lastTurnMoves: Record<"0" | "1", Coordinate[]>;
   lastTurnCaptures: Record<"0" | "1", Coordinate[]>;
-  historyLog: HistoryItem[];
+  historyLog?: HistoryItem[];
 }
 
 export interface GameoverState {
@@ -508,7 +508,7 @@ export const GHQGame: Game<GHQState> = {
           ...clearedSquares
         );
 
-        G.historyLog.push({
+        G.historyLog?.push({
           isCapture: true,
           turn: ctx.turn,
           playerId: ctx.currentPlayer,
@@ -546,7 +546,7 @@ export const GHQGame: Game<GHQState> = {
 
         const capturedByInfantry = freeCaptured.map(({ attacker }) => attacker);
 
-        G.historyLog.push({
+        G.historyLog?.push({
           isCapture: true,
           turn: ctx.turn,
           playerId: ctx.currentPlayer,
