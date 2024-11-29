@@ -247,11 +247,13 @@ const Move: Move<GHQState> = (
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
 
   let capturedPieceType: UnitType | undefined;
+  let capturedPieceOrientation: Orientation | undefined;
 
   if (capturePreference) {
-    capturedPieceType =
-      G.board[capturePreference[0]][capturePreference[1]]?.type;
-    G.board[capturePreference[0]][capturePreference[1]] = null;
+    const [x, y] = capturePreference;
+    capturedPieceType = G.board[x][y]?.type;
+    capturedPieceOrientation = G.board[x][y]?.orientation;
+    G.board[x][y] = null;
     G.lastTurnCaptures[ctx.currentPlayer as "0" | "1"].push(capturePreference);
   }
 
@@ -263,6 +265,7 @@ const Move: Move<GHQState> = (
     pieceType: piece?.type,
     capturePreference,
     capturedPieceType,
+    capturedPieceOrientation,
   });
   G.eval = calculateEval({
     ...G,
