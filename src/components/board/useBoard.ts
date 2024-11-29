@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AllowedMove, GHQState, Player } from "@/game/engine";
 import { BoardProps } from "boardgame.io/react";
-import { HistoryState } from "@/game/move-history-plugin";
 import { UserActionState } from "./state";
 import { playCaptureSound, playMoveSound } from "@/game/audio";
 import { Ctx } from "boardgame.io";
@@ -14,7 +13,6 @@ export default function useBoard({
   ctx,
   G,
   moves,
-  plugins,
   userActionState,
   currentPlayer,
   currentPlayerTurn,
@@ -108,14 +106,13 @@ export default function useBoard({
 
   // Play capture sounds when a start-of-turn capture has occurred.
   useEffect(() => {
-    const systemMessages = plugins.history.data as HistoryState;
-    const startOfTurnCaptures = systemMessages.log.find(
+    const startOfTurnCaptures = G.historyLog.find(
       ({ turn, isCapture }) => turn === ctx.turn && isCapture
     );
     if (startOfTurnCaptures) {
       playCaptureSound();
     }
-  }, [ctx.turn, plugins.history.data]);
+  }, [ctx.turn, G.historyLog]);
 
   return {
     board,

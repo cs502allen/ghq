@@ -5,9 +5,8 @@ import {
   clearBombardedSquares,
   freeInfantryCaptures,
 } from "@/game/capture-logic";
-import { appendHistory, HistoryPlugin } from "./move-history-plugin";
 import { getGameoverState } from "./gameover-logic";
-import { isMoveAllowed } from "./board-moves";
+import { isMoveAllowed, PlayerPiece } from "./board-moves";
 import { calculateEval } from "./eval";
 import { ai } from "./ai";
 
@@ -119,6 +118,15 @@ export type Board = [
   [Square, Square, Square, Square, Square, Square, Square, Square]
 ];
 
+export interface HistoryItem {
+  message?: string;
+  turn: number;
+  isCapture: boolean;
+  playerId?: string;
+  captured?: { coordinate: Coordinate; square: Square }[];
+  capturedByInfantry?: PlayerPiece[];
+}
+
 export interface GHQState {
   isOnline?: boolean;
   isReplayMode?: boolean;
@@ -154,6 +162,7 @@ export interface GHQState {
   // displaying moves from most recent turn
   lastTurnMoves: Record<"0" | "1", Coordinate[]>;
   lastTurnCaptures: Record<"0" | "1", Coordinate[]>;
+  historyLog: HistoryItem[];
 }
 
 export interface GameoverState {
@@ -441,7 +450,6 @@ export const defaultReserveFleet: ReserveFleet = {
 };
 
 export const GHQGame: Game<GHQState> = {
-  plugins: [HistoryPlugin],
   setup: ({ ctx, ...plugins }, setupData) => {
     return {
       startTime: Date.now(),
@@ -477,6 +485,7 @@ export const GHQGame: Game<GHQState> = {
         "0": [],
         "1": [],
       },
+      historyLog: [],
     };
   },
   turn: {
@@ -499,7 +508,7 @@ export const GHQGame: Game<GHQState> = {
           ...clearedSquares
         );
 
-        appendHistory(plugins, {
+        G.historyLog.push({
           isCapture: true,
           turn: ctx.turn,
           playerId: ctx.currentPlayer,
@@ -537,7 +546,7 @@ export const GHQGame: Game<GHQState> = {
 
         const capturedByInfantry = freeCaptured.map(({ attacker }) => attacker);
 
-        appendHistory(plugins, {
+        G.historyLog.push({
           isCapture: true,
           turn: ctx.turn,
           playerId: ctx.currentPlayer,
