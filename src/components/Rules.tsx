@@ -1,7 +1,27 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { Button } from "./ui/button";
+import {
+  shouldUseBoardV2,
+  useBoardV1,
+  useBoardV2,
+} from "./board/board-switcher";
 
 export default function Rules() {
+  function toggleBoard() {
+    if (shouldUseBoardV2()) {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      useBoardV1();
+    } else {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      useBoardV2();
+    }
+  }
+
+  const nextBoardVersion = shouldUseBoardV2() ? "v1" : "v2";
+
   return (
     <div className="flex flex-col gap-3">
       <div>
@@ -29,6 +49,16 @@ export default function Rules() {
           How To Play GHQ
         </a>{" "}
         video).
+      </div>
+
+      <div>
+        <Button
+          variant="outline"
+          className="h-6 px-2 text-xs"
+          onClick={toggleBoard}
+        >
+          Use {nextBoardVersion}
+        </Button>
       </div>
     </div>
   );

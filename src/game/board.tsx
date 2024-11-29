@@ -65,7 +65,6 @@ export function GHQBoard({
   playerID,
   undo,
   redo,
-  plugins,
   log,
 }: BoardProps<GHQState>) {
   const router = useRouter();
@@ -889,7 +888,7 @@ export function GHQBoard({
     return (
       <>
         <EvalBar evalValue={G.eval} />
-        <HistoryLog systemMessages={plugins.history.data} log={log} />
+        <HistoryLog systemMessages={G.historyLog} log={log} />
       </>
     );
   }, [ctx.turn, ctx.gameover]);
