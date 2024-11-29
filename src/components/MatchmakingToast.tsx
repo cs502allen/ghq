@@ -61,6 +61,7 @@ export default function MatchmakingToast() {
     } else {
       toast(
         <ToastContent
+          matchmakingMode={matchmakingMode}
           cancelMatchmaking={cancelMatchmaking}
           onMinimize={() => setIsMinimized(true)}
         />,

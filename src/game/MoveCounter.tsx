@@ -4,7 +4,6 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import classNames from "classnames";
-import { useEffect } from "react";
 
 export default function MoveCounter({
   numMoves,

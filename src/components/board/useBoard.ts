@@ -4,7 +4,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AllowedMove, GHQState, Player } from "@/game/engine";
 import { BoardProps } from "boardgame.io/react";
 import { UserActionState } from "./state";
-import { playCaptureSound, playMoveSound } from "@/game/audio";
+import {
+  playCaptureSound,
+  playMoveSound,
+  playNextTurnSound,
+} from "@/game/audio";
 import { Ctx } from "boardgame.io";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -76,6 +80,7 @@ export default function useBoard({
     // Also if it's our opponents turn and they have made 0 moves (i.e. we just made our move)
     if (currentPlayerTurn !== currentPlayer && G.thisTurnMoves.length === 0) {
       setBoard(G.board);
+      playNextTurnSound();
     }
   }, [currentPlayerTurn, G.thisTurnMoves]);
 

@@ -13,6 +13,7 @@ import { useAuth } from "@clerk/nextjs";
 import { ghqFetch } from "@/lib/api";
 import { API_URL } from "@/app/live/config";
 import { TIME_CONTROLS } from "@/game/constants";
+import { playGameReadySound } from "@/game/audio";
 
 interface MatchmakingContextType {
   matchmakingMode: keyof typeof TIME_CONTROLS | null;
@@ -58,6 +59,7 @@ export const MatchmakingProvider: React.FC<{ children: ReactNode }> = ({
       });
       if (data.match) {
         router.push(`/live/${data.match.id}`);
+        playGameReadySound();
         setMatchmakingMode(null);
       }
     } catch (error) {
