@@ -1,7 +1,6 @@
 import React from "react";
-import { GHQState } from "@/game/engine";
+import { GHQState, HistoryItem } from "@/game/engine";
 import { BoardProps } from "boardgame.io/react";
-import { HistoryState } from "@/game/move-history-plugin";
 import { coordinateToAlgebraic, degreesToCardinal } from "./notation";
 import classNames from "classnames";
 import { LogEntry } from "boardgame.io";
@@ -10,7 +9,7 @@ export function HistoryLog({
   systemMessages,
   log,
 }: {
-  systemMessages: HistoryState;
+  systemMessages: HistoryItem[];
   log: BoardProps<GHQState>["log"];
 }) {
   const filteredLog: LogEntry[] = [];
@@ -79,7 +78,7 @@ export function HistoryLog({
       };
     });
 
-  const systemCaptureMessages = systemMessages.log.flatMap(
+  const systemCaptureMessages = systemMessages.flatMap(
     ({ turn, isCapture, playerId, captured, message, capturedByInfantry }) => {
       if (message) {
         return { turn, message, isCapture };

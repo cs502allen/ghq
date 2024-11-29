@@ -508,6 +508,7 @@ export function newTutorialGHQGame({
         "0": [],
         "1": [],
       },
+      historyLog: [],
     };
   };
 

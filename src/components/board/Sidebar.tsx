@@ -25,7 +25,6 @@ export default function Sidebar({
   ctx,
   playerID,
   moves,
-  plugins,
   log,
   className,
 }: BoardProps<GHQState> & {
@@ -46,7 +45,7 @@ export default function Sidebar({
     return (
       <>
         <EvalBar evalValue={G.eval} />
-        <HistoryLog systemMessages={plugins.history.data} log={log} />
+        <HistoryLog systemMessages={G.historyLog} log={log} />
       </>
     );
   }, [ctx.turn, ctx.gameover]);
