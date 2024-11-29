@@ -698,15 +698,11 @@ export function getRecentCaptures({
 
   const playerCaptures: PlayerPiece[] = filteredLog
     .filter((entry) => entry.action.type === "MAKE_MOVE")
-    .filter((entry) => entry.metadata?.capturedPieceType)
+    .filter((entry) => entry.metadata?.capturedPiece)
     .filter((entry) => entry.turn === turn || entry.turn === turn - 1)
     .map((entry) => ({
       coordinate: entry.metadata?.capturePreference ?? [-1, -1],
-      piece: {
-        player: playerIdToPlayer(entry.action.payload.playerID),
-        type: entry.metadata?.capturedPieceType as UnitType,
-        orientation: entry.metadata?.capturedPieceOrientation as Orientation,
-      },
+      piece: entry.metadata.capturedPiece,
     }));
 
   captures.push(...playerCaptures);
@@ -729,8 +725,4 @@ export function getRecentCaptures({
   }
 
   return captures;
-}
-
-function playerIdToPlayer(playerId: string): Player {
-  return playerId === "0" ? "RED" : "BLUE";
 }

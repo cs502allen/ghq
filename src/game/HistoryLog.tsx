@@ -44,7 +44,7 @@ export function HistoryLog({
 
         const capture = entry?.metadata?.capturePreference;
         if (capture) {
-          const captureType = entry?.metadata?.capturedPieceType ?? "piece";
+          const captureType = entry?.metadata?.captured?.type ?? "piece";
           const captureNotation = coordinateToAlgebraic(capture);
           description += ` and captured ${captureType.toLowerCase()} on ${captureNotation}`;
           isCapture = true;

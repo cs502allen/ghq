@@ -246,13 +246,11 @@ const Move: Move<GHQState> = (
 
   G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
 
-  let capturedPieceType: UnitType | undefined;
-  let capturedPieceOrientation: Orientation | undefined;
+  let capturedPiece: Square = null;
 
   if (capturePreference) {
     const [x, y] = capturePreference;
-    capturedPieceType = G.board[x][y]?.type;
-    capturedPieceOrientation = G.board[x][y]?.orientation;
+    capturedPiece = JSON.parse(JSON.stringify(G.board[x][y])); // deep copy for boardgame.io engine reasons
     G.board[x][y] = null;
     G.lastTurnCaptures[ctx.currentPlayer as "0" | "1"].push(capturePreference);
   }
@@ -264,8 +262,7 @@ const Move: Move<GHQState> = (
   log.setMetadata({
     pieceType: piece?.type,
     capturePreference,
-    capturedPieceType,
-    capturedPieceOrientation,
+    capturedPiece,
   });
   G.eval = calculateEval({
     ...G,

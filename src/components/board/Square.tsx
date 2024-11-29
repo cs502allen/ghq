@@ -40,7 +40,6 @@ export interface SquareState {
   isCaptureCandidate: boolean;
   isBombardCandidate: boolean;
   showTarget: boolean;
-  wasRecentlyCaptured: boolean;
   wasRecentlyCapturedPiece: NonNullSquare | undefined;
   wasRecentlyMovedTo: boolean;
   isMovable: boolean;
@@ -55,7 +54,6 @@ export function getSquareState({
   mostRecentMove,
   recentMoves,
   recentCaptures,
-  recentCapturesV2,
   square,
   rowIndex,
   colIndex,
@@ -66,8 +64,7 @@ export function getSquareState({
   board: Board;
   mostRecentMove: AllowedMove | undefined;
   recentMoves: Coordinate[];
-  recentCaptures: Coordinate[];
-  recentCapturesV2: PlayerPiece[];
+  recentCaptures: PlayerPiece[];
   rowIndex: number;
   colIndex: number;
   square: Square;
@@ -86,10 +83,7 @@ export function getSquareState({
   const wasRecentlyMovedTo = recentMoves.some((moveCoord) =>
     areCoordsEqual(coord, moveCoord)
   );
-  const wasRecentlyCaptured = recentCaptures.some((capCoord) =>
-    areCoordsEqual(coord, capCoord)
-  );
-  const wasRecentlyCapturedPiece = recentCapturesV2.find((cap) =>
+  const wasRecentlyCapturedPiece = recentCaptures.find((cap) =>
     areCoordsEqual(coord, cap.coordinate)
   )?.piece;
   const { shouldAnimateTo } = getAnimation(coord, mostRecentMove);
@@ -103,7 +97,6 @@ export function getSquareState({
     isBlueBombarded: bombarded[`${rowIndex},${colIndex}`]?.BLUE ?? false,
     isSelected,
     showTarget: false,
-    wasRecentlyCaptured,
     wasRecentlyCapturedPiece,
     wasRecentlyMovedTo,
     isMovable,
@@ -272,7 +265,7 @@ function SquareBackground({ squareState }: { squareState: SquareState }) {
       {squareState.wasRecentlyMovedTo && (
         <SquareBackgroundColor className="bg-yellow-300/30" />
       )}
-      {squareState.wasRecentlyCaptured && (
+      {squareState.wasRecentlyCapturedPiece && (
         <SquareBackgroundColor className="bg-red-300/30" />
       )}
       {squareState.isSelected && (

@@ -29,6 +29,7 @@ export default function useBoard({
   const [mostRecentMove, setMostRecentMove] = useState<
     AllowedMove | undefined
   >();
+  const [shouldUpdateMoveOrCapture, setShouldUpdateMoveOrCapture] = useState(0);
 
   const animateOpponentsTurnToLatestBoardState = useCallback(() => {
     // Only animate when it's our turn (opponent's move has ended)

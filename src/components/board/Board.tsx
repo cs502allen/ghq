@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { AllowedMove, Coordinate, GHQState, Player } from "@/game/engine";
 import { BoardProps } from "boardgame.io/react";
 import { bombardedSquares } from "@/game/move-logic";
@@ -53,16 +53,12 @@ export default function Board({
   const bombarded = useMemo(() => bombardedSquares(board), [board]);
   const recentMoves = useMemo(
     () => [...G.lastTurnMoves["0"], ...G.lastTurnMoves["1"]],
-    [ctx.turn]
+    [board]
   );
   const recentCaptures = useMemo(
-    () => [...G.lastTurnCaptures["0"], ...G.lastTurnCaptures["1"]],
-    [ctx.turn]
-  );
-  const recentCapturesV2 = useMemo(
     () =>
       getRecentCaptures({ turn: ctx.turn, systemMessages: G.historyLog, log }),
-    [ctx.turn]
+    [board]
   );
 
   const { boardArrows, rightClicked, handleRightClickDrag, clearRightClick } =
@@ -120,7 +116,6 @@ export default function Board({
                   mostRecentMove,
                   recentMoves,
                   recentCaptures,
-                  recentCapturesV2,
                   rowIndex,
                   colIndex,
                   square,
