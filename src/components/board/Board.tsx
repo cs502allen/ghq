@@ -14,10 +14,12 @@ import useControls from "./Controls";
 import BoardContainer from "./BoardContainer";
 import useBoard from "./useBoard";
 import useRightClick from "./useRightClick";
+import { getRecentCaptures } from "@/game/capture-logic";
 
 export default function Board({
   ctx,
   G,
+  log,
   moves,
   plugins,
   undo,
@@ -55,6 +57,11 @@ export default function Board({
   );
   const recentCaptures = useMemo(
     () => [...G.lastTurnCaptures["0"], ...G.lastTurnCaptures["1"]],
+    [ctx.turn]
+  );
+  const recentCapturesV2 = useMemo(
+    () =>
+      getRecentCaptures({ turn: ctx.turn, systemMessages: G.historyLog, log }),
     [ctx.turn]
   );
 
@@ -113,6 +120,7 @@ export default function Board({
                   mostRecentMove,
                   recentMoves,
                   recentCaptures,
+                  recentCapturesV2,
                   rowIndex,
                   colIndex,
                   square,

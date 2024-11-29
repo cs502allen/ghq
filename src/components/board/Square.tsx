@@ -14,7 +14,11 @@ import {
 import classNames from "classnames";
 import { Bombarded } from "@/game/move-logic";
 import { Crosshair } from "lucide-react";
-import { isBombardedBy, isPieceArtillery } from "../../game/board-moves";
+import {
+  isBombardedBy,
+  isPieceArtillery,
+  PlayerPiece,
+} from "../../game/board-moves";
 
 import { areCoordsEqual } from "../../game/capture-logic";
 import { UserActionState } from "./state";
@@ -37,6 +41,7 @@ export interface SquareState {
   isBombardCandidate: boolean;
   showTarget: boolean;
   wasRecentlyCaptured: boolean;
+  wasRecentlyCapturedPiece: NonNullSquare | undefined;
   wasRecentlyMovedTo: boolean;
   isMovable: boolean;
   isRightClicked: boolean;
@@ -50,6 +55,7 @@ export function getSquareState({
   mostRecentMove,
   recentMoves,
   recentCaptures,
+  recentCapturesV2,
   square,
   rowIndex,
   colIndex,
@@ -61,6 +67,7 @@ export function getSquareState({
   mostRecentMove: AllowedMove | undefined;
   recentMoves: Coordinate[];
   recentCaptures: Coordinate[];
+  recentCapturesV2: PlayerPiece[];
   rowIndex: number;
   colIndex: number;
   square: Square;
@@ -82,6 +89,9 @@ export function getSquareState({
   const wasRecentlyCaptured = recentCaptures.some((capCoord) =>
     areCoordsEqual(coord, capCoord)
   );
+  const wasRecentlyCapturedPiece = recentCapturesV2.find((cap) =>
+    areCoordsEqual(coord, cap.coordinate)
+  )?.piece;
   const { shouldAnimateTo } = getAnimation(coord, mostRecentMove);
 
   return {
@@ -94,6 +104,7 @@ export function getSquareState({
     isSelected,
     showTarget: false,
     wasRecentlyCaptured,
+    wasRecentlyCapturedPiece,
     wasRecentlyMovedTo,
     isMovable,
     isCaptureCandidate,
@@ -116,9 +127,15 @@ export default function Square({
   squareState: SquareState;
   isFlipped: boolean; // In general, the square shouldn't care whether it's flipped. We only need to know this for the coordinate labels.
 }) {
-  const { rowIndex, colIndex, square, stagedSquare, shouldAnimateTo } =
-    squareState;
-  const displaySquare = stagedSquare ?? square;
+  const {
+    rowIndex,
+    colIndex,
+    square,
+    stagedSquare,
+    shouldAnimateTo,
+    wasRecentlyCapturedPiece,
+  } = squareState;
+  const displaySquare = stagedSquare ?? square ?? wasRecentlyCapturedPiece;
   const animationRef: Ref<HTMLImageElement> = useRef(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -195,6 +212,8 @@ export default function Square({
             className={classNames("pointer-events-none", {
               "opacity-25": squareState.isMidMove,
               "opacity-75": squareState.stagedSquare,
+              "opacity-50 filter grayscale":
+                squareState.wasRecentlyCapturedPiece && !square,
             })}
             src={`/${
               Units[displaySquare.type].imagePathPrefix

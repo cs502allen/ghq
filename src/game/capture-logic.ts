@@ -1,12 +1,16 @@
 import {
   Coordinate,
   GHQState,
+  HistoryItem,
   NonNullSquare,
+  Orientation,
   Player,
   Square,
   Units,
+  UnitType,
 } from "@/game/engine";
-import type { Ctx } from "boardgame.io";
+import type { Ctx, LogEntry } from "boardgame.io";
+import { BoardProps } from "boardgame.io/react";
 import { bombardedSquares } from "@/game/move-logic";
 import { PlayerPiece } from "./board-moves";
 
@@ -664,4 +668,69 @@ function findUnengagedInfantry(
   }
 
   return unengagedInfantry;
+}
+
+export function getRecentCaptures({
+  turn,
+  systemMessages,
+  log,
+}: {
+  turn: number;
+  systemMessages?: HistoryItem[];
+  log: BoardProps<GHQState>["log"];
+}): PlayerPiece[] {
+  const filteredLog: LogEntry[] = [];
+  const undoneMoves: LogEntry[] = [];
+
+  for (const entry of log) {
+    if (entry.action.type === "UNDO") {
+      const lastMove = filteredLog.pop();
+      lastMove && undoneMoves.push(lastMove);
+    } else if (entry.action.type === "REDO") {
+      const lastUndoneMove = undoneMoves.pop();
+      lastUndoneMove && filteredLog.push(lastUndoneMove);
+    } else {
+      filteredLog.push(entry);
+    }
+  }
+
+  const captures: PlayerPiece[] = [];
+
+  const playerCaptures: PlayerPiece[] = filteredLog
+    .filter((entry) => entry.action.type === "MAKE_MOVE")
+    .filter((entry) => entry.metadata?.capturedPieceType)
+    .filter((entry) => entry.turn === turn || entry.turn === turn - 1)
+    .map((entry) => ({
+      coordinate: entry.metadata?.capturePreference ?? [-1, -1],
+      piece: {
+        player: playerIdToPlayer(entry.action.payload.playerID),
+        type: entry.metadata?.capturedPieceType as UnitType,
+        orientation: entry.metadata?.capturedPieceOrientation as Orientation,
+      },
+    }));
+
+  captures.push(...playerCaptures);
+
+  if (systemMessages) {
+    const systemCaptures: PlayerPiece[] = systemMessages
+      ?.filter((entry) => entry.turn === turn || entry.turn === turn - 1)
+      .filter((entry) => entry.captured)
+      .flatMap((entry) => {
+        const capturedPieces = (entry.captured ?? [])
+          .filter(({ square }) => !!square)
+          .map(({ coordinate, square }) => ({
+            coordinate,
+            piece: square as NonNullSquare,
+          }));
+        return capturedPieces;
+      });
+
+    captures.push(...systemCaptures);
+  }
+
+  return captures;
+}
+
+function playerIdToPlayer(playerId: string): Player {
+  return playerId === "0" ? "RED" : "BLUE";
 }
