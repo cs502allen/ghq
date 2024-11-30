@@ -128,9 +128,16 @@ export interface HistoryItem {
 }
 
 export interface GHQState {
+  // True if this is an online game against other players.
   isOnline?: boolean;
+
+  // True if this game is being replayed (disables animations, etc.)
   isReplayMode?: boolean;
+
+  // Match ID for online games (possibly available already in BoardProps)
   matchId: string;
+
+  // The current user's usernames and ELOs.
   userIds: {
     "0": string;
     "1": string;
@@ -139,29 +146,46 @@ export interface GHQState {
     "0": number;
     "1": number;
   };
+
+  // The current board state.
   board: Board;
+
+  // The board state at the start of the current turn.
+  // These are being deprecated in favor of thisTurnBoards and lastTurnBoards.
   redTurnStartBoard: Board;
   blueTurnStartBoard: Board;
-  lastPlayerMoves: AllowedMove[];
+
+  // The turns made so far on this/last turn. Required to know what moves are playable this turn.
   thisTurnMoves: AllowedMove[];
+  lastPlayerMoves: AllowedMove[];
+
+  // This/last turn's board states (array of up to 3), largely used for animations.
   lastTurnBoards: Board[];
   thisTurnBoards: Board[];
   eval: number;
   redReserve: ReserveFleet;
   blueReserve: ReserveFleet;
-  // time control
+
+  // Time control. All times are in milliseconds. Time control of 0 means no time control.
   redElapsed: number;
   blueElapsed: number;
   timeControl: number;
   bonusTime: number;
   startTime: number;
   turnStartTime: number;
-  // draw state
+
+  // Whether a draw has been offered or accepted.
+  // NOTE(tyler): This probably needs to be moved outside of the game state,
+  // because we want people to be able to offer/accept draws even if it's not their turn.
   drawOfferedBy?: string;
   drawAcceptedBy?: string;
-  // displaying moves from most recent turn
+
+  // Used to display move from most recent turn.
+  // Deprecated. Don't use these if possible, instead use lastPlayerMoves and historyLog.
   lastTurnMoves: Record<"0" | "1", Coordinate[]>;
   lastTurnCaptures: Record<"0" | "1", Coordinate[]>;
+
+  // Log that should probably be renamed StartOfTurnCaptures, since that's what it stores (as of 2024-11-30).
   historyLog?: HistoryItem[];
 }
 
