@@ -423,6 +423,11 @@ function getChosenCandidates(
     }
   }
 
+  // If user is currently dragging this unit, let's consider it mid-move.
+  if (selectedCoord && userActionState?.isMouseDown) {
+    isMidMove = areCoordsEqual(coord, selectedCoord);
+  }
+
   return { isSelected, isMidMove, stagedSquare, isBombardCandidate };
 }
 

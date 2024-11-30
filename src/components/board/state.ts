@@ -31,6 +31,9 @@ export interface UserActionState {
   // The reserve piece that the user has selected that they want to place.
   selectedReserve?: keyof ReserveFleet;
 
+  // Allows us to track if the user is currently dragging the mouse.
+  isMouseDown?: boolean;
+
   // The coordinate that the user is currently hovering over. This is largely used for rendering purposes.
   hoveredCoordinate?: Coordinate;
 
@@ -53,7 +56,8 @@ export function updateClick(
   [rowIndex, colIndex]: Coordinate,
   possibleAllowedMoves: AllowedMove[],
   currentPlayer: Player,
-  currentPlayerTurn: Player
+  currentPlayerTurn: Player,
+  isMouseDown: boolean
 ): UserActionState {
   // You can only play on your turn.
   if (currentPlayer !== currentPlayerTurn) {
@@ -120,14 +124,24 @@ export function updateClick(
       ) ?? [];
 
     // If this is the currently selected piece, then we should clear the state.
+    // *Unless* the user was dragging the mouse, in which case we should keep the state.
     if (
       self.selectedPiece &&
-      areCoordsEqual(self.selectedPiece.coordinate, coordinate)
+      areCoordsEqual(self.selectedPiece.coordinate, coordinate) &&
+      !self.isMouseDown &&
+      !isMouseDown
     ) {
       return {};
     }
 
+    // If we just chose a move, then we should clear the state.
+    // This can happen because the user finished their move with a click.
+    if (self.chosenMove && !isMouseDown) {
+      return {};
+    }
+
     return {
+      isMouseDown,
       candidateMoves,
       selectedPiece: {
         piece: square,

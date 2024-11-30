@@ -5,7 +5,8 @@ import { Coordinate } from "@/game/engine";
 interface MouseTrackerProps {
   children: React.ReactNode;
   onRightClickDrag: (start: Coordinate, end: Coordinate) => void;
-  onLeftClick: (coordinate: Coordinate) => void;
+  onLeftClickDown: (coordinate: Coordinate) => void;
+  onLeftClickUp: (coordinate: Coordinate) => void;
   onMouseOver: (coordinate: Coordinate) => void;
   ref: (instance: Element | null) => void;
   flipped: boolean;
@@ -14,7 +15,8 @@ interface MouseTrackerProps {
 export default function BoardContainer({
   children,
   onRightClickDrag,
-  onLeftClick,
+  onLeftClickDown,
+  onLeftClickUp,
   onMouseOver,
   ref,
   flipped,
@@ -28,7 +30,7 @@ export default function BoardContainer({
         if (!rowIndex || !colIndex) return;
         const row = parseInt(rowIndex, 10);
         const col = parseInt(colIndex, 10);
-        onLeftClick([row, col]);
+        onLeftClickDown([row, col]);
       }
       if (e.button === 2) {
         const { rowIndex, colIndex } = (e.target as HTMLElement).dataset;
@@ -38,11 +40,18 @@ export default function BoardContainer({
         setStartCoords([row, col]);
       }
     },
-    [onLeftClick]
+    [onLeftClickDown]
   );
 
   const handleMouseUp = useCallback(
     (e: React.MouseEvent) => {
+      if (e.button === 0) {
+        const { rowIndex, colIndex } = (e.target as HTMLElement).dataset;
+        if (!rowIndex || !colIndex) return;
+        const row = parseInt(rowIndex, 10);
+        const col = parseInt(colIndex, 10);
+        onLeftClickUp([row, col]);
+      }
       if (e.button === 2 && startCoords) {
         const { rowIndex, colIndex } = (e.target as HTMLElement).dataset;
         if (!rowIndex || !colIndex) return;
@@ -52,7 +61,7 @@ export default function BoardContainer({
         setStartCoords(null);
       }
     },
-    [startCoords, onRightClickDrag]
+    [startCoords, onRightClickDrag, onLeftClickUp]
   );
 
   const handleMouseOver = useCallback(
