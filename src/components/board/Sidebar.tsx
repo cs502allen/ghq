@@ -71,7 +71,12 @@ export default function Sidebar({
             )}
           </h2>
           {ctx.gameover.reason && ctx.gameover.reason}
-          <Button onClick={async () => router.push("/")}>🏠 Home</Button>
+          <button
+            className="bg-blue-500 text-white py-1 px-2 text-sm rounded hover:bg-blue-600 flex gap-1 items-center"
+            onClick={() => router.push("/")}
+          >
+            🏠 Home
+          </button>
           <ShareGameDialog G={G} />
         </div>
       ) : (
@@ -81,8 +86,8 @@ export default function Sidebar({
             ctx.currentPlayer === "0" ? "text-red-500" : "text-blue-500"
           )}
         >
-          {ctx.currentPlayer === "0" ? "Red's " : "Blue's"} Turn
-          <div className="text-lg text-gray-600 font-mono flex gap-1 justify-center items-center">
+          {currentPlayer === currentPlayerTurn ? "Your" : "Their"} Turn
+          <div className="text-lg text-gray-600 flex gap-1 justify-center items-center font-medium">
             {3 - ctx.numMoves!} remaining move
             {ctx.numMoves !== 2 ? "s" : ""}{" "}
           </div>
