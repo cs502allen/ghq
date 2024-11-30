@@ -1,7 +1,13 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
-import { AllowedMove, Coordinate, GHQState, Player } from "@/game/engine";
+import React, { useCallback, useMemo } from "react";
+import {
+  AllowedMove,
+  Coordinate,
+  GHQState,
+  Player,
+  type Board,
+} from "@/game/engine";
 import { BoardProps } from "boardgame.io/react";
 import { bombardedSquares } from "@/game/move-logic";
 import { useMeasure } from "@uidotdev/usehooks";
@@ -10,26 +16,28 @@ import { updateClick, updateHover, UserActionState } from "./state";
 import Square, { getSquareState } from "./Square";
 import BoardArrow from "@/game/BoardArrow";
 import classNames from "classnames";
-import useControls from "./Controls";
 import BoardContainer from "./BoardContainer";
-import useBoard from "./useBoard";
 import useRightClick from "./useRightClick";
 import { getRecentCaptures } from "@/game/capture-logic";
+import { Ctx, LogEntry } from "boardgame.io";
 
 export default function Board({
   ctx,
   G,
   log,
-  moves,
-  plugins,
-  undo,
-  redo,
+  board,
+  mostRecentMove,
   userActionState,
   setUserActionState,
   possibleAllowedMoves,
   currentPlayer,
   currentPlayerTurn,
-}: BoardProps<GHQState> & {
+}: {
+  G: GHQState;
+  ctx: Ctx;
+  log: LogEntry[];
+  board: Board;
+  mostRecentMove: AllowedMove | undefined;
   currentPlayer: Player;
   currentPlayerTurn: Player;
   userActionState: UserActionState;
@@ -37,18 +45,6 @@ export default function Board({
   possibleAllowedMoves: AllowedMove[];
 }) {
   const { measureRef, squareSize, pieceSize } = useBoardDimensions();
-
-  const { board, mostRecentMove, replay } = useBoard({
-    ctx,
-    G,
-    moves,
-    plugins,
-    userActionState,
-    currentPlayer,
-    currentPlayerTurn,
-  });
-
-  useControls({ undo, redo, cancel: () => setUserActionState({}), replay });
 
   const bombarded = useMemo(() => bombardedSquares(board), [board]);
   const recentMoves = useMemo(

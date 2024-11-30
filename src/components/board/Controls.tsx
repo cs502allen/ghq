@@ -4,6 +4,7 @@ export interface ControlsProps {
   undo: () => void;
   redo: () => void;
   cancel: () => void;
+  skip: () => void;
   replay: () => void;
 }
 
@@ -11,6 +12,7 @@ export default function useControls({
   undo,
   redo,
   cancel,
+  skip,
   replay,
 }: ControlsProps) {
   useHotkeys(
@@ -19,7 +21,7 @@ export default function useControls({
       e.preventDefault();
       cancel();
     },
-    []
+    [cancel]
   );
 
   useHotkeys(
@@ -28,7 +30,7 @@ export default function useControls({
       e.preventDefault();
       undo();
     },
-    []
+    [undo]
   );
 
   useHotkeys(
@@ -37,7 +39,7 @@ export default function useControls({
       e.preventDefault();
       redo();
     },
-    []
+    [redo]
   );
 
   useHotkeys(
@@ -47,6 +49,15 @@ export default function useControls({
       replay();
     },
     [replay]
+  );
+
+  useHotkeys(
+    ".",
+    (e) => {
+      e.preventDefault();
+      skip();
+    },
+    [skip]
   );
 
   return {};

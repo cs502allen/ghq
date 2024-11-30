@@ -17,7 +17,6 @@ import {
   AcceptDrawButton,
   OfferDrawButton,
   ResignButton,
-  SkipButton,
 } from "../../game/board";
 
 export default function Sidebar({
@@ -90,9 +89,6 @@ export default function Sidebar({
           <div className="flex gap-1 justify-center items-center">
             {currentPlayer === currentPlayerTurn || !G.isOnline ? (
               <>
-                {!!ctx.numMoves && ctx.numMoves > 0 && (
-                  <SkipButton skip={() => moves.Skip()} />
-                )}
                 {G.drawOfferedBy && G.drawOfferedBy !== ctx.currentPlayer ? (
                   <AcceptDrawButton draw={() => moves.AcceptDraw()} />
                 ) : (

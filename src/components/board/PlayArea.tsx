@@ -9,11 +9,13 @@ import { updateReserveClick, UserActionState } from "./state";
 import Reserve from "./Reserve";
 import Board from "./Board";
 import classNames from "classnames";
+import ControlsView from "./ControlsView";
+import useBoard from "./useBoard";
 
 export default function PlayArea(
   props: BoardProps<GHQState> & { className: string }
 ) {
-  const { ctx, G, matchData, playerID, className } = props;
+  const { ctx, G, matchData, playerID, className, moves, log } = props;
   const [userActionState, setUserActionState] = useState<UserActionState>({});
   const currentPlayerTurn = useMemo(
     () => playerIdToPlayer(ctx.currentPlayer),
@@ -35,6 +37,15 @@ export default function PlayArea(
       }),
     [G.board, G.redReserve, G.blueReserve, currentPlayerTurn, G.thisTurnMoves]
   );
+
+  const { board, mostRecentMove, replay } = useBoard({
+    ctx,
+    G,
+    moves,
+    userActionState,
+    currentPlayer,
+    currentPlayerTurn,
+  });
 
   return (
     <div
@@ -59,7 +70,11 @@ export default function PlayArea(
         }
       />
       <Board
-        {...props}
+        G={G}
+        ctx={ctx}
+        log={log}
+        board={board}
+        mostRecentMove={mostRecentMove}
         userActionState={userActionState}
         setUserActionState={setUserActionState}
         possibleAllowedMoves={possibleAllowedMoves}
@@ -80,6 +95,12 @@ export default function PlayArea(
             updateReserveClick(userActionState, kind, possibleAllowedMoves)
           )
         }
+      />
+      <ControlsView
+        {...props}
+        isMyTurn={currentPlayer === currentPlayerTurn}
+        cancel={() => setUserActionState({})}
+        replay={() => replay()}
       />
     </div>
   );
