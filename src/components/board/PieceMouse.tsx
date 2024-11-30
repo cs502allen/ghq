@@ -50,6 +50,25 @@ export default function PieceMouse({
   }, []);
 
   useEffect(() => {
+    const handleTouchMove = (event: TouchEvent) => {
+      if (event.touches.length > 0) {
+        setX(event.touches[0].clientX);
+        setY(event.touches[0].clientY);
+      }
+    };
+
+    document.addEventListener("touchmove", handleTouchMove);
+    document.addEventListener("touchstart", handleTouchMove);
+    document.addEventListener("touchend", handleTouchMove);
+
+    return () => {
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchstart", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchMove);
+    };
+  }, []);
+
+  useEffect(() => {
     if (ref.current) {
       ref.current.style.left = `${x - pieceSize / 2}px`;
       ref.current.style.top = `${y - pieceSize / 2}px`;

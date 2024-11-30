@@ -6,7 +6,11 @@ import {
   ReserveFleet,
   type Square,
 } from "@/game/engine";
-import { isBombardedBy, PlayerPiece } from "../../game/board-moves";
+import {
+  isBombardedBy,
+  isPieceArtillery,
+  PlayerPiece,
+} from "../../game/board-moves";
 
 import { areCoordsEqual } from "../../game/capture-logic";
 
@@ -105,7 +109,13 @@ export function updateClick(
   }
 
   // If there are multiple possible moves, then we need to provide the user with a choice.
-  if (self.selectedPiece && choseCandidateMoves.length > 1) {
+  const skipChosenMoves =
+    square && isPieceArtillery(square) && self.isMouseDown;
+  if (
+    self.selectedPiece &&
+    choseCandidateMoves.length > 1 &&
+    !skipChosenMoves
+  ) {
     return {
       ...self,
       chosenMoves: choseCandidateMoves,

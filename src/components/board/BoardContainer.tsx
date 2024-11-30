@@ -23,20 +23,23 @@ export default function BoardContainer({
 }: MouseTrackerProps) {
   const [startCoords, setStartCoords] = useState<Coordinate | null>(null);
 
+  function coordinateFromHTMLElement(el: HTMLElement): Coordinate | null {
+    const { rowIndex, colIndex } = el.dataset;
+    if (!rowIndex || !colIndex) return null;
+    return [parseInt(rowIndex, 10), parseInt(colIndex, 10)];
+  }
+
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       if (e.button === 0) {
-        const { rowIndex, colIndex } = (e.target as HTMLElement).dataset;
-        if (!rowIndex || !colIndex) return;
-        const row = parseInt(rowIndex, 10);
-        const col = parseInt(colIndex, 10);
-        onLeftClickDown([row, col]);
+        const coordinate = coordinateFromHTMLElement(e.target as HTMLElement);
+        if (!coordinate) return;
+        onLeftClickDown(coordinate);
       }
       if (e.button === 2) {
-        const { rowIndex, colIndex } = (e.target as HTMLElement).dataset;
-        if (!rowIndex || !colIndex) return;
-        const row = parseInt(rowIndex, 10);
-        const col = parseInt(colIndex, 10);
+        const coordinate = coordinateFromHTMLElement(e.target as HTMLElement);
+        if (!coordinate) return;
+        const [row, col] = coordinate;
         setStartCoords([row, col]);
       }
     },
@@ -46,17 +49,15 @@ export default function BoardContainer({
   const handleMouseUp = useCallback(
     (e: React.MouseEvent) => {
       if (e.button === 0) {
-        const { rowIndex, colIndex } = (e.target as HTMLElement).dataset;
-        if (!rowIndex || !colIndex) return;
-        const row = parseInt(rowIndex, 10);
-        const col = parseInt(colIndex, 10);
+        const coordinate = coordinateFromHTMLElement(e.target as HTMLElement);
+        if (!coordinate) return;
+        const [row, col] = coordinate;
         onLeftClickUp([row, col]);
       }
       if (e.button === 2 && startCoords) {
-        const { rowIndex, colIndex } = (e.target as HTMLElement).dataset;
-        if (!rowIndex || !colIndex) return;
-        const row = parseInt(rowIndex, 10);
-        const col = parseInt(colIndex, 10);
+        const coordinate = coordinateFromHTMLElement(e.target as HTMLElement);
+        if (!coordinate) return;
+        const [row, col] = coordinate;
         onRightClickDrag(startCoords, [row, col]);
         setStartCoords(null);
       }
@@ -66,13 +67,40 @@ export default function BoardContainer({
 
   const handleMouseOver = useCallback(
     (e: React.MouseEvent) => {
-      const { rowIndex, colIndex } = (e.target as HTMLElement).dataset;
-      if (!rowIndex || !colIndex) return;
-      const row = parseInt(rowIndex, 10);
-      const col = parseInt(colIndex, 10);
+      const coordinate = coordinateFromHTMLElement(e.target as HTMLElement);
+      if (!coordinate) return;
+      const [row, col] = coordinate;
       onMouseOver([row, col]);
     },
     [onMouseOver]
+  );
+
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      const touch = e.touches[0];
+      const coordinate = coordinateFromHTMLElement(touch.target as HTMLElement);
+      if (!coordinate) return;
+      onLeftClickDown(coordinate);
+    },
+    [onLeftClickDown]
+  );
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      const touch = e.changedTouches[0];
+      const touchedElement = document.elementFromPoint(
+        touch.pageX,
+        touch.pageY
+      );
+      if (!touchedElement) return;
+      const coordinate = coordinateFromHTMLElement(
+        touchedElement as HTMLElement
+      );
+      console.log(coordinate);
+      if (!coordinate) return;
+      onLeftClickUp(coordinate);
+    },
+    [onLeftClickUp]
   );
 
   return (
@@ -81,6 +109,8 @@ export default function BoardContainer({
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onContextMenu={(e) => e.preventDefault()}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
       className={classNames(
         "w-[360px] h-[360px] lg:w-[600px] lg:h-[600px] cursor-pointer relative",
         {
@@ -88,6 +118,7 @@ export default function BoardContainer({
         }
       )}
       ref={ref}
+      style={{ touchAction: "none" }}
     >
       {children}
     </div>
