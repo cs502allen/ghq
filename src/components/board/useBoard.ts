@@ -24,7 +24,6 @@ export default function useBoard({
   ctx: Ctx;
   G: GHQState;
   moves: BoardProps<GHQState>["moves"];
-  plugins: BoardProps<GHQState>["plugins"];
   currentPlayer: Player;
   currentPlayerTurn: Player;
   userActionState: UserActionState;
@@ -33,7 +32,6 @@ export default function useBoard({
   const [mostRecentMove, setMostRecentMove] = useState<
     AllowedMove | undefined
   >();
-  const [shouldUpdateMoveOrCapture, setShouldUpdateMoveOrCapture] = useState(0);
 
   const animateOpponentsTurnToLatestBoardState = useCallback(() => {
     // Only animate when it's our turn (opponent's move has ended)
