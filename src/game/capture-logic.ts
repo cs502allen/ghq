@@ -1,13 +1,12 @@
 import {
+  Board,
   Coordinate,
   GHQState,
   HistoryItem,
   NonNullSquare,
-  Orientation,
   Player,
   Square,
   Units,
-  UnitType,
 } from "@/game/engine";
 import type { Ctx, LogEntry } from "boardgame.io";
 import { BoardProps } from "boardgame.io/react";
@@ -118,6 +117,19 @@ function getAdjacentPieces(
   }
 
   return adjacentPieces;
+}
+
+export type BoardEngagements = Record<string, Coordinate>;
+
+export function getBoardEngagements(board: Board): BoardEngagements {
+  const engaged: Record<string, Coordinate> = {};
+
+  for (const pairs of maximizeEngagement(board, null)) {
+    engaged[`${pairs.RED[0]},${pairs.RED[1]}`] = pairs.BLUE;
+    engaged[`${pairs.BLUE[0]},${pairs.BLUE[1]}`] = pairs.RED;
+  }
+
+  return engaged;
 }
 
 function maximizeEngagement(
