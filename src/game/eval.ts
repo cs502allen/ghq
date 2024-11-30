@@ -24,6 +24,17 @@ const gradient: number[][] = [
   [-0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25],
 ];
 
+const bombardGradient: number[][] = [
+  [-0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1],
+  [-0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.1],
+  [-0.1, 0.0, 0.05, 0.05, 0.05, 0.05, 0.0, -0.1],
+  [-0.1, 0.0, 0.05, 0.1, 0.1, 0.05, 0.0, -0.1],
+  [-0.1, 0.0, 0.05, 0.1, 0.1, 0.05, 0.0, -0.1],
+  [-0.1, 0.0, 0.05, 0.05, 0.05, 0.05, 0.0, -0.1],
+  [-0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.1],
+  [-0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1],
+];
+
 export interface EvalBoardState {
   board: GHQState["board"];
   redReserve: ReserveFleet;
@@ -61,32 +72,35 @@ export function calculateEval({
       }
       const fromPiece = board[from[0]][from[1]];
       if (fromPiece === null) {
+        console.warn("From piece is null", move);
         continue;
       }
       const capturePiece = board[capture[0]][capture[1]];
       if (capturePiece === null) {
+        console.warn("Capture piece is null", move);
         continue;
       }
-      const captureScore = unitScores[capturePiece.type] ?? 0;
-      if (capturePiece.player === "RED") {
-        scores.RED -= captureScore;
-      } else {
-        scores.BLUE -= captureScore;
+      const captureScore = unitScores[capturePiece.type];
+      if (!captureScore) {
+        console.warn("No score for piece", move);
+        continue;
       }
+      scores[fromPiece.player] += captureScore;
+      scores[capturePiece.player] -= captureScore;
     }
   }
 
   const freeCaptured = freeInfantryCaptures(board, currentPlayerTurn);
   for (const capture of freeCaptured) {
-    if (capture.capture) {
-      const captured = capture.capture;
-      const attackerScore = unitScores[captured.piece.type] ?? 0;
-      if (captured.piece.player === "RED") {
-        scores.RED -= attackerScore;
-      } else {
-        scores.BLUE -= attackerScore;
-      }
+    const captured = capture.capture;
+    const captureScore = unitScores[captured.piece.type];
+    if (!captureScore) {
+      console.warn("No score for piece", captured.piece);
+      continue;
     }
+
+    scores[captured.piece.player] -= captureScore;
+    scores[captured.piece.player === "RED" ? "BLUE" : "RED"] += captureScore;
   }
 
   const bombarded = bombardedSquares(board);
@@ -98,25 +112,37 @@ export function calculateEval({
         continue;
       }
 
+      let thisSquareValue = 0;
+
       // Add positional score
       if (square.type === "AIRBORNE_INFANTRY") {
         const homeRow = square.player === "RED" ? 7 : 0;
         const distance = Math.abs(i - homeRow);
-        scores[square.player] += unitScores.AIRBORNE_INFANTRY - 0.7 * distance;
+        thisSquareValue += unitScores.AIRBORNE_INFANTRY - 0.7 * distance;
       } else if (isPieceArtillery(square)) {
-        scores[square.player] +=
-          (unitScores[square.type] ?? 0) + gradient[i][j];
+        thisSquareValue = (unitScores[square.type] ?? 0) + gradient[i][j];
       } else {
-        scores[square.player] +=
-          (unitScores[square.type] ?? 0) + gradient[i][j];
+        thisSquareValue = (unitScores[square.type] ?? 0) + gradient[i][j];
+      }
+
+      scores[square.player] += thisSquareValue;
+
+      // If a player bombards a square, give them points for it
+      if (bombarded[`${i},${j}`]?.RED) {
+        scores.RED += bombardGradient[i][j];
+      }
+      if (bombarded[`${i},${j}`]?.BLUE) {
+        scores.BLUE += bombardGradient[i][j];
       }
 
       // If a player bombards a square with an enemy piece in it, give them points
       if (bombarded[`${i},${j}`]?.RED && square.player === "BLUE") {
-        scores.RED += 0.25;
+        scores.RED += thisSquareValue * 0.5;
+        scores.BLUE -= thisSquareValue * 0.5;
       }
       if (bombarded[`${i},${j}`]?.BLUE && square.player === "RED") {
-        scores.BLUE += 0.25;
+        scores.BLUE += thisSquareValue * 0.5;
+        scores.RED -= thisSquareValue * 0.5;
       }
 
       // Add points if this piece has some good captures

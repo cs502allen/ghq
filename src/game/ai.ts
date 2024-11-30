@@ -6,7 +6,7 @@ import { getAllowedMoves } from "./board-moves";
 export const ai: Game<GHQState>["ai"] = {
   // @ts-expect-error
   iterations: 500,
-  playoutDepth: 50,
+  playoutDepth: 10,
   enumerate: (G, ctx) => {
     const allowedMoves = getAllowedMoves({
       board: G.board,
