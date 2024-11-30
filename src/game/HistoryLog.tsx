@@ -1,9 +1,25 @@
-import React from "react";
-import { GHQState, HistoryItem } from "@/game/engine";
+import React, { ReactNode } from "react";
+import {
+  Coordinate,
+  GHQState,
+  HistoryItem,
+  Orientation,
+  Player,
+  Square,
+  Units,
+  UnitType,
+} from "@/game/engine";
 import { BoardProps } from "boardgame.io/react";
 import { coordinateToAlgebraic, degreesToCardinal } from "./notation";
-import classNames from "classnames";
 import { LogEntry } from "boardgame.io";
+import {
+  ArrowBigRightDash,
+  Crosshair,
+  RotateCw,
+  Ship,
+  SkipForward,
+  User,
+} from "lucide-react";
 
 export function HistoryLog({
   systemMessages,
@@ -31,10 +47,10 @@ export function HistoryLog({
     .filter((entry) => entry.action.type === "MAKE_MOVE")
     .map((entry) => {
       const { playerID, type, args } = entry.action.payload;
-      const player = playerID === "0" ? "Red" : "Blue";
+      const player = playerID === "0" ? "RED" : "BLUE";
       let description = type;
+      let reactNode: ReactNode | null = null;
       const pieceType = entry?.metadata?.pieceType?.toLowerCase() ?? "piece";
-      let isCapture = false;
 
       if (type === "Move") {
         const [from, to] = args;
@@ -44,15 +60,30 @@ export function HistoryLog({
 
         const capture = entry?.metadata?.capturePreference;
         if (capture) {
-          const captureType = entry?.metadata?.captured?.type ?? "piece";
+          const captureType = entry?.metadata?.capturedPiece?.type ?? "piece";
           const captureNotation = coordinateToAlgebraic(capture);
           description += ` and captured ${captureType.toLowerCase()} on ${captureNotation}`;
-          isCapture = true;
         }
+
+        reactNode = movedPiece({
+          player,
+          unitType: entry?.metadata?.pieceType,
+          from,
+          to,
+          capturedPiece: entry?.metadata?.capturedPiece,
+          capturedCoordinate: entry?.metadata?.capturePreference,
+          description,
+        });
       } else if (type === "Reinforce") {
         const [kind, at] = args;
         const atNotation = coordinateToAlgebraic(at);
         description = `reinforced with ${kind.toLowerCase()} at ${atNotation}`;
+        reactNode = reinforcedPiece({
+          player,
+          unitType: kind,
+          at,
+          description,
+        });
       } else if (type === "MoveAndOrient") {
         const [from, to, orientation] = args;
         const fromNotation = coordinateToAlgebraic(from);
@@ -60,6 +91,14 @@ export function HistoryLog({
         description = `moved ${pieceType} from ${fromNotation} to ${toNotation} and rotated ${degreesToCardinal(
           orientation
         )}`;
+        reactNode = movedPiece({
+          player,
+          unitType: entry?.metadata?.pieceType,
+          from,
+          to,
+          orientation,
+          description,
+        });
       } else if (type === "ChangeOrientation") {
         const [at, orientation] = args;
         const atNotation = coordinateToAlgebraic(at);
@@ -67,33 +106,27 @@ export function HistoryLog({
           orientation
         )}`;
       } else if (type === "Skip") {
-        description = "skipped the remainder of their turn";
+        description = "skipped rest of turn";
+        reactNode = playerSkip({ player, description });
       } else if (type === "Resign") {
         description = "resigned";
       }
       return {
         turn: entry.turn,
         message: `${player} ${description}`,
-        isCapture,
+        reactNode,
       };
     });
 
   const systemCaptureMessages =
     systemMessages?.flatMap(
-      ({
-        turn,
-        isCapture,
-        playerId,
-        captured,
-        message,
-        capturedByInfantry,
-      }) => {
+      ({ turn, playerId, captured, message, capturedByInfantry }) => {
         if (message) {
-          return { turn, message, isCapture };
+          return { turn, message, reactNode: null };
         }
 
-        if (isCapture && captured) {
-          const player = playerId === "0" ? "Red" : "Blue";
+        if (captured) {
+          const player = playerId === "0" ? "RED" : "BLUE";
           const clearedSquares = captured.map(({ coordinate }) => coordinate);
 
           if (capturedByInfantry) {
@@ -108,26 +141,39 @@ export function HistoryLog({
                   : "piece";
               return {
                 turn,
-                isCapture,
                 message: `${player} ${attackerPieceType} captured ${capturedPieceType} at ${coordinateToAlgebraic(
                   clearedSquares[i]
-                )}`,
+                )} at start of turn`,
+                reactNode: startOfTurnCapture({
+                  player,
+                  capturedPiece: captured[i].square,
+                  capturedCoordinate: clearedSquares[i],
+                  description: `${player} ${attackerPieceType} captured ${capturedPieceType} at ${coordinateToAlgebraic(
+                    clearedSquares[i]
+                  )} at start of turn`,
+                }),
               };
             });
           } else {
-            return {
-              turn,
-              isCapture,
-              message: `${player} artillery destroyed piece${
-                clearedSquares.length > 1 ? "s" : ""
-              } at ${clearedSquares
-                .map((coord) => coordinateToAlgebraic(coord))
-                .join(", ")}`,
-            };
+            return clearedSquares.map((coord) => {
+              return {
+                turn,
+                message: `${player} artillery destroyed piece at ${coordinateToAlgebraic(
+                  coord
+                )} at start of turn`,
+                reactNode: startOfTurnCapture({
+                  player,
+                  capturedCoordinate: coord,
+                  description: `${player} artillery destroyed piece at ${coordinateToAlgebraic(
+                    coord
+                  )} at start of turn`,
+                }),
+              };
+            });
           }
         }
 
-        return { turn, isCapture, message: "" };
+        return { turn, message: "", reactNode: null };
       }
     ) ?? [];
 
@@ -153,18 +199,174 @@ export function HistoryLog({
       <div className="font-bold text-lg">Activity</div>
       <div
         id="history-log-list"
-        className="overflow-y-auto border p-1 h-[600px]"
+        className="overflow-y-auto border p-1 h-[600px] flex flex-col"
       >
         {deduplicatedMessages.map((msg) => (
-          <div
-            key={msg.message}
-            className={classNames(msg.isCapture && "text-red-600")}
-          >
-            <span className="text-gray-500">{msg.turn} </span>
-            {msg.message}
+          <div key={msg.message} className="inline-flex space-x-2 items-center">
+            <span className="text-gray-600 text-sm">{msg.turn} </span>
+            {msg.reactNode ? msg.reactNode : <div>{msg.message}</div>}
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function movedPiece({
+  player,
+  unitType,
+  from,
+  to,
+  capturedPiece,
+  capturedCoordinate,
+  orientation,
+  description,
+}: {
+  player: Player;
+  unitType: UnitType;
+  from: Coordinate;
+  to: Coordinate;
+  capturedPiece?: Square;
+  capturedCoordinate?: Coordinate;
+  orientation?: Orientation;
+  description: string;
+}): ReactNode {
+  return (
+    <div
+      className="inline-flex items-center space-x-2 text-sm"
+      title={description}
+    >
+      <PieceIcon player={player} unitType={unitType} />
+      <div className="align-text-bottom">{coordinateToAlgebraic(from)}</div>
+      <ArrowBigRightDash className="w-3 h-3 inline-block" />
+      <div className="align-text-bottom">{coordinateToAlgebraic(to)}</div>
+      {capturedPiece && capturedCoordinate && (
+        <div className="inline-flex items-center space-x-2">
+          <Crosshair className="w-3 h-3" />
+          <PieceIcon
+            player={capturedPiece.player}
+            unitType={capturedPiece.type}
+          />
+          <div className="align-text-bottom">
+            {coordinateToAlgebraic(capturedCoordinate)}
+          </div>
+        </div>
+      )}
+      {orientation !== undefined && (
+        <div className="inline-flex items-center space-x-2">
+          <RotateCw className="w-3 h-3" />
+          <div className="align-text-bottom">
+            {degreesToCardinal(orientation)}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PieceIcon({
+  player,
+  unitType,
+}: {
+  player: Player;
+  unitType: UnitType;
+}) {
+  return (
+    <img
+      className="inline-block"
+      src={`/${Units[unitType].imagePathPrefix}-${player.toLowerCase()}.png`}
+      width={12}
+      height={12}
+      draggable="false"
+      alt={Units[unitType].imagePathPrefix}
+    />
+  );
+}
+
+function reinforcedPiece({
+  player,
+  unitType,
+  at,
+  description,
+}: {
+  player: Player;
+  unitType: UnitType;
+  at: Coordinate;
+  description: string;
+}): ReactNode {
+  return (
+    <div
+      className="inline-flex items-center space-x-2 text-sm"
+      title={description}
+    >
+      <PieceIcon player={player} unitType={unitType} />
+      <Ship className="w-3 h-3 inline-block" />
+      <div className="align-text-bottom">{coordinateToAlgebraic(at)}</div>
+    </div>
+  );
+}
+
+function playerSkip({
+  player,
+  description,
+}: {
+  player: Player;
+  description: string;
+}): ReactNode {
+  return (
+    <div
+      className="inline-flex items-center space-x-2 text-sm"
+      title={description}
+    >
+      <PlayerIcon player={player} />
+      <SkipForward className="w-3 h-3 inline-block" />
+    </div>
+  );
+}
+
+function PlayerIcon({ player }: { player: Player }): ReactNode {
+  return (
+    <User
+      className="w-4 h-4 inline-block"
+      style={{
+        color: player === "RED" ? "var(--red)" : "var(--blue)",
+        fill: player === "RED" ? "var(--red)" : "var(--blue)",
+      }}
+    />
+  );
+}
+
+function startOfTurnCapture({
+  player,
+  capturedPiece,
+  capturedCoordinate,
+  description,
+}: {
+  player: Player;
+  capturedPiece?: Square;
+  capturedCoordinate?: Coordinate;
+  description: string;
+}): ReactNode {
+  return (
+    <div
+      className="inline-flex items-center space-x-2 text-sm"
+      title={description}
+    >
+      <PlayerIcon player={player} />
+      <Crosshair className="w-3 h-3" />
+      {capturedPiece ? (
+        <PieceIcon
+          player={capturedPiece.player}
+          unitType={capturedPiece.type}
+        />
+      ) : (
+        <PlayerIcon player={player === "RED" ? "BLUE" : "RED"} />
+      )}
+      {capturedCoordinate && (
+        <div className="align-text-bottom">
+          {coordinateToAlgebraic(capturedCoordinate)}
+        </div>
+      )}
     </div>
   );
 }

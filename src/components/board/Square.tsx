@@ -205,7 +205,7 @@ export default function Square({
             className={classNames("pointer-events-none", {
               "opacity-25": squareState.isMidMove,
               "opacity-75": squareState.stagedSquare,
-              "opacity-50 filter grayscale":
+              "opacity-40 filter grayscale":
                 squareState.wasRecentlyCapturedPiece && !square,
             })}
             src={`/${
