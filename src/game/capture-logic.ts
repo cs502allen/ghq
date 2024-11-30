@@ -121,10 +121,13 @@ function getAdjacentPieces(
 
 export type BoardEngagements = Record<string, Coordinate>;
 
-export function getBoardEngagements(board: Board): BoardEngagements {
+export function getBoardEngagements(
+  board: Board,
+  attacker?: Coordinate
+): BoardEngagements {
   const engaged: Record<string, Coordinate> = {};
 
-  for (const pairs of maximizeEngagement(board, null)) {
+  for (const pairs of maximizeEngagement(board, attacker ?? null)) {
     engaged[`${pairs.RED[0]},${pairs.RED[1]}`] = pairs.BLUE;
     engaged[`${pairs.BLUE[0]},${pairs.BLUE[1]}`] = pairs.RED;
   }

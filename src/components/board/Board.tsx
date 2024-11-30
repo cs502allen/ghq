@@ -93,7 +93,12 @@ export default function Board({
 
   const isFlipped = useMemo(() => currentPlayer === "BLUE", [currentPlayer]);
 
-  const boardEngagements = useMemo(() => getBoardEngagements(board), [board]);
+  const boardEngagements = useMemo(
+    () =>
+      getBoardEngagements(board, userActionState?.selectedPiece?.coordinate),
+    [board, userActionState.selectedPiece]
+  );
+  console.log(boardEngagements);
 
   return (
     <>
