@@ -83,7 +83,7 @@ export function getSquareState({
   const wasRecentlyMovedTo = recentMoves.some((moveCoord) =>
     areCoordsEqual(coord, moveCoord)
   );
-  const wasRecentlyCapturedPiece = recentCaptures.find((cap) =>
+  const wasRecentlyCapturedPiece = recentCaptures.findLast((cap) =>
     areCoordsEqual(coord, cap.coordinate)
   )?.piece;
   const { shouldAnimateTo } = getAnimation(coord, mostRecentMove);
