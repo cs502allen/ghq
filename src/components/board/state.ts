@@ -143,13 +143,13 @@ export function updateClick(
       !self.isMouseDown &&
       !isMouseDown
     ) {
-      return {};
+      return { isMouseDown };
     }
 
     // If we just chose a move, then we should clear the state.
     // This can happen because the user finished their move with a click.
     if (self.chosenMove && !isMouseDown) {
-      return {};
+      return { isMouseDown };
     }
 
     return {

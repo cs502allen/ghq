@@ -23,6 +23,11 @@ export default function BoardContainer({
 }: MouseTrackerProps) {
   const [startCoords, setStartCoords] = useState<Coordinate | null>(null);
 
+  // There's a weird thing (it seems in Chrome dev tools) where a single tap
+  // can trigger both a touch and a mouse event simultaneously. We use this
+  // to record our best guess of whether we're on mobile, and stick to that if so.
+  const [isLikelyMobile, setIsLikelyMobile] = useState(false);
+
   function coordinateFromHTMLElement(el: HTMLElement): Coordinate | null {
     const { rowIndex, colIndex } = el.dataset;
     if (!rowIndex || !colIndex) return null;
@@ -31,6 +36,8 @@ export default function BoardContainer({
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
+      if (isLikelyMobile) return;
+
       if (e.button === 0) {
         const coordinate = coordinateFromHTMLElement(e.target as HTMLElement);
         if (!coordinate) return;
@@ -43,11 +50,13 @@ export default function BoardContainer({
         setStartCoords([row, col]);
       }
     },
-    [onLeftClickDown]
+    [onLeftClickDown, isLikelyMobile]
   );
 
   const handleMouseUp = useCallback(
     (e: React.MouseEvent) => {
+      if (isLikelyMobile) return;
+
       if (e.button === 0) {
         const coordinate = coordinateFromHTMLElement(e.target as HTMLElement);
         if (!coordinate) return;
@@ -62,7 +71,7 @@ export default function BoardContainer({
         setStartCoords(null);
       }
     },
-    [startCoords, onRightClickDrag, onLeftClickUp]
+    [startCoords, onRightClickDrag, onLeftClickUp, isLikelyMobile]
   );
 
   const handleMouseOver = useCallback(
@@ -77,6 +86,7 @@ export default function BoardContainer({
 
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
+      setIsLikelyMobile(true);
       const touch = e.touches[0];
       const coordinate = coordinateFromHTMLElement(touch.target as HTMLElement);
       if (!coordinate) return;
@@ -87,6 +97,7 @@ export default function BoardContainer({
 
   const handleTouchEnd = useCallback(
     (e: React.TouchEvent) => {
+      setIsLikelyMobile(true);
       const touch = e.changedTouches[0];
       const touchedElement = document.elementFromPoint(
         touch.pageX,
