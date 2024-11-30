@@ -36,10 +36,10 @@ export function PlayOnlineButton({
   return (
     <>
       <Button onClick={playOnline} loadingText="Searching...">
-        🌎 Play {toTitleCase(mode)}
-        <div className="font-medium text-sm">
+        🌎 Play {toTitleCase(mode)}{" "}
+        <span className="font-medium text-sm">
           ({timeControl.time / 60 / 1000}+{timeControl.bonus / 1000})
-        </div>
+        </span>
       </Button>
     </>
   );
