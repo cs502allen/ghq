@@ -109,6 +109,8 @@ export function updateClick(
   }
 
   // If there are multiple possible moves, then we need to provide the user with a choice.
+  // Note: If the piece is an artillery piece and mouse is still down, we need to skip this step,
+  //       otherwise we'll always default to keeping this piece in the same place.
   const skipChosenMoves =
     square && isPieceArtillery(square) && self.isMouseDown;
   if (

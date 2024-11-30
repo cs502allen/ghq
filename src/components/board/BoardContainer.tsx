@@ -96,7 +96,6 @@ export default function BoardContainer({
       const coordinate = coordinateFromHTMLElement(
         touchedElement as HTMLElement
       );
-      console.log(coordinate);
       if (!coordinate) return;
       onLeftClickUp(coordinate);
     },
