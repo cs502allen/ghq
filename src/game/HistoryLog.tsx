@@ -14,7 +14,9 @@ import { coordinateToAlgebraic, degreesToCardinal } from "./notation";
 import { LogEntry } from "boardgame.io";
 import {
   ArrowBigRightDash,
+  Bomb,
   Crosshair,
+  Flag,
   RotateCw,
   Ship,
   SkipForward,
@@ -110,6 +112,13 @@ export function HistoryLog({
         reactNode = playerSkip({ player, description });
       } else if (type === "Resign") {
         description = "resigned";
+        reactNode = playerResign({ player, description });
+      } else {
+        reactNode = playerAction({
+          player,
+          action: type,
+          description: `${player} ${type}`,
+        });
       }
       return {
         turn: entry.turn,
@@ -158,13 +167,14 @@ export function HistoryLog({
             return clearedSquares.map((coord) => {
               return {
                 turn,
-                message: `${player} artillery destroyed piece at ${coordinateToAlgebraic(
+                message: `${player} artillery bombarded piece at ${coordinateToAlgebraic(
                   coord
                 )} at start of turn`,
                 reactNode: startOfTurnCapture({
                   player,
                   capturedCoordinate: coord,
-                  description: `${player} artillery destroyed piece at ${coordinateToAlgebraic(
+                  isBombardment: true,
+                  description: `${player} artillery bombarded piece at ${coordinateToAlgebraic(
                     coord
                   )} at start of turn`,
                 }),
@@ -340,11 +350,13 @@ function startOfTurnCapture({
   player,
   capturedPiece,
   capturedCoordinate,
+  isBombardment,
   description,
 }: {
   player: Player;
   capturedPiece?: Square;
   capturedCoordinate?: Coordinate;
+  isBombardment?: boolean;
   description: string;
 }): ReactNode {
   return (
@@ -353,7 +365,11 @@ function startOfTurnCapture({
       title={description}
     >
       <PlayerIcon player={player} />
-      <Crosshair className="w-3 h-3" />
+      {isBombardment ? (
+        <Bomb className="w-3 h-3" />
+      ) : (
+        <Crosshair className="w-3 h-3" />
+      )}
       {capturedPiece ? (
         <PieceIcon
           player={capturedPiece.player}
@@ -367,6 +383,44 @@ function startOfTurnCapture({
           {coordinateToAlgebraic(capturedCoordinate)}
         </div>
       )}
+    </div>
+  );
+}
+
+function playerResign({
+  player,
+  description,
+}: {
+  player: Player;
+  description: string;
+}): ReactNode {
+  return (
+    <div
+      className="inline-flex items-center space-x-2 text-sm"
+      title={description}
+    >
+      <PlayerIcon player={player} />
+      <Flag className="w-3 h-3 inline-block" />
+    </div>
+  );
+}
+
+function playerAction({
+  player,
+  action,
+  description,
+}: {
+  player: Player;
+  action: string;
+  description: string;
+}): ReactNode {
+  return (
+    <div
+      className="inline-flex items-center space-x-2 text-sm"
+      title={description}
+    >
+      <PlayerIcon player={player} />
+      <div className="align-text-bottom">{action}</div>
     </div>
   );
 }
