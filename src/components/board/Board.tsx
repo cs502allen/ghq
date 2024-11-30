@@ -20,6 +20,7 @@ import BoardContainer from "./BoardContainer";
 import useRightClick from "./useRightClick";
 import { getRecentCaptures } from "@/game/capture-logic";
 import { Ctx, LogEntry } from "boardgame.io";
+import PieceMouse from "./PieceMouse";
 
 export default function Board({
   ctx,
@@ -61,7 +62,7 @@ export default function Board({
     useRightClick({ board });
 
   const handleLeftClick = useCallback(
-    ([rowIndex, colIndex]: Coordinate) => {
+    ([rowIndex, colIndex]: Coordinate, isMouseDown: boolean) => {
       if (ctx.gameover) {
         return;
       }
@@ -75,7 +76,8 @@ export default function Board({
           [rowIndex, colIndex],
           possibleAllowedMoves,
           currentPlayer,
-          currentPlayerTurn
+          currentPlayerTurn,
+          isMouseDown
         )
       );
 
@@ -93,48 +95,56 @@ export default function Board({
   const isFlipped = useMemo(() => currentPlayer === "BLUE", [currentPlayer]);
 
   return (
-    <BoardContainer
-      ref={measureRef}
-      onRightClickDrag={handleRightClickDrag}
-      onLeftClick={handleLeftClick}
-      onMouseOver={handleMouseOver}
-      flipped={isFlipped}
-    >
-      {board.map((row, rowIndex) => (
-        <div key={rowIndex} style={{ display: "flex" }}>
-          {row.map((square, colIndex) => (
-            <div key={colIndex}>
-              <Square
-                squareSize={squareSize}
-                pieceSize={pieceSize}
-                squareState={getSquareState({
-                  board,
-                  mostRecentMove,
-                  recentMoves,
-                  recentCaptures,
-                  rowIndex,
-                  colIndex,
-                  square,
-                  bombarded,
-                  userActionState,
-                  rightClicked,
-                })}
-                isFlipped={isFlipped}
-              />
-            </div>
-          ))}
-        </div>
-      ))}
-      {boardArrows.map((boardArrow) => (
-        <BoardArrow
-          key={`${boardArrow.from[0]},${boardArrow.from[1]}-${boardArrow.to[0]},${boardArrow.to[1]}`}
-          squareSize={squareSize}
-          from={boardArrow.from}
-          to={boardArrow.to}
-          className={classNames("fill-green-600 stroke-green-600")}
-        />
-      ))}
-    </BoardContainer>
+    <>
+      <BoardContainer
+        ref={measureRef}
+        onRightClickDrag={handleRightClickDrag}
+        onLeftClickDown={(coord) => handleLeftClick(coord, true)}
+        onLeftClickUp={(coord) => handleLeftClick(coord, false)}
+        onMouseOver={handleMouseOver}
+        flipped={isFlipped}
+      >
+        {board.map((row, rowIndex) => (
+          <div key={rowIndex} style={{ display: "flex" }}>
+            {row.map((square, colIndex) => (
+              <div key={colIndex}>
+                <Square
+                  squareSize={squareSize}
+                  pieceSize={pieceSize}
+                  squareState={getSquareState({
+                    board,
+                    mostRecentMove,
+                    recentMoves,
+                    recentCaptures,
+                    rowIndex,
+                    colIndex,
+                    square,
+                    bombarded,
+                    userActionState,
+                    rightClicked,
+                  })}
+                  isFlipped={isFlipped}
+                />
+              </div>
+            ))}
+          </div>
+        ))}
+        {boardArrows.map((boardArrow) => (
+          <BoardArrow
+            key={`${boardArrow.from[0]},${boardArrow.from[1]}-${boardArrow.to[0]},${boardArrow.to[1]}`}
+            squareSize={squareSize}
+            from={boardArrow.from}
+            to={boardArrow.to}
+            className={classNames("fill-green-600 stroke-green-600")}
+          />
+        ))}
+      </BoardContainer>
+      <PieceMouse
+        userActionState={userActionState}
+        pieceSize={pieceSize}
+        currentPlayer={currentPlayer}
+      />
+    </>
   );
 }
 

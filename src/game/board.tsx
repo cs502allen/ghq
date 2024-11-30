@@ -1074,6 +1074,7 @@ export function ReserveBank(props: {
           width="30"
           height="30"
           alt={Units[kind].imagePathPrefix}
+          draggable={false}
         />
         <div>{count}</div>
       </div>
