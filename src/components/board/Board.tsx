@@ -8,7 +8,6 @@ import {
   Player,
   type Board,
 } from "@/game/engine";
-import { BoardProps } from "boardgame.io/react";
 import { bombardedSquares } from "@/game/move-logic";
 import { useMeasure } from "@uidotdev/usehooks";
 import { pieceSizes, squareSizes } from "@/game/constants";
@@ -18,7 +17,7 @@ import BoardArrow from "@/game/BoardArrow";
 import classNames from "classnames";
 import BoardContainer from "./BoardContainer";
 import useRightClick from "./useRightClick";
-import { getRecentCaptures } from "@/game/capture-logic";
+import { getBoardEngagements, getRecentCaptures } from "@/game/capture-logic";
 import { Ctx, LogEntry } from "boardgame.io";
 import PieceMouse from "./PieceMouse";
 
@@ -94,6 +93,8 @@ export default function Board({
 
   const isFlipped = useMemo(() => currentPlayer === "BLUE", [currentPlayer]);
 
+  const boardEngagements = useMemo(() => getBoardEngagements(board), [board]);
+
   return (
     <>
       <BoardContainer
@@ -122,6 +123,7 @@ export default function Board({
                     bombarded,
                     userActionState,
                     rightClicked,
+                    boardEngagements,
                   })}
                   isFlipped={isFlipped}
                 />

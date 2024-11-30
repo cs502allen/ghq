@@ -20,7 +20,7 @@ import {
   PlayerPiece,
 } from "../../game/board-moves";
 
-import { areCoordsEqual } from "../../game/capture-logic";
+import { areCoordsEqual, BoardEngagements } from "../../game/capture-logic";
 import { UserActionState } from "./state";
 import BoardCoordinateLabels from "./BoardCoordinateLabels";
 
@@ -47,6 +47,7 @@ export interface SquareState {
   isHovered: boolean;
   isMidMove: boolean;
   shouldAnimateTo: AnimateTo | undefined;
+  engagedOrientation: Orientation | undefined;
 }
 
 export function getSquareState({
@@ -60,6 +61,7 @@ export function getSquareState({
   bombarded,
   userActionState,
   rightClicked,
+  boardEngagements,
 }: {
   board: Board;
   mostRecentMove: AllowedMove | undefined;
@@ -71,6 +73,7 @@ export function getSquareState({
   bombarded: Bombarded;
   userActionState: UserActionState | null;
   rightClicked: Set<string>;
+  boardEngagements: BoardEngagements;
 }): SquareState {
   const coord: Coordinate = [rowIndex, colIndex];
   const hoveredCoord = userActionState?.hoveredCoordinate ?? [-1, -1];
@@ -87,6 +90,7 @@ export function getSquareState({
     areCoordsEqual(coord, cap.coordinate)
   )?.piece;
   const { shouldAnimateTo } = getAnimation(coord, mostRecentMove);
+  const engagedOrientation = getEngagedOrientation(coord, boardEngagements);
 
   return {
     rowIndex,
@@ -106,6 +110,7 @@ export function getSquareState({
     isHovered: areCoordsEqual(coord, hoveredCoord),
     isMidMove,
     shouldAnimateTo,
+    engagedOrientation,
   };
 }
 
@@ -215,7 +220,10 @@ export default function Square({
             height={pieceSize}
             draggable="false"
             style={{
-              transform: `rotate(${getRotationForPiece(displaySquare)}deg)`,
+              transform: `rotate(${getRotationForPiece(
+                displaySquare,
+                squareState
+              )}deg)`,
               transition: "transform 0.1s",
             }}
             alt={Units[displaySquare.type].imagePathPrefix}
@@ -226,9 +234,16 @@ export default function Square({
   );
 }
 
-function getRotationForPiece(square: NonNullSquare): number {
+function getRotationForPiece(
+  square: NonNullSquare,
+  squareState: SquareState
+): number {
   if (isPieceArtillery(square)) {
     return square.orientation ?? 0;
+  }
+
+  if (squareState.engagedOrientation !== undefined) {
+    return squareState.engagedOrientation;
   }
 
   return square.player === "BLUE" ? 180 : 0;
@@ -455,4 +470,16 @@ function getAnimation(
   }
 
   return { shouldAnimateTo };
+}
+
+function getEngagedOrientation(
+  coord: Coordinate,
+  engagements: Record<string, Coordinate>
+) {
+  let engagedOrientation: Orientation | undefined = undefined;
+  const engagedCoord = engagements[`${coord[0]},${coord[1]}`];
+  if (engagedCoord) {
+    engagedOrientation = getOrientationBetween(coord, engagedCoord);
+  }
+  return engagedOrientation;
 }
