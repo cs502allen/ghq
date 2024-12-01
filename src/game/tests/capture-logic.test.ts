@@ -725,6 +725,26 @@ describe("computing allowed captures v2", () => {
       })
     ).toEqual([]);
   });
+  it("doesn't allow capturing hq when moving an adjacent infantry (issue #138)", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, RINF, B_HQ, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+    ];
+    expect(
+      captureCandidatesV2({
+        attacker: RINF,
+        attackerFrom: [4, 3],
+        attackerTo: [5, 4],
+        board,
+      })
+    ).toEqual([]);
+  });
 });
 
 describe("clear free captures", () => {
