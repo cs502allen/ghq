@@ -38,7 +38,7 @@ const server = Server({
 server.app.use(cors({ credentials: true }));
 server.app.use(authMiddleware);
 
-const QUEUE_STALE_MS = 10_000;
+const QUEUE_STALE_MS = 5_000;
 const blitzQueue: Map<string, number> = new Map();
 const rapidQueue: Map<string, number> = new Map();
 
@@ -66,10 +66,18 @@ server.router.post("/matchmaking", async (ctx) => {
 
   const queue = mode === "blitz" ? blitzQueue : rapidQueue;
 
-  // If user isn't in the queue, or they are but we haven't heard from them in a while (stale), add them to the queue.
+  // Iterate through the queue and remove stale users
   const now = Date.now();
+  for (const [userId, lastActive] of queue.entries()) {
+    if (lastActive < Date.now() - QUEUE_STALE_MS) {
+      console.log(`Removing stale user from ${mode} queue`, userId);
+      queue.delete(userId);
+    }
+  }
+
+  // If user isn't in the queue, add them to the queue.
   const queuedUser = queue.get(userId);
-  if (!queuedUser || queuedUser < now - QUEUE_STALE_MS) {
+  if (!queuedUser) {
     console.log(`Adding user to ${mode} queue`, userId);
     queue.set(userId, now);
     console.log("Users in queue", queue);
