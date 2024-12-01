@@ -11,6 +11,7 @@ import MultiplayerReplayCapability from "@/game/MultiplayerReplayCapability";
 import { ghqFetch } from "@/lib/api";
 import { useAuth } from "@clerk/nextjs";
 import { shouldUseBoardV2 } from "@/components/board/board-switcher";
+import AbandonedDialog from "./AbandonedDialog";
 
 const GameClient = Client({
   game: newOnlineGHQGame({}),
@@ -29,6 +30,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const [playerId, setPlayerId] = useState<string | undefined>();
   const [credentials, setCredentials] = useState<string>("");
   const [disableReplays, setDisableReplays] = useState<boolean>(true);
+  const [abandoned, setAbandoned] = useState<boolean>(false);
   const { isSignedIn, getToken } = useAuth();
 
   const getMatchInfo = useCallback(
@@ -44,6 +46,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         } else if (data?.status) {
           setDisableReplays(false);
           setPlayerId("0"); // default to player 0 during replay mode
+        }
+
+        if (data?.status === "ABORTED") {
+          setAbandoned(true);
         }
       } catch (error) {
         console.error("Error polling matchmaking API:", error);
@@ -98,6 +104,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             useOnlineGameClient={useOnlineGameClient}
             setUseOnlineGameClient={setUseOnlineGameClient}
           />
+          <AbandonedDialog abandoned={abandoned} />
         </>
       )}
     </div>
