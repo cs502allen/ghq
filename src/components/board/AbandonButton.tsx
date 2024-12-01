@@ -1,16 +1,17 @@
+import AbortGameModal from "@/game/AbortGameModal";
 import { useState } from "react";
-import AbortGameModal from "./AbortGameModal";
+import { Button } from "../ui/button";
 
-export default function AbortGameButton({ matchId }: { matchId: string }) {
+export default function AbandonButton({ matchId }: { matchId: string }) {
   const [openAbortModal, setOpenAbortModal] = useState(false);
   return (
     <>
-      <button
-        className="bg-red-500 text-white py-1 px-2 text-sm rounded hover:bg-red-600 flex gap-1 items-center"
+      <Button
+        className="bg-red-500 hover:bg-red-600 flex gap-1 items-center"
         onClick={() => setOpenAbortModal(true)}
       >
         Abandon
-      </button>
+      </Button>
       <AbortGameModal
         matchId={matchId}
         open={openAbortModal}

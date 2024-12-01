@@ -19,7 +19,7 @@ export default function ShareGameDialog({ G }: { G: GHQState }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="px-2 py-1 h-7 text-sm">
+        <Button className="text-sm">
           <Share /> Share
         </Button>
       </DialogTrigger>

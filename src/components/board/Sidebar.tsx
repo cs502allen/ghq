@@ -7,17 +7,12 @@ import classNames from "classnames";
 import { HistoryLog } from "../../game/HistoryLog";
 import EvalBar from "../../game/EvalBar";
 
-import { Button } from "@/app/live/Button";
-import { useRouter } from "next/navigation";
-import AbortGameButton from "../../game/AbortGameButton";
 import Header from "@/components/Header";
 import ShareGameDialog from "../../game/ExportGameDialog";
 import HowToPlayView from "../../game/HowToPlayView";
-import {
-  AcceptDrawButton,
-  OfferDrawButton,
-  ResignButton,
-} from "../../game/board";
+import HomeButton from "./HomeButton";
+import ResignButton from "./ResignButton";
+import AbandonButton from "./AbandonButton";
 
 export default function Sidebar({
   G,
@@ -29,8 +24,6 @@ export default function Sidebar({
 }: BoardProps<GHQState> & {
   className: string;
 }) {
-  const router = useRouter();
-
   const currentPlayerTurn = useMemo(
     () => playerIdToPlayer(ctx.currentPlayer),
     [ctx.currentPlayer]
@@ -75,13 +68,10 @@ export default function Sidebar({
             )}
           </h2>
           {ctx.gameover.reason && ctx.gameover.reason}
-          <button
-            className="bg-blue-500 text-white py-1 px-2 text-sm rounded hover:bg-blue-600 flex gap-1 items-center"
-            onClick={() => router.push("/")}
-          >
-            🏠 Home
-          </button>
-          <ShareGameDialog G={G} />
+          <div className="flex gap-1">
+            <ShareGameDialog G={G} />
+            <HomeButton />
+          </div>
         </div>
       ) : (
         <div
@@ -98,30 +88,20 @@ export default function Sidebar({
           <div className="flex gap-1 justify-center items-center">
             {currentPlayer === currentPlayerTurn || !G.isOnline ? (
               <>
-                {G.drawOfferedBy && G.drawOfferedBy !== ctx.currentPlayer ? (
+                {/* {G.drawOfferedBy && G.drawOfferedBy !== ctx.currentPlayer ? (
                   <AcceptDrawButton draw={() => moves.AcceptDraw()} />
                 ) : (
                   <OfferDrawButton
                     draw={(offer: boolean) => moves.OfferDraw(offer)}
                   />
-                )}
+                )} */}
                 <ResignButton resign={() => moves.Resign()} />
                 <ShareGameDialog G={G} />
               </>
             ) : (
               <>
-                <AbortGameButton matchId={G.matchId} />
+                <AbandonButton matchId={G.matchId} />
                 <ShareGameDialog G={G} />
-              </>
-            )}
-            {!G.isOnline && (
-              <>
-                <button
-                  className="bg-blue-500 text-white py-1 px-2 text-sm rounded hover:bg-blue-600 flex gap-1 items-center"
-                  onClick={() => router.push("/")}
-                >
-                  🏠 Home
-                </button>
               </>
             )}
           </div>

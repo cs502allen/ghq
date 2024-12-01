@@ -98,7 +98,6 @@ export default function Board({
       getBoardEngagements(board, userActionState?.selectedPiece?.coordinate),
     [board, userActionState.selectedPiece]
   );
-  console.log(boardEngagements);
 
   return (
     <>
