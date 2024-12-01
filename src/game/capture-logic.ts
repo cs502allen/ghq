@@ -53,9 +53,10 @@ function findAdjacentAttackablePieces(
   board: GHQState["board"],
   engagedInfantry: Record<string, Player>,
   attacker: NonNullSquare,
-  attackerCoords: Coordinate
+  attackerTo: Coordinate,
+  attackerFrom?: Coordinate
 ): Coordinate[] {
-  const attackerAdjacentPieces = getAdjacentPieces(board, attackerCoords);
+  const attackerAdjacentPieces = getAdjacentPieces(board, attackerTo);
 
   // Find capturable pieces
   const attackablePieces = attackerAdjacentPieces.filter((coord) => {
@@ -72,7 +73,7 @@ function findAdjacentAttackablePieces(
     }
 
     // If it's an artillery that we're not standing in it's line of fire, it's capturable
-    if (isNonDirectArtillery(piece, coord, attackerCoords)) {
+    if (isNonDirectArtillery(piece, coord, attackerTo)) {
       return true;
     }
 
@@ -81,9 +82,10 @@ function findAdjacentAttackablePieces(
       isCapturableHQ({
         board,
         engagedInfantry,
-        lastMovedInfantry: attackerCoords,
+        attackerTo,
         coord,
         attacker,
+        attackerFrom,
       })
     ) {
       return true;
@@ -346,13 +348,15 @@ function isHQ(square: Square): boolean {
 function isCapturableHQ({
   board,
   engagedInfantry,
-  lastMovedInfantry,
+  attackerTo,
+  attackerFrom,
   coord,
   attacker,
 }: {
   board: GHQState["board"];
   engagedInfantry: Record<string, Player>;
-  lastMovedInfantry: Coordinate;
+  attackerTo: Coordinate;
+  attackerFrom?: Coordinate;
   coord: Coordinate;
   attacker: Square;
 }): boolean {
@@ -364,27 +368,29 @@ function isCapturableHQ({
     return false;
   }
 
+  let numAttackers = 0;
+
   const hqAdjacentCoords = getAdjacentPieces(board, coord);
   for (const hqAttackerCoord of hqAdjacentCoords) {
-    if (
-      hqAttackerCoord[0] === lastMovedInfantry[0] &&
-      hqAttackerCoord[1] === lastMovedInfantry[1]
-    ) {
+    // Skip the square the attacker was on, since it's not there anymore.
+    if (attackerFrom && areCoordsEqual(hqAttackerCoord, attackerFrom)) {
       continue;
     }
 
-    const hqAttacker = board[hqAttackerCoord[0]][hqAttackerCoord[1]];
+    const existingHqAttacker = board[hqAttackerCoord[0]][hqAttackerCoord[1]];
     if (
-      hqAttacker &&
-      hqAttacker.player === attacker.player &&
-      isInfantry(hqAttacker) &&
+      existingHqAttacker &&
+      existingHqAttacker.player === attacker.player &&
+      isInfantry(existingHqAttacker) &&
       !isAlreadyEngaged(engagedInfantry, hqAttackerCoord)
     ) {
-      return true;
+      numAttackers += 1;
+    } else if (areCoordsEqual(hqAttackerCoord, attackerTo)) {
+      numAttackers += 1;
     }
   }
 
-  return false;
+  return numAttackers >= 2;
 }
 
 function isArtillery(piece: Square): boolean {
@@ -465,7 +471,8 @@ export function captureCandidatesV2({
     board,
     engagedInfantry,
     attacker,
-    attackerTo
+    attackerTo,
+    attackerFrom
   );
 }
 
