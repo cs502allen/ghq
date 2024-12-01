@@ -189,6 +189,24 @@ export const boards: Record<string, TutorialSetupData> = {
     category: "capturing",
     boardArrows: [{ from: [7, 3], to: [2, 3] }],
   },
+  "Capture on deploy": {
+    boardState: {
+      board: [
+        [B.HQ, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, B.IN, R.IN, null, null, null, R.HQ],
+      ],
+      redReserve: { ...emptyReserveFleet, INFANTRY: 1 },
+      blueReserve: emptyReserveFleet,
+    },
+    category: "capturing",
+    boardArrows: [],
+  },
   "Infantry capture HQ": {
     boardState: {
       board: [

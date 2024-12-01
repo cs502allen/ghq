@@ -117,6 +117,7 @@ export default function Board({
                   squareSize={squareSize}
                   pieceSize={pieceSize}
                   squareState={getSquareState({
+                    currentPlayer,
                     board,
                     mostRecentMove,
                     recentMoves,

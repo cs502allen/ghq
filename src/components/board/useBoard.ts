@@ -95,7 +95,7 @@ export default function useBoard({
       const { name, args } = userActionState.chosenMove;
       moves[name](...args);
 
-      if (name === "Move" && args[2]) {
+      if ((name === "Move" || name === "Reinforce") && args[2]) {
         playCaptureSound();
       } else {
         playMoveSound();

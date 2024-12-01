@@ -65,10 +65,28 @@ export function getAllowedMoves({
     }
 
     for (const spawnPosition of spawnPositions) {
+      const piece = {
+        player: currentPlayerTurn,
+        type: unitType as keyof ReserveFleet,
+      };
       allMoves.push({
         name: "Reinforce",
-        args: [unitType as keyof ReserveFleet, spawnPosition],
+        args: [piece.type, spawnPosition],
       });
+
+      // Calculate possible captures for spawn.
+      const captures = captureCandidatesV2({
+        attacker: piece,
+        attackerFrom: [-1, -1], // hack: we're not on the board
+        attackerTo: spawnPosition,
+        board,
+      });
+      for (const capture of captures) {
+        allMoves.push({
+          name: "Reinforce",
+          args: [piece.type, spawnPosition, capture],
+        });
+      }
     }
   }
 

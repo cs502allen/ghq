@@ -79,9 +79,9 @@ export function updateClick(
           colIndex,
         ])) ||
       (move.name === "Reinforce" &&
-        areCoordsEqual(move.args[1], [rowIndex, colIndex]))
+        areCoordsEqual(move.args[2] ?? [-1, -1], [rowIndex, colIndex]))
   );
-  if (self.selectedPiece && chosenMove) {
+  if ((self.selectedPiece || self.selectedReserve) && chosenMove) {
     return {
       chosenMove,
     };
@@ -114,7 +114,7 @@ export function updateClick(
   const skipChosenMoves =
     square && isPieceArtillery(square) && self.isMouseDown;
   if (
-    self.selectedPiece &&
+    (self.selectedPiece || self.selectedReserve) &&
     choseCandidateMoves.length > 1 &&
     !skipChosenMoves
   ) {
@@ -132,7 +132,9 @@ export function updateClick(
         (move) =>
           (move.name === "Move" && areCoordsEqual(coordinate, move.args[0])) ||
           (move.name === "MoveAndOrient" &&
-            areCoordsEqual(coordinate, move.args[0]))
+            areCoordsEqual(coordinate, move.args[0])) ||
+          (move.name === "Reinforce" &&
+            areCoordsEqual(coordinate, move.args[1]))
       ) ?? [];
 
     // If this is the currently selected piece, then we should clear the state.

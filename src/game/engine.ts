@@ -89,7 +89,11 @@ export type AllowedMove =
 
 export interface ReinforceMove {
   name: "Reinforce";
-  args: [unitType: keyof ReserveFleet, to: Coordinate];
+  args: [
+    unitType: keyof ReserveFleet,
+    to: Coordinate,
+    capturePreference?: Coordinate
+  ];
 }
 
 export interface MoveMove {
@@ -196,16 +200,17 @@ export interface GameoverState {
 }
 
 const Reinforce: Move<GHQState> = (
-  { G, ctx },
+  { G, ctx, log },
   unitType: keyof ReserveFleet,
-  to: Coordinate
+  to: Coordinate,
+  capturePreference?: Coordinate
 ) => {
   const reserve = ctx.currentPlayer === "0" ? G.redReserve : G.blueReserve;
   if (
     !G.isReplayMode &&
     !isMoveAllowed(G, ctx, {
       name: "Reinforce",
-      args: [unitType, to],
+      args: [unitType, to, capturePreference],
     })
   ) {
     return INVALID_MOVE;
@@ -214,6 +219,7 @@ const Reinforce: Move<GHQState> = (
   if (reserve[unitType] === 0) {
     return INVALID_MOVE;
   }
+  G.thisTurnBoards.push(JSON.parse(JSON.stringify(G.board)));
 
   // decrement reserves
   reserve[unitType]--;
@@ -236,12 +242,26 @@ const Reinforce: Move<GHQState> = (
   };
   G.board[to[0]][to[1]] = s;
 
+  G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
+
+  let capturedPiece: Square = null;
+
+  if (capturePreference) {
+    const [x, y] = capturePreference;
+    capturedPiece = JSON.parse(JSON.stringify(G.board[x][y])); // deep copy for boardgame.io engine reasons
+    G.board[x][y] = null;
+    G.lastTurnCaptures[ctx.currentPlayer as "0" | "1"].push(capturePreference);
+  }
+
   G.thisTurnMoves.push({
     name: "Reinforce",
-    args: [unitType, to],
+    args: [unitType, to, capturePreference],
   });
-  G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(to);
-  G.thisTurnBoards.push(JSON.parse(JSON.stringify(G.board)));
+  log.setMetadata({
+    pieceType: unitType,
+    capturePreference,
+    capturedPiece,
+  });
   G.eval = calculateEval({
     ...G,
     currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
