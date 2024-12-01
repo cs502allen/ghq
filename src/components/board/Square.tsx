@@ -79,7 +79,9 @@ export function getSquareState({
   const hoveredCoord = userActionState?.hoveredCoordinate ?? [-1, -1];
   const { isMovable, isCaptureCandidate } = getMoveAndCaptureCandidates(
     coord,
-    userActionState?.candidateMoves
+    userActionState?.candidateMoves,
+    userActionState?.chosenMoves,
+    userActionState?.hoveredCoordinate
   );
   const { isSelected, isMidMove, stagedSquare, isBombardCandidate } =
     getChosenCandidates(coord, userActionState, board);
@@ -354,7 +356,9 @@ function getCaptureLocation(move: AllowedMove): Coordinate | undefined {
 
 function getMoveAndCaptureCandidates(
   coord: Coordinate,
-  candidateMoves: AllowedMove[] = []
+  candidateMoves: AllowedMove[] = [],
+  chosenMoves: AllowedMove[] = [],
+  hoveredCoordinate?: Coordinate
 ) {
   let isMovable = false;
   let isCaptureCandidate = false;
@@ -362,11 +366,25 @@ function getMoveAndCaptureCandidates(
   // #perf-improvement-possible: candidateMoves could be a set
   for (const move of candidateMoves) {
     const moveDestination = getMoveDestination(move);
-    const captureLocation = getCaptureLocation(move);
 
     if (moveDestination && areCoordsEqual(coord, moveDestination)) {
       isMovable = true;
     }
+
+    if (
+      moveDestination &&
+      hoveredCoordinate &&
+      areCoordsEqual(moveDestination, hoveredCoordinate)
+    ) {
+      const captureLocation = getCaptureLocation(move);
+      if (captureLocation && areCoordsEqual(coord, captureLocation)) {
+        isCaptureCandidate = true;
+      }
+    }
+  }
+
+  for (const move of chosenMoves) {
+    const captureLocation = getCaptureLocation(move);
     if (captureLocation && areCoordsEqual(coord, captureLocation)) {
       isCaptureCandidate = true;
     }
