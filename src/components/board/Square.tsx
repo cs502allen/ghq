@@ -429,7 +429,9 @@ function getChosenCandidates(
       isSelected = false;
     }
 
-    let originPiece = moveOrigin ? board[moveOrigin[0]][moveOrigin[1]] : null;
+    let originPiece = moveOrigin
+      ? JSON.parse(JSON.stringify(board[moveOrigin[0]][moveOrigin[1]]))
+      : null;
 
     // If the current move is to Reinforce, then generate the origin piece.
     if (move.name === "Reinforce") {
