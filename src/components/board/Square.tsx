@@ -8,6 +8,7 @@ import {
   Coordinate,
   NonNullSquare,
   Orientation,
+  Player,
   type Square,
   Units,
 } from "@/game/engine";
@@ -51,6 +52,7 @@ export interface SquareState {
 }
 
 export function getSquareState({
+  currentPlayer,
   board,
   mostRecentMove,
   recentMoves,
@@ -63,6 +65,7 @@ export function getSquareState({
   rightClicked,
   boardEngagements,
 }: {
+  currentPlayer: Player;
   board: Board;
   mostRecentMove: AllowedMove | undefined;
   recentMoves: Coordinate[];
@@ -84,7 +87,7 @@ export function getSquareState({
     userActionState?.hoveredCoordinate
   );
   const { isSelected, isMidMove, stagedSquare, isBombardCandidate } =
-    getChosenCandidates(coord, userActionState, board);
+    getChosenCandidates(coord, userActionState, board, currentPlayer);
   const wasRecentlyMovedTo = recentMoves.some((moveCoord) =>
     areCoordsEqual(coord, moveCoord)
   );
@@ -350,7 +353,9 @@ function getMoveDestination(move: AllowedMove): Coordinate | undefined {
 }
 
 function getCaptureLocation(move: AllowedMove): Coordinate | undefined {
-  // TODO(tyler): update this later to allow reinforcement captures
+  if (move.name === "Reinforce") {
+    return move.args[2];
+  }
   return move.name === "Move" ? move.args[2] : undefined;
 }
 
@@ -404,7 +409,8 @@ function getMoveOrigin(move: AllowedMove): Coordinate | undefined {
 function getChosenCandidates(
   coord: Coordinate,
   userActionState: UserActionState | null,
-  board: Board
+  board: Board,
+  currentPlayer: Player
 ) {
   const selectedCoord = userActionState?.selectedPiece?.coordinate ?? [-1, -1];
 
@@ -423,16 +429,33 @@ function getChosenCandidates(
       isSelected = false;
     }
 
+    let originPiece = moveOrigin
+      ? JSON.parse(JSON.stringify(board[moveOrigin[0]][moveOrigin[1]]))
+      : null;
+
+    // If the current move is to Reinforce, then generate the origin piece.
+    if (move.name === "Reinforce") {
+      const type = move.args[0];
+      originPiece = {
+        type,
+        player: currentPlayer,
+        orientation: type.includes("ARTILLERY")
+          ? currentPlayer === "RED"
+            ? 0
+            : 180
+          : undefined,
+      };
+    }
+
     // If the square is the destination of the move, then it's considered "selected" and becomes emphasized.
     const moveDestination = getMoveDestination(move);
     if (
-      moveOrigin &&
+      originPiece &&
       moveDestination &&
       areCoordsEqual(coord, moveDestination)
     ) {
       isSelected = true;
-      const [row, col] = moveOrigin;
-      stagedSquare = structuredClone(board[row][col]);
+      stagedSquare = originPiece;
 
       // Figure out orientation based on the hovered coordinate.
       if (
