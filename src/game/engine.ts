@@ -515,7 +515,7 @@ export const GHQGame: Game<GHQState> = {
   turn: {
     minMoves: 1,
     maxMoves: 3,
-    onBegin: ({ ctx, G, random, log, ...plugins }) => {
+    onBegin: ({ ctx, G }) => {
       G.lastPlayerMoves = G.thisTurnMoves;
       G.thisTurnMoves = [];
       G.lastTurnBoards = G.thisTurnBoards;

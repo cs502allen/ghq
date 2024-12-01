@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
 import {
   Coordinate,
+  GameoverState,
   GHQState,
   HistoryItem,
   Orientation,
@@ -26,9 +27,11 @@ import {
 export function HistoryLog({
   systemMessages,
   log,
+  gameover,
 }: {
   systemMessages?: HistoryItem[];
   log: BoardProps<GHQState>["log"];
+  gameover?: GameoverState;
 }) {
   const filteredLog: LogEntry[] = [];
 
@@ -217,9 +220,24 @@ export function HistoryLog({
             {msg.reactNode ? msg.reactNode : <div>{msg.message}</div>}
           </div>
         ))}
+
+        {gameover && (
+          <div className="inline-flex space-x-2 items-center">
+            {gameover.status === "DRAW" && "Game ended in a draw"}
+            {gameover.winner && (
+              <>
+                {toTitleCase(gameover.winner)} won {gameover.reason}!
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
+}
+
+function toTitleCase(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
 function movedPiece({

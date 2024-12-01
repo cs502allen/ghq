@@ -44,7 +44,11 @@ export default function Sidebar({
     return (
       <>
         <EvalBar evalValue={G.eval} />
-        <HistoryLog systemMessages={G.historyLog} log={log} />
+        <HistoryLog
+          systemMessages={G.historyLog}
+          log={log}
+          gameover={ctx.gameover}
+        />
       </>
     );
   }, [ctx.turn, ctx.gameover]);
