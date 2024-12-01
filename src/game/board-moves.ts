@@ -1,5 +1,5 @@
 import { Ctx } from "boardgame.io";
-import { captureCandidatesV2 } from "./capture-logic";
+import { areCoordsEqual, captureCandidatesV2 } from "./capture-logic";
 import {
   AllowedMove,
   Coordinate,
@@ -89,6 +89,14 @@ export function getAllowedMoves({
 
       if (isPieceArtillery(playerPiece.piece)) {
         for (const angle of orientations) {
+          // Artillery can't stay in the same orientation at the same location
+          if (
+            angle === playerPiece.piece.orientation &&
+            areCoordsEqual(playerPiece.coordinate, move)
+          ) {
+            continue;
+          }
+
           allMoves.push({
             name: "MoveAndOrient",
             args: [playerPiece.coordinate, move, angle],
