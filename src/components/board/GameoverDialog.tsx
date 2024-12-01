@@ -20,9 +20,7 @@ export default function GameoverDialog({
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (gameover) {
-      setOpen(true);
-    }
+    setOpen(!!gameover);
   }, [gameover]);
   return (
     <Dialog open={open} onOpenChange={setOpen}>

@@ -43,6 +43,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           setPlayerId(data.playerId);
         } else if (data?.status) {
           setDisableReplays(false);
+          setPlayerId("0"); // default to player 0 during replay mode
         }
       } catch (error) {
         console.error("Error polling matchmaking API:", error);
@@ -89,6 +90,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           <div className={useOnlineGameClient ? "hidden" : ""}>
             <OfflineGameClient
               ref={(ref) => setOfflineClient(ref?.client)}
+              matchID={matchId}
               playerID={playerId}
             />
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { GHQState, Player } from "@/game/engine";
 import { BoardProps } from "boardgame.io/react";
 import { getAllowedMoves, getOpponent } from "../../game/board-moves";
@@ -11,6 +11,7 @@ import Board from "./Board";
 import classNames from "classnames";
 import ControlsView from "./ControlsView";
 import useBoard from "./useBoard";
+import { useUsernames } from "./useUsernames";
 
 export default function PlayArea(
   props: BoardProps<GHQState> & { className: string }
@@ -25,7 +26,8 @@ export default function PlayArea(
     () => (playerID === null ? currentPlayerTurn : playerIdToPlayer(playerID)),
     [currentPlayerTurn, playerID]
   );
-  const usernames = ["Player 1", "Player 2"];
+  const { usernames } = useUsernames({ G });
+
   const possibleAllowedMoves = useMemo(
     () =>
       getAllowedMoves({

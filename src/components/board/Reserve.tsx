@@ -37,6 +37,7 @@ export default function Reserve({
   selectReserve: (kind: keyof ReserveFleet) => void;
 }) {
   const playerIndex = player === "RED" ? 0 : 1;
+  const defaultUsername = `Player ${playerIndex + 1}`;
 
   return (
     <>
@@ -59,7 +60,7 @@ export default function Reserve({
                 isConnected={matchData[playerIndex].isConnected}
               />
             )}
-            {usernames[playerIndex]} ({G.elos[playerIndex]})
+            {usernames[playerIndex] ?? defaultUsername} ({G.elos[playerIndex]})
           </div>
           <div className="flex gap-2 justify-center items-center">
             <MoveCounter
