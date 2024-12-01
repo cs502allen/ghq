@@ -21,7 +21,7 @@ export default function Rules() {
   const nextBoardVersion = shouldUseBoardV2() ? "v1" : "v2";
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 text-sm">
       <div>
         GHQ is a game of strategy and tactics for two players. Players alternate
         turns moving pieces on the board, attempting to capture their

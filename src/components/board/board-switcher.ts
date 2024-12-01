@@ -16,7 +16,7 @@ export function shouldUseBoardV2(): boolean {
   if (typeof window === "undefined") {
     return false;
   }
-  return localStorage.getItem("useBoardV2") === "true";
+  return (localStorage.getItem("useBoardV2") ?? "true") === "true";
 }
 
 export function useBoardV2() {
@@ -24,5 +24,5 @@ export function useBoardV2() {
 }
 
 export function useBoardV1() {
-  localStorage.setItem("useBoardV2", "true");
+  localStorage.setItem("useBoardV2", "false");
 }
