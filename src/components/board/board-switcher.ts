@@ -14,7 +14,7 @@ if (typeof window !== "undefined") {
 
 export function shouldUseBoardV2(): boolean {
   if (typeof window === "undefined") {
-    return false;
+    return true;
   }
   return (localStorage.getItem("useBoardV2") ?? "true") === "true";
 }
