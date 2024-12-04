@@ -12,25 +12,30 @@ export default function BoardCoordinateLabels({
 }) {
   const color =
     (rowIndex + colIndex) % 2 === 0 ? "text-gray-50" : "text-gray-400";
+
+  const bottomRank = isFlipped ? 0 : 7;
+  const leftColumn = isFlipped ? 7 : 0;
   return (
     <>
       <div
         className={classNames(
-          "absolute top-0 left-1 select-none text-xs font-bold",
+          "absolute select-none text-xs font-bold",
+          isFlipped ? "bottom-0 right-1" : "top-0 left-1",
           { "rotate-180": isFlipped },
           color
         )}
       >
-        {colIndex === 0 && rowIndexToRank(rowIndex)}
+        {colIndex === leftColumn && rowIndexToRank(rowIndex)}
       </div>
       <div
         className={classNames(
-          "absolute bottom-0 left-1 select-none text-xs font-bold",
+          "absolute select-none text-xs font-bold",
+          isFlipped ? "top-0 right-1" : "bottom-0 left-1",
           { "rotate-180": isFlipped },
           color
         )}
       >
-        {rowIndex === 7 && colIndexToFile(colIndex)}
+        {rowIndex === bottomRank && colIndexToFile(colIndex)}
       </div>
     </>
   );
