@@ -138,6 +138,9 @@ export interface GHQState {
   // True if this game is being replayed (disables animations, etc.)
   isReplayMode?: boolean;
 
+  // True if this game is in pass-and-play mode (adds board perspective change).
+  isPassAndPlayMode?: boolean;
+
   // Match ID for online games (possibly available already in BoardProps)
   matchId: string;
 
@@ -668,6 +671,20 @@ export function newOnlineGHQGame({
   if (onEnd) {
     game.onEnd = (args) => onEnd(args);
   }
+
+  return game;
+}
+
+export function newLocalGHQGame(): Game<GHQState> {
+  const game = { ...GHQGame };
+
+  const oldSetup = game.setup;
+  game.setup = ({ ctx, ...plugins }, setupData): GHQState => {
+    if (!oldSetup) throw new Error("No setup function found");
+    const state = oldSetup({ ctx, ...plugins }, setupData);
+    state.isPassAndPlayMode = true;
+    return state;
+  };
 
   return game;
 }

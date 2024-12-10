@@ -13,6 +13,7 @@ import HowToPlayView from "../../game/HowToPlayView";
 import HomeButton from "./HomeButton";
 import ResignButton from "./ResignButton";
 import AbandonButton from "./AbandonButton";
+import SettingsMenu, { Settings } from "./SettingsMenu";
 
 export default function Sidebar({
   G,
@@ -21,8 +22,12 @@ export default function Sidebar({
   moves,
   log,
   className,
+  settings,
+  setSettings,
 }: BoardProps<GHQState> & {
   className: string;
+  settings: Settings;
+  setSettings: (settings: Settings) => void;
 }) {
   const currentPlayerTurn = useMemo(
     () => playerIdToPlayer(ctx.currentPlayer),
@@ -74,13 +79,14 @@ export default function Sidebar({
           </div>
         </div>
       ) : (
-        <div
-          className={classNames(
-            "text-center font-semibold flex items-center flex-col justify-center text-2xl flex-1",
-            ctx.currentPlayer === "0" ? "text-red-500" : "text-blue-500"
-          )}
-        >
-          {currentPlayer === currentPlayerTurn ? "Your" : "Their"} Turn
+        <div className="text-center font-semibold flex items-center flex-col justify-center text-2xl flex-1">
+          <div
+            className={classNames(
+              ctx.currentPlayer === "0" ? "text-red-500" : "text-blue-500"
+            )}
+          >
+            {currentPlayer === currentPlayerTurn ? "Your" : "Their"} Turn
+          </div>
           <div className="text-lg text-gray-600 flex gap-1 justify-center items-center font-medium">
             {3 - ctx.numMoves!} remaining move
             {ctx.numMoves !== 2 ? "s" : ""}{" "}
@@ -97,11 +103,13 @@ export default function Sidebar({
                 )} */}
                 <ResignButton resign={() => moves.Resign()} />
                 <ShareGameDialog G={G} />
+                <SettingsMenu settings={settings} setSettings={setSettings} />
               </>
             ) : (
               <>
                 <AbandonButton matchId={G.matchId} />
                 <ShareGameDialog G={G} />
+                <SettingsMenu settings={settings} setSettings={setSettings} />
               </>
             )}
           </div>

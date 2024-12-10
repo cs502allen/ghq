@@ -27,6 +27,8 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const { setBoardArrows } = useBoardArrow();
 
+  const playerId = "0"; // default to player 0, so that board doesn't flip unexpectedly
+
   useEffect(() => {
     const boardType = searchParams.get("boardType") as BoardType | undefined;
     const jfen = searchParams.get("jfen") as string | undefined;
