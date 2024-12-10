@@ -111,7 +111,7 @@ export default function useBoard({
     if (startOfTurnCaptures) {
       playCaptureSound();
     }
-  }, [ctx.turn, G.historyLog]);
+  }, [ctx.turn]);
 
   return {
     board,
