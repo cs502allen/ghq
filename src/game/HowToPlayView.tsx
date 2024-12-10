@@ -21,13 +21,21 @@ export default function HowToPlayView() {
       <div className="font-bold text-lg">How To Play</div>
 
       <div>
+        <div className="font-bold">Pieces</div>
+        <div className="flex flex-col gap-1">
+          {Object.values(PIECE_INFO).map((piece) => (
+            <PieceCard key={piece.name} piece={piece} />
+          ))}
+        </div>
+      </div>
+      <div>
         <div>
           <strong>Available moves</strong> (3 per turn)
         </div>
         <div className="flex flex-col">
           <div>
             <div>1. Deploy a piece from your reserve.</div>
-            <div className="text-sm ml-5 text-gray-800">
+            <div className="text-sm ml-5 text-gray-700">
               Click on a piece from the reserve section below the board and then
               click on a square on your home row to place it there.
             </div>
@@ -35,35 +43,20 @@ export default function HowToPlayView() {
 
           <div>
             <div>2. Move an infantry and/or capture a piece.</div>
-            <div className="text-sm ml-5 text-gray-800">
+            <div className="text-sm ml-5 text-gray-700">
               Click on an infantry and then click on a square to move it there.
-              If it can capture one piece, it will do so automatically. If there
-              are multiple pieces to capture, you can choose which one.
+              If you move to an square adjacent to an enemy piece, you can click
+              the enemy piece to capture it.
             </div>
           </div>
 
           <div>
             <div>3. Move and/or rotate an artillery.</div>
-            <div className="text-sm ml-5 text-gray-800">
+            <div className="text-sm ml-5 text-gray-700">
               Click on an artillery and then click on a square to move it there.
-              Move your mouse and click again to rotate the piece. To re-rotate,
-              hold down on the piece and then try again.
+              Click again to rotate the piece to face a different direction.
             </div>
           </div>
-        </div>
-
-        <div className="text-sm text-gray-800">
-          Tip: you can hit the back arrow on your keyboard to undo your last
-          move during a turn.
-        </div>
-      </div>
-
-      <div>
-        <div className="font-bold">Pieces</div>
-        <div className="flex flex-col gap-1">
-          {Object.values(PIECE_INFO).map((piece) => (
-            <PieceCard key={piece.name} piece={piece} />
-          ))}
         </div>
       </div>
     </div>
