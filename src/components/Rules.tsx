@@ -13,6 +13,7 @@ export default function Rules() {
         <a
           className="text-blue-600 hover:text-blue-400"
           href="https://www.vonnegutgame.com/"
+          target="_blank"
         >
           Kurt Vonnegut
         </a>
@@ -24,10 +25,23 @@ export default function Rules() {
         <a
           className="text-blue-600 hover:text-blue-400"
           href="https://www.youtube.com/watch?v=zfXPIhvFPjw"
+          target="_blank"
         >
           How To Play GHQ
         </a>{" "}
         video).
+      </div>
+
+      <div>
+        This website is being actively developed on{" "}
+        <a
+          className="text-blue-600 hover:text-blue-400"
+          href="https://github.com/acunniffe/ghq"
+          target="_blank"
+        >
+          GitHub
+        </a>
+        .
       </div>
     </div>
   );

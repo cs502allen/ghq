@@ -6,11 +6,11 @@ import { PlayOnlineButton } from "./live/PlayOnlineButton";
 import { Learn } from "@/components/Learn";
 import Header from "@/components/Header";
 import LiveGamesList from "./LiveGamesList";
-import LatestMessage from "@/components/LatestMessage";
 import Leaderboard from "./Leaderboard";
-import LearnPage, { Section } from "./learn/page";
+import { Section } from "./learn/page";
 import { Community } from "@/components/Community";
 import LearnBasics from "./learn/LearnBasics";
+import { GHQNight } from "@/components/GHQNight";
 function App() {
   const router = useRouter();
 
@@ -29,7 +29,7 @@ function App() {
   return (
     <div className="p-2 flex flex-col gap-4 lg:px-48">
       <Header />
-      <LatestMessage />
+      {/* <LatestMessage /> */}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
         <div className="col-span-1 flex flex-col gap-2">
@@ -44,15 +44,16 @@ function App() {
             </div>
           </div>
 
-          <div className="border rounded p-4 bg-slate-50 flex flex-col gap-2">
+          {/* <div className="border rounded p-4 bg-slate-50 flex flex-col gap-2">
             <Community />
-          </div>
+          </div> */}
           <div className="border rounded p-4 bg-slate-50 flex flex-col gap-2">
             <Learn />
           </div>
         </div>
 
         <div className="col-span-1 flex flex-col gap-2">
+          <GHQNight />
           <div className="border rounded p-4 bg-slate-50">
             <Leaderboard />
           </div>
