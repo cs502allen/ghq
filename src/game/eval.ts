@@ -41,6 +41,7 @@ export interface EvalBoardState {
   blueReserve: ReserveFleet;
   currentPlayerTurn: Player;
   thisTurnMoves: AllowedMove[];
+  isReplayMode?: boolean;
 }
 
 function updateScoresForCaptures({
@@ -98,7 +99,12 @@ export function calculateEval({
   blueReserve,
   currentPlayerTurn,
   thisTurnMoves,
+  isReplayMode,
 }: EvalBoardState): number {
+  if (isReplayMode) {
+    return 0;
+  }
+
   const scores: Record<Player, number> = {
     RED: 0,
     BLUE: 0,
