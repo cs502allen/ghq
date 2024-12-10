@@ -53,7 +53,8 @@ export default function ControlsView({
     if (canUndo) {
       undo();
     }
-  }, [canUndo, undo]);
+    cancel();
+  }, [canUndo, undo, cancel]);
 
   const doRedo = useCallback(() => {
     if (canRedo) {
@@ -71,7 +72,8 @@ export default function ControlsView({
     if (canReplay) {
       replay();
     }
-  }, [replay]);
+    cancel();
+  }, [replay, cancel]);
 
   useControls({
     undo: doUndo,
