@@ -32,6 +32,7 @@ export default function Board({
   possibleAllowedMoves,
   currentPlayer,
   currentPlayerTurn,
+  isFlipped,
 }: {
   G: GHQState;
   ctx: Ctx;
@@ -43,6 +44,7 @@ export default function Board({
   userActionState: UserActionState;
   setUserActionState: React.Dispatch<React.SetStateAction<UserActionState>>;
   possibleAllowedMoves: AllowedMove[];
+  isFlipped: boolean;
 }) {
   const { measureRef, squareSize, pieceSize } = useBoardDimensions();
 
@@ -90,8 +92,6 @@ export default function Board({
       updateHover(userActionState, [rowIndex, colIndex])
     );
   }, []);
-
-  const isFlipped = useMemo(() => currentPlayer === "BLUE", [currentPlayer]);
 
   const boardEngagements = useMemo(
     () =>

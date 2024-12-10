@@ -12,21 +12,37 @@ import classNames from "classnames";
 import ControlsView from "./ControlsView";
 import useBoard from "./useBoard";
 import { useUsernames } from "./useUsernames";
+import { Settings } from "./SettingsMenu";
 
 export default function PlayArea(
-  props: BoardProps<GHQState> & { className: string }
+  props: BoardProps<GHQState> & { className: string; settings: Settings }
 ) {
-  const { ctx, G, matchData, playerID, className, moves, log } = props;
+  const { ctx, G, matchData, playerID, className, moves, log, settings } =
+    props;
   const [userActionState, setUserActionState] = useState<UserActionState>({});
+  const [viewPlayerPref, setViewPlayerPref] = useState<Player>("RED");
   const currentPlayerTurn = useMemo(
     () => playerIdToPlayer(ctx.currentPlayer),
     [ctx.currentPlayer]
   );
+
+  // Note: playerID is null in local play (non-multiplayer, non-bot), also when spectating, replaying, and tutorials.
   const currentPlayer = useMemo(
     () => (playerID === null ? currentPlayerTurn : playerIdToPlayer(playerID)),
     [currentPlayerTurn, playerID]
   );
   const { usernames } = useUsernames({ G });
+
+  const isFlipped = useMemo(() => viewPlayerPref === "BLUE", [viewPlayerPref]);
+
+  useEffect(() => {
+    // If G.isPassAndPlayMode, then viewPlayerPref should snap to currentPlayerTurn.
+    if (G.isPassAndPlayMode && settings.autoFlipBoard && playerID === null) {
+      setViewPlayerPref(currentPlayerTurn);
+    } else if (playerID !== null) {
+      setViewPlayerPref(playerIdToPlayer(playerID));
+    }
+  }, [G.isPassAndPlayMode, playerID, currentPlayerTurn, settings]);
 
   const possibleAllowedMoves = useMemo(
     () =>
@@ -82,6 +98,7 @@ export default function PlayArea(
         possibleAllowedMoves={possibleAllowedMoves}
         currentPlayer={currentPlayer}
         currentPlayerTurn={currentPlayerTurn}
+        isFlipped={isFlipped}
       />
       <Reserve
         G={G}
