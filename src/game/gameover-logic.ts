@@ -1,6 +1,11 @@
 import { GameoverState, GHQState, Player } from "./engine";
 
 export function getGameoverState(G: GHQState): GameoverState | undefined {
+  // No gameover during replays
+  if (G.isReplayMode) {
+    return;
+  }
+
   if (G.timeControl > 0 && G.redElapsed > G.timeControl) {
     return newWinner("BLUE", "on time");
   }
