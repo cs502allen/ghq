@@ -36,3 +36,35 @@ export function isHqOnBoard(board: GHQState["board"], player: Player): boolean {
     rows.some((square) => square?.type === "HQ" && square.player === player)
   );
 }
+
+export function checkTimeForGameover({
+  G,
+  currentPlayer,
+}: {
+  G: GHQState;
+  currentPlayer: Player;
+}) {
+  const elapsed = Date.now() - G.turnStartTime;
+
+  const playerElapsed = currentPlayer === "RED" ? G.redElapsed : G.blueElapsed;
+  const newPlayerElapsed = playerElapsed + elapsed - G.bonusTime;
+  const timeLeft = G.timeControl - newPlayerElapsed;
+
+  if (timeLeft >= 0) {
+    return;
+  }
+
+  if (currentPlayer === "RED") {
+    G.redElapsed = newPlayerElapsed;
+  } else {
+    G.blueElapsed = newPlayerElapsed;
+  }
+
+  const gameover: GameoverState = {
+    status: "WIN",
+    winner: currentPlayer === "RED" ? "BLUE" : "RED",
+    reason: "on time",
+  };
+
+  return gameover;
+}
