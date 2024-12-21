@@ -13,6 +13,7 @@ import { calculateElo } from "./game/elo";
 import cors from "@koa/cors";
 import { authMiddleware, clerkClient } from "./server/auth";
 import { TIME_CONTROLS } from "./game/constants";
+import { matchLifecycle } from "./server/match-lifecycle";
 
 const supabase = createClient(
   "https://wjucmtrnmjcaatbtktxo.supabase.co",
@@ -43,6 +44,10 @@ const blitzQueue: Map<string, number> = new Map();
 const rapidQueue: Map<string, number> = new Map();
 
 const DEFAULT_TIME_CONTROL = "rapid";
+
+setInterval(() => {
+  matchLifecycle({ supabase, db: server.db, onGameEnd });
+}, 10_000);
 
 server.router.post("/matchmaking", async (ctx) => {
   const userId = ctx.state.auth.userId;
