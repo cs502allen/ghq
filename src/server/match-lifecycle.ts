@@ -66,6 +66,8 @@ export async function checkAndUpdateMatch({
     return;
   }
 
+  // TODO(tyler): mark game as abandoned early if player disconnected for 30+ seconds
+
   // Let's look at the state and see if it's gameover
   const currentPlayer: Player =
     state.ctx.currentPlayer === "0" ? "RED" : "BLUE";

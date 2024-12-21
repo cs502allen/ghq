@@ -159,7 +159,7 @@ server.router.get("/matches", async (ctx) => {
       "id, created_at, player0_id, player1_id, player0_elo, player1_elo, winner_id, status"
     )
     .order("created_at", { ascending: false })
-    .limit(10);
+    .limit(100);
 
   if (matchesError) {
     console.log({

@@ -7,6 +7,8 @@ import { useAuth } from "@clerk/nextjs";
 import { DateTime } from "luxon";
 import classNames from "classnames";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Game {
   id: string;
@@ -23,6 +25,8 @@ export default function LiveGamesList() {
   const { isSignedIn, getToken } = useAuth();
   const [loading, setLoading] = useState(true);
   const [games, setGames] = useState<Game[]>([]);
+  const [page, setPage] = useState(0);
+  const [pageGames, setPageGames] = useState<Game[]>([]);
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -39,9 +43,16 @@ export default function LiveGamesList() {
     })
       .then((data) => {
         setGames(data.matches ?? []);
+        setPage(0);
       })
       .finally(() => setLoading(false));
   }, [isSignedIn]);
+
+  useEffect(() => {
+    const start = page * 10;
+    const end = start + 10;
+    setPageGames(games.slice(start, end));
+  }, [page, games]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -59,7 +70,7 @@ export default function LiveGamesList() {
       )}
 
       <div className="flex flex-col gap-2">
-        {games.map((game: Game) => (
+        {pageGames.map((game: Game) => (
           <Link
             key={game.id}
             href={`/live/${game.id}`}
@@ -95,6 +106,25 @@ export default function LiveGamesList() {
             </div>
           </Link>
         ))}
+      </div>
+
+      <div className="flex justify-between">
+        <Button
+          variant="outline"
+          onClick={() => page > 0 && setPage(page - 1)}
+          disabled={page === 0}
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => setPage(page + 1)}
+          disabled={page >= Math.ceil(games.length / 10) - 1}
+        >
+          Next
+          <ChevronRight className="w-4 h-4" />
+        </Button>
       </div>
     </div>
   );
