@@ -624,8 +624,8 @@ export const GHQGame: Game<GHQState> = {
       }
     },
   },
-  endIf: ({ G }) => {
-    return getGameoverState(G);
+  endIf: ({ G, ctx }) => {
+    return getGameoverState(G, ctx.currentPlayer === "0" ? "RED" : "BLUE");
   },
   minPlayers: 2,
   maxPlayers: 2,
