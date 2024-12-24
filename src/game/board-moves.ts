@@ -47,7 +47,7 @@ export function getAllowedMoves({
   blueReserve: ReserveFleet;
   currentPlayerTurn: Player;
 }): AllowedMove[] {
-  const allMoves: AllowedMove[] = [{ name: "Skip", args: [] }];
+  const allMoves: AllowedMove[] = [];
 
   const thisTurnMoveCoordinates = new Set(
     coordsForThisTurnMoves(thisTurnMoves).map(
@@ -137,6 +137,11 @@ export function getAllowedMoves({
         }
       }
     }
+  }
+
+  // Only allow skip if the user has made at least one move this turn already.
+  if (thisTurnMoves.length > 0) {
+    allMoves.push({ name: "Skip", args: [] });
   }
 
   return allMoves;
