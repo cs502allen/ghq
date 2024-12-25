@@ -46,7 +46,9 @@ export default function Board({
   possibleAllowedMoves: AllowedMove[];
   isFlipped: boolean;
 }) {
-  const { measureRef, squareSize, pieceSize } = useBoardDimensions();
+  const { measureRef, squareSize, pieceSize } = useBoardDimensions(
+    G.isTutorial
+  );
 
   const bombarded = useMemo(() => bombardedSquares(board), [board]);
   const recentMoves = useMemo(
@@ -108,6 +110,7 @@ export default function Board({
         onLeftClickUp={(coord) => handleLeftClick(coord, false)}
         onMouseOver={handleMouseOver}
         flipped={isFlipped}
+        isTutorial={G.isTutorial}
       >
         {board.map((row, rowIndex) => (
           <div key={rowIndex} style={{ display: "flex" }}>
@@ -155,7 +158,7 @@ export default function Board({
   );
 }
 
-function useBoardDimensions() {
+function useBoardDimensions(isTutorial: boolean) {
   const [measureRef, { width, height }] = useMeasure();
 
   const [squareSize, pieceSize] = useMemo(() => {
@@ -166,6 +169,14 @@ function useBoardDimensions() {
       return [squareSizes.small, pieceSizes.small];
     }
   }, [width, height]);
+
+  if (isTutorial) {
+    return {
+      measureRef,
+      squareSize: squareSizes.small,
+      pieceSize: pieceSizes.small,
+    };
+  }
 
   return { measureRef, squareSize, pieceSize };
 }

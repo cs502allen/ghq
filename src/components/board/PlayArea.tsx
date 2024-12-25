@@ -67,10 +67,14 @@ export default function PlayArea(
 
   return (
     <div
-      className={classNames(
-        "flex flex-col w-[360px] md:w-[600px] lg:w-[600px] overflow-x-hidden overflow-y-auto",
-        className
-      )}
+      className={
+        G.isTutorial
+          ? "flex flex-col w-[360px]"
+          : classNames(
+              "flex flex-col w-[360px] md:w-[600px] lg:w-[600px] overflow-x-hidden overflow-y-auto",
+              className
+            )
+      }
     >
       <Reserve
         G={G}

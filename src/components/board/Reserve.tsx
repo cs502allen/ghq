@@ -54,27 +54,32 @@ export default function Reserve({
           selectReserve={selectReserve}
         />
         <div className="ml-4 lg:ml-20 my-2 flex flex-col gap-1">
-          <div className="flex gap-2 items-center">
-            {matchData?.[playerIndex]?.isConnected !== undefined && (
-              <ConnectionStatus
-                isConnected={matchData[playerIndex].isConnected}
+          {!G.isTutorial && (
+            <div className="flex gap-2 items-center">
+              {matchData?.[playerIndex]?.isConnected !== undefined && (
+                <ConnectionStatus
+                  isConnected={matchData[playerIndex].isConnected}
+                />
+              )}
+              {usernames[playerIndex] ?? defaultUsername} ({G.elos[playerIndex]}
+              )
+            </div>
+          )}
+          {!G.isTutorial && (
+            <div className="flex gap-2 justify-center items-center">
+              <MoveCounter
+                numMoves={ctx.numMoves}
+                active={currentPlayerTurn === player && !ctx.gameover}
               />
-            )}
-            {usernames[playerIndex] ?? defaultUsername} ({G.elos[playerIndex]})
-          </div>
-          <div className="flex gap-2 justify-center items-center">
-            <MoveCounter
-              numMoves={ctx.numMoves}
-              active={currentPlayerTurn === player && !ctx.gameover}
-            />
-            <CountdownTimer
-              active={currentPlayerTurn === player && !ctx.gameover}
-              player={player}
-              elapsed={player === "RED" ? G.redElapsed : G.blueElapsed}
-              startDate={G.turnStartTime}
-              totalTimeAllowed={G.timeControl}
-            />
-          </div>
+              <CountdownTimer
+                active={currentPlayerTurn === player && !ctx.gameover}
+                player={player}
+                elapsed={player === "RED" ? G.redElapsed : G.blueElapsed}
+                startDate={G.turnStartTime}
+                totalTimeAllowed={G.timeControl}
+              />
+            </div>
+          )}
         </div>
       </div>
     </>

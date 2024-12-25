@@ -7,6 +7,7 @@ import { BoardArrowProvider } from "@/game/BoardArrowProvider";
 import { MatchmakingProvider } from "@/components/MatchmakingProvider";
 import MatchmakingToast from "@/components/MatchmakingToast";
 import { config } from "@/lib/config";
+import { LatestMoveProvider } from "@/components/LatestMoveContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -62,15 +63,17 @@ export default function RootLayout({
     >
       <MatchmakingProvider>
         <BoardArrowProvider>
-          <html lang="en">
-            <body
-              className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-            >
-              {children}
-              <Toaster />
-              <MatchmakingToast />
-            </body>
-          </html>
+          <LatestMoveProvider>
+            <html lang="en">
+              <body
+                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+              >
+                {children}
+                <Toaster />
+                <MatchmakingToast />
+              </body>
+            </html>
+          </LatestMoveProvider>
         </BoardArrowProvider>
       </MatchmakingProvider>
     </ClerkProvider>
