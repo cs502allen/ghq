@@ -486,14 +486,16 @@ export type BoardType = keyof typeof boards;
 
 export function newTutorialGHQGame({
   boardState: { board, redReserve, blueReserve },
+  isTutorial,
 }: {
   boardState: BoardState;
+  isTutorial: boolean;
 }): Game<GHQState> {
   const game = { ...GHQGame };
 
   game.setup = ({ ctx }, setupData) => {
     return {
-      isTutorial: true,
+      isTutorial,
       startTime: Date.now(),
       turnStartTime: Date.now(),
       blueElapsed: 0,

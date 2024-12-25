@@ -26,6 +26,10 @@ function App() {
     router.push("/learn");
   }
 
+  async function startTutorial() {
+    router.push("/tutorial/1-hq");
+  }
+
   return (
     <div className="p-2 flex flex-col gap-4 lg:px-48">
       <Header />
@@ -40,7 +44,8 @@ function App() {
               <PlayOnlineButton mode="rapid" />
               <Button onClick={playLocal}>👨‍💻 Pass n&apos; Play</Button>
               <Button onClick={playBot}>🤖 Play Bot</Button>
-              <Button onClick={goLearn}>📚 Learn</Button>
+              <Button onClick={startTutorial}>🙋‍♂️ Learn Rules</Button>
+              <Button onClick={goLearn}>📚 Puzzles</Button>
             </div>
           </div>
 

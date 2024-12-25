@@ -46,7 +46,10 @@ export default function Page() {
     }, 500);
 
     const DynamicApp = Client({
-      game: newTutorialGHQGame({ boardState: boardInfo.boardState }),
+      game: newTutorialGHQGame({
+        boardState: boardInfo.boardState,
+        isTutorial: false,
+      }),
       board: shouldUseBoardV2() ? GHQBoardV2 : GHQBoard,
     });
     setApp(() => {

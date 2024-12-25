@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 
 import { TutorialBoard } from "@/app/tutorial/tutorial-board";
+import { LatestMoveProvider } from "@/components/LatestMoveContext";
 
 export async function generateStaticParams() {
   return frames;
@@ -38,7 +39,9 @@ export default async function Page({ params }: any) {
         <h1 className="text-2xl mb-4  font-bold">{tutorialFrame.heading}</h1>
         <h3 className="text-xl px-20  ">{tutorialFrame.details}</h3>
       </div>
-      <TutorialBoard slug={tutorialFrame.slug} nextLink={nextLink} />
+      <LatestMoveProvider key={tutorialFrame.slugWithIndex}>
+        <TutorialBoard slug={tutorialFrame.slug} nextLink={nextLink} />
+      </LatestMoveProvider>
     </div>
   );
 }

@@ -12,10 +12,11 @@ import classNames from "classnames";
 import { useBoardArrow } from "@/game/BoardArrowProvider";
 import { coordinateToAlgebraic, degreesToCardinal } from "@/game/notation";
 import { MoveLog } from "@/app/tutorial/types";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export function TutorialBoard(props: { slug: string; nextLink: string }) {
   const [client, setClient] = useState<any | null>(null);
+  const router = useRouter();
 
   // load it here so we can access the function props
   const tutorialFrame = frames.find((i) => i.slug === props.slug)!;
@@ -27,7 +28,7 @@ export function TutorialBoard(props: { slug: string; nextLink: string }) {
 
   const next = useCallback(() => {
     setTimeout(() => {
-      redirect(props.nextLink);
+      router.push(props.nextLink);
     }, 800);
   }, [props.nextLink]);
 
@@ -49,6 +50,7 @@ export function TutorialBoard(props: { slug: string; nextLink: string }) {
             redReserve: tutorialFrame.redReserve,
             blueReserve: tutorialFrame.blueReserve,
           },
+          isTutorial: true,
         }),
         board: shouldUseBoardV2() ? GHQBoardV2 : GHQBoard,
       }),

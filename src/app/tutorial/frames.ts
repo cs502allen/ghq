@@ -84,23 +84,22 @@ addFrame({
 addFrame({
   slug: "reserve-intro",
   heading: "You also get Reserves",
-  details:
-    "These additional begin off-board and can be deployed during your turn",
+  details: "These pieces begin off-board and can be deployed during your turn",
   board: defaultBoard,
   disablePlay: true,
 });
 
 addFrame({
   slug: "a-turn",
-  heading: "Each player gets to make 3 moves on their turn",
+  heading: "In GHQ players get 3 moves per Turn ",
   details:
-    "You can move a piece, deploy from your reserve or rotate an Artillery piece.",
+    "They can move a piece, deploy from your reserve, or rotate an Artillery piece without moving it.",
   board: defaultBoard,
 });
 
 addFrame({
   slug: "moving-infantry",
-  heading: "Move an Infantry",
+  heading: "Try moving Infantry",
   details: "Normal infantry can move one square in any direction",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
@@ -239,7 +238,7 @@ addFrame({
 
 addFrame({
   slug: "deploying",
-  heading: "You can also use your moves to deploy reinforcements ",
+  heading: "Now deploy some Reinforcements ",
   details:
     "Click a piece in your reserve and then choose any square on the back rank to deploy it",
   redReserve: defaultReserveFleet,
@@ -342,7 +341,7 @@ addFrame({
 });
 addFrame({
   slug: "capturing-4",
-  heading: "Now you outnumber Blue.",
+  heading: "Outnumber enemy Infantry to capture their pieces.",
   details: "Can you figure out how to capture an infantry?",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
@@ -370,9 +369,9 @@ addFrame({
 
 addFrame({
   slug: "capturing-artillery",
-  heading:
-    "Artillery can be captured by a single Infantry if you get alonside it (not diagonal)",
-  details: "Capture Blue's Artillery",
+  heading: "Artillery is easier to capture.",
+  details:
+    "A single Infantry captures artillery if you move next to it. Note: diagonal does not count. ",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -462,7 +461,7 @@ addFrame({
 
 addFrame({
   slug: "airborne",
-  heading: "And now, the most powerful piece in the game",
+  heading: "And now: the most powerful piece in the game",
   details:
     "Each Player gets one Airborne Infantry that can parachute anywhere on the board in a moment's notice. Try it out!",
   redReserve: emptyReserveFleet,
@@ -563,9 +562,9 @@ addFrame({
 
 addFrame({
   slug: "airborne-4",
-  heading: "Once your Airborne is used, it can't jump again",
+  heading: "The Airborne can only jump from the back rank",
   details:
-    "Once it's off the back rank behaves like a normal Infantry. Pro tip: if you walk it home you can use it again.",
+    "Once it's in the game it behaves like a normal Infantry. Pro tip: if you walk it home you can use it again.",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -594,7 +593,7 @@ addFrame({
   slug: "summary",
   heading: "That's GHQ",
   details:
-    "3 Moves a Turn. Capture Infantry with 2:1s. Defend your Artillery. Have fun! Capture the enemy HQ!!! ",
+    "3 Moves a Turn. Capture Infantry with 2:1s. Defend your Artillery. Have fun! If all goes well your game will end like this. To finish this tutorial capture the enemy HQ!!! ",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
