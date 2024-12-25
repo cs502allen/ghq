@@ -153,6 +153,7 @@ export interface GHQState {
     "0": number;
     "1": number;
   };
+  isTutorial: boolean;
 
   // The current board state.
   board: Board;
@@ -496,9 +497,19 @@ export const defaultReserveFleet: ReserveFleet = {
   HEAVY_ARTILLERY: 1,
 };
 
+export const emptyReserveFleet: ReserveFleet = {
+  INFANTRY: 0,
+  ARMORED_INFANTRY: 0,
+  AIRBORNE_INFANTRY: 0,
+  ARTILLERY: 0,
+  ARMORED_ARTILLERY: 0,
+  HEAVY_ARTILLERY: 0,
+};
+
 export const GHQGame: Game<GHQState> = {
   setup: ({ ctx, ...plugins }, setupData) => {
     return {
+      isTutorial: false,
       startTime: Date.now(),
       turnStartTime: Date.now(),
       blueElapsed: 0,

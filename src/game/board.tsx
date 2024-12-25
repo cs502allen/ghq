@@ -1083,9 +1083,7 @@ export function ReserveBank(props: {
 
   if (reserves.every((r) => r === null)) {
     return (
-      <div className="flex-1 flex items-center justify-center font-bold text-gray-500">
-        None
-      </div>
+      <div className="flex-1 flex items-center justify-center font-bold text-gray-500"></div>
     );
   }
 

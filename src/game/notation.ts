@@ -52,6 +52,7 @@ function cardinalToDegrees(cardinal: string): Orientation | undefined {
 }
 
 export interface BoardState {
+  isTutorial?: true;
   board: GHQState["board"];
   redReserve: ReserveFleet;
   blueReserve: ReserveFleet;

@@ -10,6 +10,7 @@ interface MouseTrackerProps {
   onMouseOver: (coordinate: Coordinate) => void;
   ref: (instance: Element | null) => void;
   flipped: boolean;
+  isTutorial: boolean;
 }
 
 export default function BoardContainer({
@@ -20,6 +21,7 @@ export default function BoardContainer({
   onMouseOver,
   ref,
   flipped,
+  isTutorial,
 }: MouseTrackerProps) {
   const [startCoords, setStartCoords] = useState<Coordinate | null>(null);
 
@@ -122,7 +124,9 @@ export default function BoardContainer({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       className={classNames(
-        "w-[360px] h-[360px] lg:w-[600px] lg:h-[600px] cursor-pointer relative",
+        isTutorial
+          ? "w-[360px] h-[360px]"
+          : "w-[360px] h-[360px] lg:w-[600px] lg:h-[600px] cursor-pointer relative",
         {
           "rotate-180": flipped,
         }

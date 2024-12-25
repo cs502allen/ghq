@@ -4,7 +4,7 @@ import { GHQGame, GHQState, ReserveFleet, Square } from "./engine";
 import { BoardArrowType } from "./BoardArrow";
 import { BoardState, FENtoBoardState } from "./notation";
 
-const B: Record<string, Square> = {
+export const B: Record<string, Square> = {
   HQ: { type: "HQ", player: "BLUE" },
   IN: { type: "INFANTRY", player: "BLUE" },
   AI: { type: "ARMORED_INFANTRY", player: "BLUE" },
@@ -17,7 +17,7 @@ const B: Record<string, Square> = {
   H1: { type: "HEAVY_ARTILLERY", player: "BLUE", orientation: 135 },
 };
 
-const R: Record<string, Square> = {
+export const R: Record<string, Square> = {
   HQ: { type: "HQ", player: "RED" },
   IN: { type: "INFANTRY", player: "RED" },
   AI: { type: "ARMORED_INFANTRY", player: "RED" },
@@ -486,13 +486,16 @@ export type BoardType = keyof typeof boards;
 
 export function newTutorialGHQGame({
   boardState: { board, redReserve, blueReserve },
+  isTutorial,
 }: {
   boardState: BoardState;
+  isTutorial: boolean;
 }): Game<GHQState> {
   const game = { ...GHQGame };
 
   game.setup = ({ ctx }, setupData) => {
     return {
+      isTutorial,
       startTime: Date.now(),
       turnStartTime: Date.now(),
       blueElapsed: 0,
