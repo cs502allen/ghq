@@ -24,7 +24,7 @@ export default async function Page({ params }: any) {
 
   const nextLink = `/tutorial/${next}`;
   return (
-    <div className="max-w-4xl mx-auto pt-10  text-center">
+    <div className="max-w-4xl mx-auto pt-10 xs:text-left sm:text-center">
       {next ? (
         <Link className="tutorial-link" href={nextLink}>
           Next ►
@@ -37,7 +37,7 @@ export default async function Page({ params }: any) {
 
       <div className="p-5 bg-gray-200">
         <h1 className="text-2xl mb-4  font-bold">{tutorialFrame.heading}</h1>
-        <h3 className="text-xl px-20  ">{tutorialFrame.details}</h3>
+        <h3 className="text-xl px-2  ">{tutorialFrame.details}</h3>
       </div>
       <LatestMoveProvider key={tutorialFrame.slugWithIndex}>
         <TutorialBoard slug={tutorialFrame.slug} nextLink={nextLink} />

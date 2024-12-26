@@ -7,7 +7,6 @@ import {
 } from "@/game/engine";
 import { B, R } from "@/game/tutorial";
 import { BoardArrowType } from "@/game/BoardArrow";
-import { LogEntry, Move } from "boardgame.io";
 import { MoveLog } from "@/app/tutorial/types";
 import { bombardedSquares } from "@/game/move-logic";
 
@@ -54,7 +53,7 @@ function addFrame(frame: TutorialFrame) {
 addFrame({
   slug: "hq",
   heading: "GHQ is played by two players on an 8x8 board",
-  details: "The goal of the game is to capture your oponent's HQ (⭐)️ ",
+  details: "The goal of the game is to capture your opponent's HQ (the star)️ ",
   disablePlay: true,
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
@@ -72,9 +71,9 @@ addFrame({
 
 addFrame({
   slug: "setup",
-  heading: "The game starts with this setup",
+  heading: "The game starts with these pieces on the board",
   details:
-    "3 Infantry and 1 Artillery are always deployed at the start of the game, with the HQ secure in the corner",
+    "The arrow pieces are called Infantry. The tanks piece is called Artillery",
   board: defaultBoard,
   disablePlay: true,
   redReserve: emptyReserveFleet,
@@ -83,8 +82,8 @@ addFrame({
 
 addFrame({
   slug: "reserve-intro",
-  heading: "You also get Reserves",
-  details: "These pieces begin off-board and can be deployed during your turn",
+  heading: "Each players get a set of Reserve pieces",
+  details: "These begin off-board and can be deployed as part of one's turn",
   board: defaultBoard,
   disablePlay: true,
 });
@@ -93,14 +92,14 @@ addFrame({
   slug: "a-turn",
   heading: "In GHQ players get 3 moves per Turn ",
   details:
-    "They can move a piece, deploy from your reserve, or rotate an Artillery piece without moving it.",
+    "They can move a piece, deploy from their reserve, or rotate an Artillery piece without moving it.",
   board: defaultBoard,
 });
 
 addFrame({
   slug: "moving-infantry",
-  heading: "Try moving Infantry",
-  details: "Normal infantry can move one square in any direction",
+  heading: "Infantry can move one square in any direction",
+  details: "Try moving a piece on the tutorial board",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -291,7 +290,7 @@ addFrame({
   slug: "capturing-2",
   heading: "Outnumber the enemy to Capture their Infantry",
   details:
-    "Together Infantry can capture enemy Infantry. A two on one will win the piece. Try to Capture the Blue Infantry",
+    "Together Infantry can capture enemy Infantry. A two on one will win the piece. Try to capture the Blue Infantry",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
