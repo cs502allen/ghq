@@ -173,7 +173,8 @@ addFrame({
     const last = moves[moves.length - 1];
     if (moves.length && last) {
       const bombarded = bombardedSquares(board);
-      if (last.type === "MoveAndOrient" && Boolean(bombarded["3,3"])) {
+      console.log(bombarded);
+      if (last.type === "MoveAndOrient" && Boolean(bombarded["2,2"])) {
         next();
       } else {
         message("You didn't aim at Blue's HQ. Try again!");
