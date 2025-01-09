@@ -11,6 +11,7 @@ import { Section } from "./learn/page";
 import { Community } from "@/components/Community";
 import LearnBasics from "./learn/LearnBasics";
 import { GHQNight } from "@/components/GHQNight";
+import CorrespondenceView from "./CorrespondenceView";
 function App() {
   const router = useRouter();
 
@@ -54,6 +55,9 @@ function App() {
           </div> */}
           <div className="border rounded p-4 bg-slate-50 flex flex-col gap-2">
             <Learn />
+          </div>
+          <div className="border rounded p-4 bg-slate-50 flex flex-col gap-2">
+            <CorrespondenceView />
           </div>
         </div>
 

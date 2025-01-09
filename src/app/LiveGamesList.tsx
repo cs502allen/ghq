@@ -4,29 +4,17 @@ import { API_URL } from "./live/config";
 import { ghqFetch } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { DateTime } from "luxon";
-import classNames from "classnames";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
-interface Game {
-  id: string;
-  winner: string;
-  player1: string;
-  player1Elo: number;
-  player2: string;
-  player2Elo: number;
-  status: string;
-  createdAt: string;
-}
+import { MatchLink } from "./MatchLink";
+import { MatchModel } from "@/lib/types";
 
 export default function LiveGamesList() {
   const { isSignedIn, getToken } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [games, setGames] = useState<Game[]>([]);
+  const [games, setGames] = useState<MatchModel[]>([]);
   const [page, setPage] = useState(0);
-  const [pageGames, setPageGames] = useState<Game[]>([]);
+  const [pageGames, setPageGames] = useState<MatchModel[]>([]);
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -36,7 +24,7 @@ export default function LiveGamesList() {
 
     setLoading(true);
 
-    ghqFetch<{ matches: Game[] }>({
+    ghqFetch<{ matches: MatchModel[] }>({
       url: `${API_URL}/matches`,
       getToken,
       method: "GET",
@@ -70,41 +58,8 @@ export default function LiveGamesList() {
       )}
 
       <div className="flex flex-col gap-2">
-        {pageGames.map((game: Game) => (
-          <Link
-            key={game.id}
-            href={`/live/${game.id}`}
-            className="py-2 px-3 bg-white border border-gray-200 rounded-lg shadow hover:shadow-md flex justify-between"
-          >
-            <div className="tracking-tight">
-              <div className="flex gap-1">
-                <div
-                  className={classNames(
-                    game.player1 === game.winner && "text-green-700"
-                  )}
-                >
-                  {game.player1}
-                </div>{" "}
-                ({game.player1Elo})<span className="text-gray-500"> vs.</span>
-                <div
-                  className={classNames(
-                    game.player2 === game.winner && "text-green-700"
-                  )}
-                >
-                  {game.player2}
-                </div>{" "}
-                ({game.player2Elo})
-              </div>
-            </div>
-
-            <div className="flex gap-1 items-center text-sm">
-              <div>{(game.status ?? "ongoing").toLowerCase()}</div>
-
-              <div className="text-gray-500">
-                {DateTime.fromISO(game.createdAt).toRelative()}
-              </div>
-            </div>
-          </Link>
+        {pageGames.map((game: MatchModel) => (
+          <MatchLink key={game.id} game={game} />
         ))}
       </div>
 

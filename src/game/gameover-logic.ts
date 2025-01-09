@@ -64,6 +64,10 @@ export function checkTimeForGameover({
   G: GHQState;
   currentPlayer: Player;
 }) {
+  if (G.timeControl === 0) {
+    return;
+  }
+
   const elapsed = Date.now() - G.turnStartTime;
 
   const playerElapsed = currentPlayer === "RED" ? G.redElapsed : G.blueElapsed;

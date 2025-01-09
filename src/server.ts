@@ -14,6 +14,8 @@ import cors from "@koa/cors";
 import { authMiddleware, clerkClient } from "./server/auth";
 import { TIME_CONTROLS } from "./game/constants";
 import { matchLifecycle } from "./server/match-lifecycle";
+import bodyParser from "koa-bodyparser";
+import { MatchModel } from "./lib/types";
 
 const supabase = createClient(
   "https://wjucmtrnmjcaatbtktxo.supabase.co",
@@ -37,6 +39,7 @@ const server = Server({
 });
 
 server.app.use(cors({ credentials: true }));
+server.app.use(bodyParser());
 server.app.use(authMiddleware);
 
 const QUEUE_STALE_MS = 5_000;
@@ -131,6 +134,7 @@ server.router.post("/matchmaking", async (ctx) => {
       user1,
       player0Creds,
       player1Creds,
+      isCorrespondence: false,
     });
 
     ctx.body = JSON.stringify({});
@@ -153,21 +157,34 @@ server.router.delete("/matchmaking", (ctx) => {
 });
 
 server.router.get("/matches", async (ctx) => {
-  const { data: matchesData, error: matchesError } = await supabase
+  const matches = await listMatches();
+  ctx.body = JSON.stringify({ matches });
+});
+
+async function listMatches(userId?: string): Promise<MatchModel[]> {
+  const query = supabase
     .from("matches")
     .select(
       "id, created_at, player0_id, player1_id, player0_elo, player1_elo, winner_id, status"
-    )
-    .order("created_at", { ascending: false })
-    .limit(100);
+    );
+
+  if (userId) {
+    query
+      .or(`player0_id.eq.${userId},player1_id.eq.${userId}`)
+      .eq("is_correspondence", true)
+      .order("created_at", { ascending: false });
+  } else {
+    query.order("created_at", { ascending: false }).limit(100);
+  }
+
+  const { data: matchesData, error: matchesError } = await query;
 
   if (matchesError) {
     console.log({
       message: "Error fetching matches",
       matchesError,
     });
-    ctx.body = JSON.stringify({ matches: [] });
-    return;
+    return [];
   }
 
   const userIds = matchesData.flatMap((match) => [
@@ -185,18 +202,10 @@ server.router.get("/matches", async (ctx) => {
       message: "Error fetching users for matches",
       error,
     });
+    return [];
   }
 
-  const matches: {
-    id: string;
-    player1: string;
-    player1Elo: number;
-    player2: string;
-    player2Elo: number;
-    winner: string | null;
-    status: string;
-    createdAt: string;
-  }[] = [];
+  const matches: MatchModel[] = [];
 
   if (users) {
     const userMap = new Map(
@@ -217,8 +226,8 @@ server.router.get("/matches", async (ctx) => {
     }
   }
 
-  ctx.body = JSON.stringify({ matches });
-});
+  return matches;
+}
 
 server.router.get("/matches/:matchId", async (ctx) => {
   const userId = ctx.state.auth.userId;
@@ -381,12 +390,14 @@ async function createActiveMatches({
   user1,
   player0Creds,
   player1Creds,
+  isCorrespondence = false,
 }: {
   matchId: string;
   user0: User;
   user1: User;
   player0Creds: string;
   player1Creds: string;
+  isCorrespondence: boolean;
 }): Promise<void> {
   const { error } = await supabase.from("active_user_matches").insert([
     {
@@ -394,12 +405,14 @@ async function createActiveMatches({
       match_id: matchId,
       player_id: "0",
       credentials: player0Creds,
+      is_correspondence: isCorrespondence,
     },
     {
       user_id: user1.id,
       match_id: matchId,
       player_id: "1",
       credentials: player1Creds,
+      is_correspondence: isCorrespondence,
     },
   ]);
   if (error) throw error;
@@ -411,6 +424,7 @@ async function createActiveMatches({
       player1_id: user1.id,
       player0_elo: user0.elo,
       player1_elo: user1.elo,
+      is_correspondence: isCorrespondence,
     },
   ]);
   if (matchError) throw matchError;
@@ -427,6 +441,7 @@ async function getActiveMatch(userId: string): Promise<ActiveMatch | null> {
     .from("active_user_matches")
     .select("match_id, player_id, credentials")
     .eq("user_id", userId)
+    .eq("is_correspondence", false) // distinguish between live and correspondence, correspondence allows multiple simultaneous games
     .single();
   if (error) return null;
 
@@ -583,4 +598,184 @@ server.router.get("/leaderboard", async (ctx) => {
   }
 
   ctx.body = JSON.stringify({ users });
+});
+
+server.router.get("/users", async (ctx) => {
+  const { data: users, error } = await supabase
+    .from("users")
+    .select("id, username, elo")
+    .neq("username", "Anonymous")
+    .neq("username", "")
+    .order("username", { ascending: true });
+
+  if (error) {
+    console.log({
+      message: "Error fetching users",
+      error,
+    });
+    ctx.throw(400, "Error fetching users");
+  }
+
+  ctx.body = JSON.stringify({ users });
+});
+
+server.router.get("/correspondence/matches", async (ctx) => {
+  const userId = ctx.state.auth.userId;
+  if (!userId) {
+    throw new Error("userId is required");
+  }
+
+  const matches = await listMatches(userId);
+  ctx.body = JSON.stringify({ matches });
+});
+
+server.router.post("/correspondence/challenge", async (ctx) => {
+  const userId = ctx.state.auth.userId;
+  if (!userId) {
+    throw new Error("userId is required");
+  }
+
+  const { targetUserId } = ctx.request.body as { targetUserId: string };
+  if (!targetUserId) {
+    ctx.throw(400, "targetUserId is required");
+  }
+
+  const { data: challenge, error } = await supabase
+    .from("correspondence_challenges")
+    .insert({
+      challenger_user_id: userId,
+      target_user_id: targetUserId,
+      status: "sent",
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.log({
+      message: "Error creating correspondence challenge",
+      error,
+    });
+    ctx.throw(400, "Error creating challenge");
+  }
+
+  ctx.body = JSON.stringify({ challenge });
+});
+
+server.router.get("/correspondence/challenges", async (ctx) => {
+  const userId = ctx.state.auth.userId;
+  if (!userId) {
+    throw new Error("userId is required");
+  }
+
+  const { data: challenges, error } = await supabase
+    .from("correspondence_challenges")
+    .select(
+      `
+      challenger:users!challenger_user_id(id, username, elo),
+      target:users!target_user_id(id, username, elo)
+    `
+    )
+    .or(`challenger_user_id.eq.${userId},target_user_id.eq.${userId}`)
+    .eq("status", "sent")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.log({
+      message: "Error fetching correspondence challenges",
+      error,
+    });
+    ctx.throw(400, "Error fetching challenges");
+  }
+
+  ctx.body = JSON.stringify({ challenges });
+});
+
+server.router.post("/correspondence/accept", async (ctx) => {
+  const userId = ctx.state.auth.userId;
+  if (!userId) {
+    throw new Error("userId is required");
+  }
+
+  const { challengerUserId } = ctx.request.body as {
+    challengerUserId: string;
+  };
+  if (!challengerUserId) {
+    ctx.throw(400, "challengerUserId is required");
+  }
+
+  const { data: challenge, error: challengeError } = await supabase
+    .from("correspondence_challenges")
+    .select("challenger_user_id, target_user_id")
+    .eq("challenger_user_id", challengerUserId)
+    .eq("target_user_id", userId)
+    .eq("status", "sent")
+    .single();
+
+  if (challengeError || !challenge) {
+    ctx.throw(400, "Invalid challenge");
+    return;
+  }
+
+  const isRandomFirst = Math.random() < 0.5;
+
+  const user0 = await getOrCreateUser(
+    isRandomFirst ? challenge.challenger_user_id : userId
+  );
+  const user1 = await getOrCreateUser(
+    isRandomFirst ? userId : challenge.challenger_user_id
+  );
+
+  const newMatch = await createNewMatch({
+    ctx,
+    db: server.db,
+    player0: challenge.challenger_user_id,
+    player1: userId,
+    numPlayers: 2,
+    setupData: {
+      players: {
+        "0": user0.id,
+        "1": user1.id,
+      },
+      elos: {
+        "0": user0.elo,
+        "1": user1.elo,
+      },
+      timeControl: TIME_CONTROLS.correspondence.time,
+      bonusTime: TIME_CONTROLS.correspondence.bonus,
+    },
+    unlisted: false,
+    game: ghqGame as SrcGame,
+  });
+
+  if (!newMatch) {
+    ctx.throw(400, "Failed to create match");
+    return;
+  }
+
+  const { matchId, player0Creds, player1Creds } = newMatch;
+
+  await createActiveMatches({
+    matchId,
+    user0,
+    user1,
+    player0Creds,
+    player1Creds,
+    isCorrespondence: true,
+  });
+
+  const { error: updateError } = await supabase
+    .from("correspondence_challenges")
+    .delete()
+    .eq("challenger_user_id", challengerUserId)
+    .eq("target_user_id", userId);
+
+  if (updateError) {
+    console.log({
+      message: "Error updating challenge status",
+      error: updateError,
+    });
+    ctx.throw(400, "Error accepting challenge");
+  }
+
+  ctx.body = JSON.stringify({ matchId });
 });
