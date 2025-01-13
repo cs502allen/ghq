@@ -670,10 +670,10 @@ export function newOnlineGHQGame({
       if (!setupData.matchId) {
         return "Missing match ID";
       }
-      if (setupData?.bonusTime && setupData.bonusTime < 0) {
+      if (setupData?.bonusTime !== undefined && setupData.bonusTime < 0) {
         return "Invalid bonus time";
       }
-      if (setupData?.timeControl && setupData.timeControl <= 0) {
+      if (setupData?.timeControl !== undefined && setupData.timeControl < 0) {
         return "Invalid time control";
       }
     }

@@ -1673,6 +1673,13 @@
   resolved "https://registry.npmjs.org/@types/keygrip/-/keygrip-1.0.6.tgz"
   integrity sha512-lZuNAY9xeJt7Bx4t4dx0rYCDqGPW8RXhQZK1td7d4H6E9zYbLoOtjBvfwdTKpsyxQI/2jv+armjX/RW+ZNpXOQ==
 
+"@types/koa-bodyparser@^4.3.12":
+  version "4.3.12"
+  resolved "https://registry.yarnpkg.com/@types/koa-bodyparser/-/koa-bodyparser-4.3.12.tgz#c19355e504422fd2a8fdb3496a32da48cd29133c"
+  integrity sha512-hKMmRMVP889gPIdLZmmtou/BijaU1tHPyMNmcK7FAHAdATnRcGQQy78EqTTxLH1D4FTsrxIzklAQCso9oGoebQ==
+  dependencies:
+    "@types/koa" "*"
+
 "@types/koa-compose@*":
   version "3.2.8"
   resolved "https://registry.npmjs.org/@types/koa-compose/-/koa-compose-3.2.8.tgz"
@@ -2351,6 +2358,11 @@ busboy@1.6.0:
   dependencies:
     streamsearch "^1.1.0"
 
+bytes@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/bytes/-/bytes-1.0.0.tgz#3569ede8ba34315fab99c3e92cb04c7220de1fa8"
+  integrity sha512-/x68VkHLeTl3/Ll8IvxdwzhrT+IyKc52e/oyHhA2RwqPqswSnjVbSddfPRwAsJtbilMAPSRWwAlpxdYsSWOTKQ==
+
 bytes@3.1.2:
   version "3.1.2"
   resolved "https://registry.npmjs.org/bytes/-/bytes-3.1.2.tgz"
@@ -2481,6 +2493,14 @@ clsx@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/clsx/-/clsx-2.1.1.tgz#eed397c9fd8bd882bfb18deab7102049a2f32999"
   integrity sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==
+
+co-body@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/co-body/-/co-body-2.0.0.tgz#7302abb8e88a2ce084f67ca4f3162c1b54a64b67"
+  integrity sha512-OFdxyTLZndkM9xl7WqGKfkNe2KKWmSywaJAz/xZQnj519T8o29W+QM1osyi2ilps4WiP/q3H+qiIuSXesrmcnw==
+  dependencies:
+    qs "~2.4.1"
+    raw-body "~1.3.4"
 
 co-body@^5.1.1:
   version "5.2.0"
@@ -3864,6 +3884,11 @@ iconv-lite@0.4.24:
   dependencies:
     safer-buffer ">= 2.1.2 < 3"
 
+iconv-lite@0.4.8:
+  version "0.4.8"
+  resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.8.tgz#c6019a7595f2cefca702eab694a010bcd9298d20"
+  integrity sha512-D90rbOiZuEJGtmIBK9wcRpW//ZKLD8bTPOAx5oEsu+O+HhSOstX/HCZFBvNkuyDuiNHunb81cfsqaYzZxcUMYA==
+
 iconv-lite@0.6.3:
   version "0.6.3"
   resolved "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.6.3.tgz"
@@ -4743,6 +4768,13 @@ kleur@^3.0.3:
   resolved "https://registry.npmjs.org/kleur/-/kleur-3.0.3.tgz"
   integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
 
+koa-body-parser@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/koa-body-parser/-/koa-body-parser-1.1.2.tgz#6698bf9cfb33b993f801a8af49a85467c402fc64"
+  integrity sha512-RYslHxGU1DWKUgxHrd95VxQWcj6NxdRWNOFvAGI70Lr66qcACQur/7q8j8JHcPvIQ5eABM9Q11GHarg+Dhg08Q==
+  dependencies:
+    co-body "^2.0.0"
+
 koa-body@^5.0.0:
   version "5.0.0"
   resolved "https://registry.npmjs.org/koa-body/-/koa-body-5.0.0.tgz"
@@ -5604,6 +5636,11 @@ qs@^6.11.0, qs@^6.4.0, qs@^6.5.2:
   dependencies:
     side-channel "^1.0.6"
 
+qs@~2.4.1:
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-2.4.2.tgz#f7ce788e5777df0b5010da7f7c4e73ba32470f5a"
+  integrity sha512-Ur2glV49dt6jknphzkWeLUNCy7pmwGxGaEJuuxVVBioSwQzT00cZPLEtRqr4cg/iO/6N+RbfB0lFD2EovyeEng==
+
 querystringify@^2.1.1:
   version "2.2.0"
   resolved "https://registry.npmjs.org/querystringify/-/querystringify-2.2.0.tgz"
@@ -5623,6 +5660,14 @@ raw-body@^2.2.0, raw-body@^2.3.3:
     http-errors "2.0.0"
     iconv-lite "0.4.24"
     unpipe "1.0.0"
+
+raw-body@~1.3.4:
+  version "1.3.4"
+  resolved "https://registry.yarnpkg.com/raw-body/-/raw-body-1.3.4.tgz#ccc7ddfc46b72861cdd5bb433c840b70b6f27f54"
+  integrity sha512-ZC2kBq6BsR0uK441H5SvGH9H+hRpTKVRjvlI6BhLOJrih3oGbGRYdFyyKKESw4/hjzJEr4cZkQgbuU52s63MOQ==
+  dependencies:
+    bytes "1.0.0"
+    iconv-lite "0.4.8"
 
 react-cookies@^0.1.0:
   version "0.1.1"
