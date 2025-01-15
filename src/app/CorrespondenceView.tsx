@@ -33,7 +33,7 @@ export default function CorrespondenceView() {
     })
       .then((data) => {
         const matches = data.matches ?? [];
-        setMatches(matches.filter((m) => m.status === "ongoing"));
+        setMatches(matches.filter((m) => m.status !== "WIN"));
       })
       .finally(() => setLoading(false));
 
@@ -78,7 +78,7 @@ export default function CorrespondenceView() {
       )}
 
       {receivedChallenges.length > 0 && (
-        <div>
+        <div className="flex flex-col gap-2">
           {receivedChallenges.map((challenge) => (
             <ReceivedChallengeRow
               key={`${challenge.challenger.id}-${challenge.target.id}`}
