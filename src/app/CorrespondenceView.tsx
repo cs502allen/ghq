@@ -107,7 +107,7 @@ export default function CorrespondenceView() {
       )}
 
       {sentChallenges.length > 0 && (
-        <div>
+        <div className="flex flex-col gap-2">
           {sentChallenges.map((challenge) => (
             <SentChallengeRow
               key={`${challenge.challenger.id}-${challenge.target.id}`}
