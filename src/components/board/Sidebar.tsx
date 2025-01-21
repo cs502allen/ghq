@@ -14,6 +14,7 @@ import HomeButton from "./HomeButton";
 import ResignButton from "./ResignButton";
 import AbandonButton from "./AbandonButton";
 import SettingsMenu, { Settings } from "./SettingsMenu";
+import { Swords } from "lucide-react";
 
 export default function Sidebar({
   G,
@@ -79,13 +80,19 @@ export default function Sidebar({
           </div>
         </div>
       ) : (
-        <div className="text-center font-semibold flex items-center flex-col justify-center text-2xl flex-1">
+        <div className="text-center flex items-center flex-col justify-center text-xl flex-1">
           <div
             className={classNames(
-              ctx.currentPlayer === "0" ? "text-red-500" : "text-blue-500"
+              ctx.currentPlayer === "0" ? "text-red-500" : "text-blue-500",
+              "flex items-center gap-1"
             )}
           >
-            {currentPlayer === currentPlayerTurn ? "Your" : "Their"} Turn
+            <div className="flex items-center gap-1 font-semibold">
+              <Swords className="w-6 h-6" /> {ctx.turn}{" "}
+            </div>
+            <div>
+              {currentPlayer === currentPlayerTurn ? "Your" : "Their"} Turn
+            </div>
           </div>
           <div className="text-lg text-gray-600 flex gap-1 justify-center items-center font-medium">
             {3 - ctx.numMoves!} remaining move
