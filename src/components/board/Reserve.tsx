@@ -4,7 +4,7 @@ import { GHQState, Player, ReserveFleet } from "@/game/engine";
 import CountdownTimer from "@/game/countdown";
 
 import MoveCounter from "../../game/MoveCounter";
-import { Ctx } from "boardgame.io";
+import { ChatMessage, Ctx } from "boardgame.io";
 import { ReserveBank } from "../../game/board";
 import { UserActionState } from "./state";
 import { BoardProps } from "boardgame.io/react";
@@ -14,6 +14,8 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import classNames from "classnames";
+import ChatIcon from "./ChatIcon";
+import LatestChatMessage from "./LatestChatMessage";
 
 export default function Reserve({
   G,
@@ -25,6 +27,8 @@ export default function Reserve({
   userActionState,
   usernames,
   selectReserve,
+  sendChatMessage,
+  chatMessages,
 }: {
   G: GHQState;
   ctx: Ctx;
@@ -32,6 +36,8 @@ export default function Reserve({
   player: Player;
   currentPlayer: Player;
   currentPlayerTurn: Player;
+  sendChatMessage: (message: string) => void;
+  chatMessages: ChatMessage[];
   userActionState: UserActionState;
   usernames: string[];
   selectReserve: (kind: keyof ReserveFleet) => void;
@@ -41,6 +47,7 @@ export default function Reserve({
 
   return (
     <>
+      <LatestChatMessage player={player} chatMessages={chatMessages} />
       <div className="items-center justify-center flex py-2 px-1">
         <ReserveBank
           player={player}
@@ -67,6 +74,9 @@ export default function Reserve({
           )}
           {!G.isTutorial && (
             <div className="flex gap-2 justify-center items-center">
+              {player === currentPlayer && (
+                <ChatIcon sendChatMessage={sendChatMessage} />
+              )}
               <MoveCounter
                 numMoves={ctx.numMoves}
                 active={currentPlayerTurn === player && !ctx.gameover}

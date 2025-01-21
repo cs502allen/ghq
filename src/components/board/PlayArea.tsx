@@ -17,8 +17,18 @@ import { Settings } from "./SettingsMenu";
 export default function PlayArea(
   props: BoardProps<GHQState> & { className: string; settings: Settings }
 ) {
-  const { ctx, G, matchData, playerID, className, moves, log, settings } =
-    props;
+  const {
+    ctx,
+    G,
+    matchData,
+    playerID,
+    className,
+    moves,
+    log,
+    settings,
+    sendChatMessage,
+    chatMessages,
+  } = props;
   const [userActionState, setUserActionState] = useState<UserActionState>({});
   const [viewPlayerPref, setViewPlayerPref] = useState<Player>("RED");
   const currentPlayerTurn = useMemo(
@@ -90,6 +100,10 @@ export default function PlayArea(
             updateReserveClick(userActionState, kind, possibleAllowedMoves)
           )
         }
+        sendChatMessage={(message) =>
+          sendChatMessage({ message, time: Date.now() })
+        }
+        chatMessages={chatMessages}
       />
       <Board
         G={G}
@@ -118,6 +132,10 @@ export default function PlayArea(
             updateReserveClick(userActionState, kind, possibleAllowedMoves)
           )
         }
+        sendChatMessage={(message) =>
+          sendChatMessage({ message, time: Date.now() })
+        }
+        chatMessages={chatMessages}
       />
       <ControlsView
         {...props}
