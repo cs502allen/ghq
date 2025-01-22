@@ -1,4 +1,4 @@
-import { describe, expect, it } from "@jest/globals";
+import { describe, expect, it, xdescribe } from "@jest/globals";
 import { GHQState } from "@/game/engine";
 import { Red, Blue } from "@/game/tests/test-boards";
 import { getGameoverState } from "./gameover-logic";
@@ -18,7 +18,20 @@ describe("gameover", () => {
       [null, null, null, null, null, null, null, null],
       [null, null, null, null, null, null, null, B_HQ],
     ];
-    expect(getGameoverState({ board } as GHQState)).toBeUndefined();
+    expect(
+      getGameoverState(
+        {
+          board,
+          redElapsed: 0,
+          blueElapsed: 0,
+          timeControl: 0,
+          thisTurnMoves: [],
+          redReserve: {},
+          blueReserve: {},
+        } as unknown as GHQState,
+        "RED"
+      )
+    ).toBeUndefined();
   });
 
   it("is gameover when an hq is missing", () => {
@@ -32,7 +45,7 @@ describe("gameover", () => {
       [null, null, null, null, null, null, null, null],
       [null, null, null, null, null, null, null, B_HQ],
     ];
-    expect(getGameoverState({ board } as GHQState)).toEqual({
+    expect(getGameoverState({ board } as GHQState, "RED")).toEqual({
       status: "WIN",
       winner: "BLUE",
       reason: "by HQ capture",
@@ -45,7 +58,7 @@ describe("gameover", () => {
       blueElapsed: 101,
       timeControl: 100,
     } as GHQState;
-    expect(getGameoverState(G)).toEqual({
+    expect(getGameoverState(G, "RED")).toEqual({
       status: "WIN",
       winner: "RED",
       reason: "on time",
@@ -58,7 +71,7 @@ describe("gameover", () => {
       blueElapsed: 0,
       timeControl: 100,
     } as GHQState;
-    expect(getGameoverState(G)).toEqual({
+    expect(getGameoverState(G, "RED")).toEqual({
       status: "WIN",
       winner: "BLUE",
       reason: "on time",

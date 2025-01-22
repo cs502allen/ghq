@@ -495,6 +495,9 @@ function maximizeEngagementV2(
   let index0 = 0;
   let index1 = 0;
 
+  const attackerColor: Player = attacker.player;
+  const defenderColor: Player = attackerColor === "RED" ? "BLUE" : "RED";
+
   // Populate pieces0 and pieces1 arrays and their indices
   for (let i = 0; i < N; i++) {
     for (let j = 0; j < N; j++) {
@@ -513,10 +516,10 @@ function maximizeEngagementV2(
         continue;
       }
 
-      if (unit.player === "RED") {
+      if (unit.player === attackerColor) {
         pieces0.push({ x: i, y: j });
         piece0Index[`${i},${j}`] = index0++;
-      } else if (unit.player === "BLUE") {
+      } else {
         pieces1.push({ x: i, y: j });
         piece1Index[`${i},${j}`] = index1++;
       }
@@ -524,7 +527,7 @@ function maximizeEngagementV2(
   }
 
   // Add the attacker to the list of pieces at the end, to make it last priority for matching.
-  if (attacker.player === "RED") {
+  if (attacker.player === attackerColor) {
     pieces0.push({ x: attackerTo[0], y: attackerTo[1] });
     piece0Index[`${attackerTo[0]},${attackerTo[1]}`] = index0++;
   } else {
@@ -555,9 +558,9 @@ function maximizeEngagementV2(
         y1 >= 0 &&
         y1 < N &&
         // If red is attacking, then we're looking for any blue piece as a pair
-        (board[x1]?.[y1]?.player === "BLUE" ||
+        (board[x1]?.[y1]?.player === defenderColor ||
           // But if blue is attacking, the board won't have the blue piece there yet, so we need to check the attacker coordinates
-          (attacker.player === "BLUE" &&
+          (attacker.player === defenderColor &&
             x1 === attackerTo[0] &&
             y1 === attackerTo[1]))
       ) {
@@ -607,9 +610,9 @@ function maximizeEngagementV2(
       const piece0 = pieces0[u];
       const piece1 = pieces1[v];
       engagedPairs.push({
-        RED: [piece0.x, piece0.y],
-        BLUE: [piece1.x, piece1.y],
-      });
+        [attackerColor]: [piece0.x, piece0.y],
+        [defenderColor]: [piece1.x, piece1.y],
+      } as Record<Player, Coordinate>);
     }
   }
 
