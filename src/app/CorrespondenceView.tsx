@@ -33,7 +33,7 @@ export default function CorrespondenceView() {
     })
       .then((data) => {
         const matches = data.matches ?? [];
-        setMatches(matches.filter((m) => m.status !== "WIN"));
+        setMatches(matches.filter((m) => m.status === null));
       })
       .finally(() => setLoading(false));
 
