@@ -745,6 +745,29 @@ describe("computing allowed captures v2", () => {
       })
     ).toEqual([]);
   });
+  it("allows weird paratrooper capture scenario (issue #173)", () => {
+    const board: GHQState["board"] = [
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, BINF, null, null],
+      [null, null, null, null, null, null, RART, BINF],
+      [null, null, null, null, null, RINF, BINF, RINF],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+    ];
+    expect(
+      captureCandidatesV2({
+        attacker: BINF,
+        attackerFrom: [2, 5],
+        attackerTo: [3, 5],
+        board,
+      })
+    ).toEqual([
+      [4, 5],
+      [3, 6],
+    ]);
+  });
 });
 
 describe("clear free captures", () => {
