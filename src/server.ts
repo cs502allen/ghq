@@ -121,6 +121,7 @@ server.router.post("/matchmaking", async (ctx) => {
         },
         timeControl: timeControl.time,
         bonusTime: timeControl.bonus,
+        variant: timeControl?.variant,
       },
       unlisted: false,
       game: ghqGame as SrcGame,
