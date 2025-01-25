@@ -35,11 +35,11 @@ export const R: Record<string, Square> = {
 export const normandy: Variant = {
   name: "normandy",
   blueReserve: {
-    INFANTRY: 12,
-    ARMORED_INFANTRY: 6,
+    INFANTRY: 8,
+    ARMORED_INFANTRY: 8,
     AIRBORNE_INFANTRY: 2,
     ARTILLERY: 2,
-    ARMORED_ARTILLERY: 2,
+    ARMORED_ARTILLERY: 1,
     HEAVY_ARTILLERY: 0,
   },
   redReserve: {
