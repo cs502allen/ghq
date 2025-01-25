@@ -9,6 +9,8 @@ import { getGameoverState } from "./gameover-logic";
 import { isMoveAllowed, PlayerPiece } from "./board-moves";
 import { calculateEval } from "./eval";
 import { ai } from "./ai";
+import { TIME_CONTROLS } from "./constants";
+import { variants } from "./variants";
 
 export const Units: {
   [key: string]: {
@@ -508,6 +510,12 @@ export const emptyReserveFleet: ReserveFleet = {
 
 export const GHQGame: Game<GHQState> = {
   setup: ({ ctx, ...plugins }, setupData) => {
+    const variant = variants[setupData?.variant];
+    const redReserve =
+      variant?.redReserve ?? structuredClone(defaultReserveFleet);
+    const blueReserve =
+      variant?.blueReserve ?? structuredClone(defaultReserveFleet);
+    const board = variant?.board ?? defaultBoard;
     return {
       isTutorial: false,
       startTime: Date.now(),
@@ -517,15 +525,15 @@ export const GHQGame: Game<GHQState> = {
       bonusTime: setupData?.bonusTime ?? 10 * 1000,
       lastPlayerMoves: [],
       timeControl: setupData?.timeControl ?? 15 * 60 * 1000,
-      redTurnStartBoard: defaultBoard,
-      blueTurnStartBoard: defaultBoard,
-      board: defaultBoard,
+      redTurnStartBoard: board,
+      blueTurnStartBoard: board,
+      board,
       thisTurnMoves: [],
       lastTurnBoards: [],
       thisTurnBoards: [],
       eval: 0,
-      redReserve: structuredClone(defaultReserveFleet),
-      blueReserve: structuredClone(defaultReserveFleet),
+      redReserve,
+      blueReserve,
       userIds: {
         "0": setupData?.players?.["0"] || "Player 1",
         "1": setupData?.players?.["1"] || "Player 2",
@@ -675,6 +683,9 @@ export function newOnlineGHQGame({
       }
       if (setupData?.timeControl !== undefined && setupData.timeControl < 0) {
         return "Invalid time control";
+      }
+      if (setupData?.variant && !TIME_CONTROLS[setupData.variant]) {
+        return "Invalid variant";
       }
     }
   };
