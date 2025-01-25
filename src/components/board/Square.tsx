@@ -13,7 +13,7 @@ import {
   Units,
 } from "@/game/engine";
 import classNames from "classnames";
-import { Bombarded } from "@/game/move-logic";
+import { Bombarded, bombardedSquares } from "@/game/move-logic";
 import { Crosshair } from "lucide-react";
 import {
   isBombardedBy,
@@ -96,14 +96,20 @@ export function getSquareState({
   )?.piece;
   const { shouldAnimateTo } = getAnimation(coord, mostRecentMove);
   const engagedOrientation = getEngagedOrientation(coord, boardEngagements);
+  const { isRedBombarded, isBlueBombarded } = getBombardStatus(
+    board,
+    coord,
+    userActionState,
+    bombarded
+  );
 
   return {
     rowIndex,
     colIndex,
     square,
     stagedSquare,
-    isRedBombarded: bombarded[`${rowIndex},${colIndex}`]?.RED ?? false,
-    isBlueBombarded: bombarded[`${rowIndex},${colIndex}`]?.BLUE ?? false,
+    isRedBombarded,
+    isBlueBombarded,
     isSelected,
     showTarget: false,
     wasRecentlyCapturedPiece,
@@ -523,4 +529,29 @@ function getEngagedOrientation(
     engagedOrientation = getOrientationBetween(coord, engagedCoord);
   }
   return engagedOrientation;
+}
+
+function getBombardStatus(
+  board: Board,
+  coord: Coordinate,
+  userActionState: UserActionState | null,
+  bombarded: Bombarded
+) {
+  if (!userActionState?.chosenMoves) {
+    return {
+      isRedBombarded: bombarded[`${coord[0]},${coord[1]}`]?.RED ?? false,
+      isBlueBombarded: bombarded[`${coord[0]},${coord[1]}`]?.BLUE ?? false,
+    };
+  }
+
+  const updatedBoard = JSON.parse(JSON.stringify(board));
+  const originPiece = userActionState?.selectedPiece;
+  if (originPiece) {
+    updatedBoard[originPiece.coordinate[0]][originPiece.coordinate[1]] = null;
+  }
+  const updatedBombarded = bombardedSquares(updatedBoard);
+  return {
+    isRedBombarded: updatedBombarded[`${coord[0]},${coord[1]}`]?.RED ?? false,
+    isBlueBombarded: updatedBombarded[`${coord[0]},${coord[1]}`]?.BLUE ?? false,
+  };
 }
