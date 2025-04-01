@@ -62,7 +62,7 @@ function App() {
         </div>
 
         <div className="col-span-1 flex flex-col gap-2">
-          <GHQNight />
+          {/* <GHQNight /> */}
           <div className="border rounded p-4 bg-slate-50">
             <Leaderboard />
           </div>
