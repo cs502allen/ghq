@@ -12,7 +12,7 @@ const messages = [
   "🍀 Good luck!",
   "👏 Nice move!",
   "🤝 GG",
-  "🙏 Thanks for the game!",
+  "🙏 Thanks!",
 ];
 
 export default function ChatIcon({
