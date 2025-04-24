@@ -530,6 +530,7 @@ export function newTutorialGHQGame({
         "1": [],
       },
       historyLog: [],
+      has4MovesPerTurn: true,
     };
   };
 

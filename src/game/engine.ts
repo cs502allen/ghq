@@ -198,8 +198,9 @@ export interface GHQState {
   // Log that should probably be renamed StartOfTurnCaptures, since that's what it stores (as of 2024-11-30).
   historyLog?: HistoryItem[];
 
-  // The number of moves made this turn. We have to track manually in order to allow for "confirm turn"
-  // movesMadeThisTurn: number;
+  // Flag that indicates if this game engine has 4 moves per turn. This is used to determine how to process moves in replay mode.
+  // This was added on 2025-04-24.
+  has4MovesPerTurn?: boolean;
 }
 
 export interface GameoverState {
@@ -410,7 +411,11 @@ const ChangeOrientation: Move<GHQState> = (
 
 const Skip: Move<GHQState> = {
   noLimit: true,
-  move: ({ events }) => {
+  move: ({ G, events }) => {
+    if (G.isReplayMode) {
+      return;
+    }
+
     events.endTurn();
   },
 };
@@ -573,6 +578,7 @@ export const GHQGame: Game<GHQState> = {
         "1": [],
       },
       historyLog: [],
+      has4MovesPerTurn: true,
     };
   },
   turn: {

@@ -67,6 +67,12 @@ export default function MultiplayerReplayCapability({
     };
     setInitialState(initialState);
 
+    // We made a change to the game engine on 2025-04-24 that changes max moves from 3 to 4.
+    // This is a fix for replays to ensure that games played before this change are still replayable.
+    if (!onlineInitialState?.G?.has4MovesPerTurn) {
+      onlineClient.game.turn.maxMoves = 3;
+    }
+
     offlineClient.log = onlineClient.log;
     const log = nonAutomaticLogs(offlineClient.log);
     const reducer = CreateGameReducer({ game: offlineClient.game });
