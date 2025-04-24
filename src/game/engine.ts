@@ -197,6 +197,9 @@ export interface GHQState {
 
   // Log that should probably be renamed StartOfTurnCaptures, since that's what it stores (as of 2024-11-30).
   historyLog?: HistoryItem[];
+
+  // The number of moves made this turn. We have to track manually in order to allow for "confirm turn"
+  // movesMadeThisTurn: number;
 }
 
 export interface GameoverState {
@@ -211,6 +214,10 @@ const Reinforce: Move<GHQState> = (
   to: Coordinate,
   capturePreference?: Coordinate
 ) => {
+  if (hasMoveLimitReached(ctx)) {
+    return INVALID_MOVE;
+  }
+
   const reserve = ctx.currentPlayer === "0" ? G.redReserve : G.blueReserve;
   if (
     !G.isReplayMode &&
@@ -273,12 +280,17 @@ const Reinforce: Move<GHQState> = (
     currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
   });
 };
+
 const Move: Move<GHQState> = (
   { G, ctx, log, ...plugins },
   from: Coordinate,
   to: Coordinate,
   capturePreference?: Coordinate
 ) => {
+  if (hasMoveLimitReached(ctx)) {
+    return INVALID_MOVE;
+  }
+
   const piece = G.board[from[0]][from[1]];
   if (
     !G.isReplayMode &&
@@ -326,6 +338,10 @@ const MoveAndOrient: Move<GHQState> = (
   to: Coordinate,
   orientation?: Orientation
 ) => {
+  if (hasMoveLimitReached(ctx)) {
+    return INVALID_MOVE;
+  }
+
   const piece = G.board[from[0]][from[1]]!;
   if (typeof Units[piece.type].artilleryRange === "undefined") {
     return INVALID_MOVE;
@@ -356,11 +372,16 @@ const MoveAndOrient: Move<GHQState> = (
     currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
   });
 };
+
 const ChangeOrientation: Move<GHQState> = (
   { G, ctx, log },
   on: Coordinate,
   orientation: Orientation
 ) => {
+  if (hasMoveLimitReached(ctx)) {
+    return INVALID_MOVE;
+  }
+
   const piece = G.board[on[0]][on[1]];
   if (
     !G.isReplayMode &&
@@ -556,7 +577,7 @@ export const GHQGame: Game<GHQState> = {
   },
   turn: {
     minMoves: 1,
-    maxMoves: 3,
+    maxMoves: 4,
     onBegin: ({ ctx, G }) => {
       G.lastPlayerMoves = G.thisTurnMoves;
       G.thisTurnMoves = [];
@@ -709,4 +730,8 @@ export function newLocalGHQGame(): Game<GHQState> {
   };
 
   return game;
+}
+
+export function hasMoveLimitReached(ctx: Ctx) {
+  return ctx.numMoves !== undefined && ctx.numMoves >= 3;
 }
