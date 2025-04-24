@@ -11,7 +11,10 @@ import { Settings } from "./SettingsMenu";
 import { useLatestMoveContext } from "@/components/LatestMoveContext";
 
 export function GHQBoardV2(props: BoardProps<GHQState>) {
-  const [settings, setSettings] = useState<Settings>({ autoFlipBoard: true });
+  const [settings, setSettings] = useState<Settings>({
+    autoFlipBoard: true,
+    confirmTurn: true,
+  });
   const { isTutorial } = props.G;
 
   const { setBoard, setMoves } = useLatestMoveContext();

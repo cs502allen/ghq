@@ -11,6 +11,7 @@ import { BoardProps } from "boardgame.io/react";
 import { GHQState } from "@/game/engine";
 import { useCallback, useMemo } from "react";
 import { Ctx, LogEntry } from "boardgame.io";
+import { cn } from "@/lib/utils";
 
 export default function ControlsView({
   ctx,
@@ -21,6 +22,7 @@ export default function ControlsView({
   isMyTurn,
   log,
   cancel,
+  hasMoveLimitReached,
 }: {
   ctx: Ctx;
   undo: () => void;
@@ -30,6 +32,7 @@ export default function ControlsView({
   log: LogEntry[];
   moves: BoardProps<GHQState>["moves"];
   isMyTurn: boolean;
+  hasMoveLimitReached: boolean;
 }) {
   const lastLog = useMemo(() => log.slice(-1)[0], [log]);
   const canUndo = useMemo(
@@ -99,9 +102,14 @@ export default function ControlsView({
       />
       <ActionButton
         Icon={SkipForward}
-        tooltip='Skip the remainder of your turn after making at least one move (shortcut: ".")'
+        tooltip='Skip or confirm the remainder of your turn after making at least one move (shortcut: ".")'
         onClick={doSkip}
         disabled={!canSkip}
+        className={
+          hasMoveLimitReached
+            ? "border-blue-800 bg-blue-300 text-blue-800 hover:bg-blue-300/80 transition-colors duration-200"
+            : ""
+        }
       />
       <ActionButton
         Icon={Repeat}
@@ -118,11 +126,13 @@ function ActionButton({
   tooltip,
   onClick,
   disabled,
+  className,
 }: {
   Icon: React.FC;
   tooltip: string;
   onClick: () => void;
   disabled: boolean;
+  className?: string;
 }) {
   return (
     <TooltipProvider>
@@ -130,7 +140,7 @@ function ActionButton({
         <TooltipTrigger asChild>
           <Button
             variant="outline"
-            className="w-full"
+            className={cn("w-full", className ?? "")}
             onClick={onClick}
             disabled={disabled}
           >

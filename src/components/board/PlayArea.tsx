@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { GHQState, Player } from "@/game/engine";
+import { GHQState, hasMoveLimitReached, Player } from "@/game/engine";
 import { BoardProps } from "boardgame.io/react";
 import { getAllowedMoves, getOpponent } from "../../game/board-moves";
 
@@ -54,17 +54,32 @@ export default function PlayArea(
     }
   }, [G.isPassAndPlayMode, playerID, currentPlayerTurn, settings]);
 
-  const possibleAllowedMoves = useMemo(
-    () =>
-      getAllowedMoves({
-        board: G.board,
-        redReserve: G.redReserve,
-        blueReserve: G.blueReserve,
-        currentPlayerTurn,
-        thisTurnMoves: G.thisTurnMoves,
-      }),
-    [G.board, G.redReserve, G.blueReserve, currentPlayerTurn, G.thisTurnMoves]
-  );
+  const possibleAllowedMoves = useMemo(() => {
+    if (hasMoveLimitReached(ctx)) {
+      return [];
+    }
+    return getAllowedMoves({
+      board: G.board,
+      redReserve: G.redReserve,
+      blueReserve: G.blueReserve,
+      currentPlayerTurn,
+      thisTurnMoves: G.thisTurnMoves,
+    });
+  }, [
+    G.board,
+    G.redReserve,
+    G.blueReserve,
+    currentPlayerTurn,
+    G.thisTurnMoves,
+    ctx,
+  ]);
+
+  // If the move limit has been reached and user has confirm disabled, automatically skip the turn.
+  useEffect(() => {
+    if (!settings.confirmTurn && hasMoveLimitReached(ctx)) {
+      moves.Skip();
+    }
+  }, [ctx.numMoves]);
 
   const { board, mostRecentMove, replay } = useBoard({
     ctx,
@@ -140,6 +155,7 @@ export default function PlayArea(
       <ControlsView
         {...props}
         isMyTurn={currentPlayer === currentPlayerTurn}
+        hasMoveLimitReached={hasMoveLimitReached(ctx)}
         cancel={() => setUserActionState({})}
         replay={() => replay()}
       />
