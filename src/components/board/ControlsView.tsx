@@ -107,7 +107,7 @@ export default function ControlsView({
         disabled={!canSkip}
         className={
           hasMoveLimitReached
-            ? "border-blue-800 bg-blue-300 text-blue-800 hover:bg-blue-300/80 transition-colors duration-200"
+            ? "border-blue-800 bg-blue-200 text-blue-800 hover:bg-blue-100 transition-colors duration-200"
             : ""
         }
       />
