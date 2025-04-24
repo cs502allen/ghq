@@ -74,6 +74,13 @@ export default function PlayArea(
     ctx,
   ]);
 
+  // If the move limit has been reached and user has confirm disabled, automatically skip the turn.
+  useEffect(() => {
+    if (!settings.confirmTurn && hasMoveLimitReached(ctx)) {
+      moves.Skip();
+    }
+  }, [ctx.numMoves]);
+
   const { board, mostRecentMove, replay } = useBoard({
     ctx,
     G,
