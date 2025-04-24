@@ -48,6 +48,37 @@ export default function MultiplayerReplayCapability({
     return log.filter((logEntry: any) => !logEntry.automatic);
   }
 
+  // This function gets the next log index to move to.
+  // It skips over GAME_EVENT and SKIP moves.
+  function getNextLogIndex(
+    log: any[],
+    currentIndex: number,
+    direction: 1 | -1
+  ): number {
+    const nextIndex = currentIndex + direction;
+
+    if (nextIndex < 0) {
+      return -1;
+    }
+    if (nextIndex >= log.length) {
+      return log.length;
+    }
+
+    const nextLogEntry = log[nextIndex];
+    if (nextLogEntry.action.type === "GAME_EVENT") {
+      return getNextLogIndex(log, nextIndex, direction);
+    }
+
+    if (
+      nextLogEntry.action.type === "MAKE_MOVE" &&
+      nextLogEntry.action.payload.type === "Skip"
+    ) {
+      return getNextLogIndex(log, nextIndex, direction);
+    }
+
+    return nextIndex;
+  }
+
   const rewind = (logIndex: number) => {
     if (!onlineClient.log || !offlineClient) {
       return;
@@ -112,14 +143,15 @@ export default function MultiplayerReplayCapability({
         return;
       }
 
-      const logIndex =
+      const currentIndex =
         currentLogIndex === "latest" ? log.length - 1 : currentLogIndex;
+      const nextIndex = getNextLogIndex(log, currentIndex, -1);
 
-      if (logIndex - 1 >= 0) {
-        const state = rewind(logIndex - 1);
-        setCurrentLogIndex(logIndex - 1);
+      if (nextIndex >= 0) {
+        const state = rewind(nextIndex);
+        setCurrentLogIndex(nextIndex);
         offlineClient.overrideGameState(state);
-      } else if (logIndex === 0) {
+      } else {
         setCurrentLogIndex("init");
         offlineClient.overrideGameState(initialState);
       }
@@ -153,12 +185,13 @@ export default function MultiplayerReplayCapability({
       }
 
       const log = nonAutomaticLogs(onlineClient.log);
+      const nextIndex = getNextLogIndex(log, currentLogIndex, 1);
 
-      if (currentLogIndex + 1 < log.length) {
-        const state = rewind(currentLogIndex + 1);
-        setCurrentLogIndex(currentLogIndex + 1);
+      if (nextIndex < log.length) {
+        const state = rewind(nextIndex);
+        setCurrentLogIndex(nextIndex);
         offlineClient.overrideGameState(state);
-      } else if (currentLogIndex + 1 >= log.length) {
+      } else {
         setCurrentLogIndex("latest");
       }
 
