@@ -1,6 +1,6 @@
 "use client";
 
-import { ClerkLoaded, ClerkLoading, useClerk } from "@clerk/nextjs";
+import { ClerkLoaded, ClerkLoading, useAuth, useClerk } from "@clerk/nextjs";
 import Image from "next/image";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
@@ -8,7 +8,8 @@ import { getUser, User } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { config } from "@/lib/config";
-
+import { ghqFetch } from "@/lib/api";
+import { API_URL } from "@/app/live/config";
 export default function Header() {
   return (
     <div className="flex justify-between">
@@ -32,12 +33,45 @@ export default function Header() {
 
 function AuthSection() {
   const { user } = useClerk();
+  const [isLoadingUserInfo, setIsLoadingUserInfo] = useState(true);
   const [userInfo, setUserInfo] = useState<User | null>(null);
+  const { getToken } = useAuth();
+
   useEffect(() => {
     if (user) {
-      getUser(user.id).then(setUserInfo);
+      getUser(user.id)
+        .then(setUserInfo)
+        .finally(() => setIsLoadingUserInfo(false));
     }
   }, [user]);
+
+  useEffect(() => {
+    // If user info is still loading, don't do anything
+    if (isLoadingUserInfo) {
+      return;
+    }
+
+    // If clerk user is not loaded, don't do anything
+    if (!user) {
+      return;
+    }
+
+    if (
+      // If clerk username is set and it's different from the username in the database, update the username.
+      (user.username && user.username !== userInfo?.username) ||
+      // If the username in the database is null, update it to a random default.
+      !userInfo?.username
+    ) {
+      // NOTE: This also creates the user if they don't exist.
+      ghqFetch({
+        url: `${API_URL}/users/me/username`,
+        method: "PUT",
+        getToken: getToken,
+      }).then((data: any) => {
+        setUserInfo(data.user);
+      });
+    }
+  }, [user, userInfo, isLoadingUserInfo]);
 
   return (
     <>
