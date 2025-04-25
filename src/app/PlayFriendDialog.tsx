@@ -109,7 +109,9 @@ export function PlayFriendDialog() {
           )}
           <div className="flex flex-col gap-1 h-80 overflow-y-auto border rounded-md p-2">
             {users
-              .filter((user) => user.username.includes(search))
+              .filter((user) =>
+                user.username.toLowerCase().includes(search.toLowerCase())
+              )
               .map((user) => (
                 <div
                   key={user.id}

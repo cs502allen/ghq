@@ -555,11 +555,21 @@ async function getOrCreateUser(userId: string): Promise<User> {
     .single();
 
   if (user) {
-    if (user.username !== clerkUser.username) {
-      await supabase
+    if (
+      // If clerk username is set and it's different from the username in the database, update the username
+      (clerkUser.username && user.username !== clerkUser.username) ||
+      // If the username in the database is null, update it to a random default
+      !user.username
+    ) {
+      const username = clerkUsernameOrRandomDefault(clerkUser.username);
+      const { error } = await supabase
         .from("users")
-        .update({ username: clerkUser.username })
+        .update({ username })
         .eq("id", userId);
+
+      if (!error) {
+        user.username = username;
+      }
     }
 
     return user;
@@ -569,7 +579,7 @@ async function getOrCreateUser(userId: string): Promise<User> {
     const newUser = {
       id: userId,
       elo: 1000,
-      username: clerkUser.username ?? "Anonymous",
+      username: clerkUsernameOrRandomDefault(clerkUser.username),
     };
     const { error: insertError } = await supabase
       .from("users")
@@ -619,6 +629,17 @@ server.router.get("/users", async (ctx) => {
   }
 
   ctx.body = JSON.stringify({ users });
+});
+
+server.router.put("/users/me/username", async (ctx) => {
+  const userId = ctx.state.auth.userId;
+  if (!userId) {
+    throw new Error("userId is required");
+  }
+
+  const user = await getOrCreateUser(userId);
+
+  ctx.body = JSON.stringify({ user });
 });
 
 server.router.get("/correspondence/matches", async (ctx) => {
@@ -781,3 +802,72 @@ server.router.post("/correspondence/accept", async (ctx) => {
 
   ctx.body = JSON.stringify({ matchId });
 });
+
+function clerkUsernameOrRandomDefault(username?: string | null): string {
+  console.log("clerkUsernameOrRandomDefault", username);
+  if (username && username.length > 0) {
+    return username;
+  }
+
+  const adjectives = [
+    "Brave",
+    "Clever",
+    "Dazzling",
+    "Energetic",
+    "Fierce",
+    "Glorious",
+    "Happy",
+    "Incredible",
+    "Jolly",
+    "Keen",
+    "Luminous",
+    "Mighty",
+    "Noble",
+    "Optimistic",
+    "Powerful",
+    "Quirky",
+    "Radiant",
+    "Spectacular",
+    "Terrific",
+    "Unstoppable",
+    "Vibrant",
+    "Wonderful",
+    "Excellent",
+    "Youthful",
+    "Zealous",
+  ];
+
+  const nouns = [
+    "Panda",
+    "Tiger",
+    "Dragon",
+    "Phoenix",
+    "Wizard",
+    "Knight",
+    "Ninja",
+    "Pirate",
+    "Robot",
+    "Astronaut",
+    "Dinosaur",
+    "Unicorn",
+    "Warrior",
+    "Explorer",
+    "Hero",
+    "Falcon",
+    "Dolphin",
+    "Lion",
+    "Wolf",
+    "Eagle",
+    "Shark",
+    "Titan",
+    "Champion",
+    "Voyager",
+    "Ranger",
+  ];
+
+  const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+  const noun = nouns[Math.floor(Math.random() * nouns.length)];
+  const number = Math.floor(Math.random() * 1000);
+
+  return `${adjective}${noun}${number}`;
+}
