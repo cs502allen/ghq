@@ -37,7 +37,7 @@ export default function Leaderboard() {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-2xl">Leaderboard</div>
+      <div className="font-bold text-lg">Leaderboard</div>
 
       {!isSignedIn && (
         <div className="text-gray-600">Sign in to see the top players!</div>

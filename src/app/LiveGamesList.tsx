@@ -44,7 +44,7 @@ export default function LiveGamesList() {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-2xl">Recent games</div>
+      <div className="font-bold text-lg">Recent games</div>
 
       {!loading && games.length === 0 && (
         <div className="text-gray-600">No games found</div>
