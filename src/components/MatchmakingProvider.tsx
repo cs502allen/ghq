@@ -104,13 +104,22 @@ export const MatchmakingProvider: React.FC<{ children: ReactNode }> = ({
       return;
     }
 
-    ghqFetch<UsersOnline>({
-      url: `${API_URL}/users/online`,
-      getToken,
-      method: "GET",
-    }).then((data) => {
-      setUsersOnline(data);
-    });
+    const fetchOnlineUsers = () => {
+      ghqFetch<UsersOnline>({
+        url: `${API_URL}/users/online`,
+        getToken,
+        method: "GET",
+      }).then((data) => {
+        setUsersOnline(data);
+      });
+    };
+
+    fetchOnlineUsers();
+    const interval = setInterval(fetchOnlineUsers, 5000);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [isSignedIn, getToken]);
 
   return (

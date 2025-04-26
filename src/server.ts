@@ -44,6 +44,7 @@ server.app.use(bodyParser());
 server.app.use(authMiddleware);
 
 const QUEUE_STALE_MS = 5_000;
+const ONLINE_USER_STALE_MS = 10_000;
 const blitzQueue: Map<string, number> = new Map();
 const rapidQueue: Map<string, number> = new Map();
 const usersOnline: Map<string, number> = new Map();
@@ -944,7 +945,7 @@ function updateOnlineUsers(userId: string) {
   // Iterate through the online users
   const now = Date.now();
   for (const [userId, lastActive] of usersOnline.entries()) {
-    if (lastActive < Date.now() - QUEUE_STALE_MS) {
+    if (lastActive < Date.now() - ONLINE_USER_STALE_MS) {
       console.log(`Removing stale user from online users`, userId);
       usersOnline.delete(userId);
     }
