@@ -38,7 +38,7 @@ function App() {
       {/* <LatestMessage /> */}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 bg-gray-600 gap-[2px]">
-        <div className="col-span-1 flex flex-col gap-[2px] bg-gray-600">
+        <div className="col-span-1 flex flex-col gap-[2px] bg-white">
           <div className="flex flex-col gap-2 p-4 border-black bg-white">
             <div className="font-bold text-lg">Play a game</div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 justify-center items-center">
@@ -60,7 +60,7 @@ function App() {
           <div className="p-4 flex flex-col gap-2 bg-white flex-1"></div>
         </div>
 
-        <div className="col-span-1 flex flex-col gap-[2px] bg-gray-600">
+        <div className="col-span-1 flex flex-col gap-[2px] bg-white">
           <GHQNight />
           <div className="p-4 bg-white">
             <Leaderboard />
