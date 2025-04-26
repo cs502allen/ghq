@@ -68,7 +68,12 @@ function AuthSection() {
         method: "PUT",
         getToken: getToken,
       }).then((data: any) => {
-        setUserInfo(data.user);
+        console.log({
+          message: "Updated username",
+          data,
+        });
+        // Don't update this for now, it's causing infinite re-renders, needs a better solution.
+        // setUserInfo(data.user);
       });
     }
   }, [user, userInfo, isLoadingUserInfo]);
