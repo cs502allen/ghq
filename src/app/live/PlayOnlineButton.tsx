@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "./Button";
+import Button from "./ButtonV2";
 import { useAuth } from "@clerk/nextjs";
 import { useMatchmaking } from "@/components/MatchmakingProvider";
 import { TIME_CONTROLS } from "@/game/constants";
@@ -37,7 +37,7 @@ export function PlayOnlineButton({
     <>
       <Button onClick={playOnline} loadingText="Searching...">
         🌎 Play {toTitleCase(mode)}{" "}
-        <span className="font-medium text-sm">
+        <span className="font-medium text-xs">
           ({timeControl.time / 60 / 1000}+{timeControl.bonus / 1000})
         </span>
       </Button>

@@ -189,7 +189,7 @@ export function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-2 border rounded p-4 bg-slate-50 w-full">
+    <div className="flex flex-col gap-2 w-full">
       <div className="text-lg font-bold">{heading}</div>
       {children}
     </div>
