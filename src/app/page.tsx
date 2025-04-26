@@ -67,10 +67,9 @@ function App() {
           <div className="p-4 bg-white">
             <PlayersTab />
           </div>
-          <div className="p-4 bg-white">
+          <div className="p-4 bg-white flex-1">
             <LiveGamesList />
           </div>
-          <div className="p-4 flex flex-col gap-2 bg-white flex-1"></div>
         </div>
       </div>
     </div>
