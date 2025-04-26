@@ -42,7 +42,7 @@ function App() {
           <div className="flex flex-col gap-2 p-4 border-black">
             <div className="font-bold text-lg">Play a game</div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 justify-center items-center">
-              <PlayOnlineButton mode="normandy" />
+              <PlayOnlineButton mode="blitz" />
               <PlayOnlineButton mode="rapid" />
               <Button onClick={startTutorial}>🙋‍♂️ Learn to Play</Button>
               <Button onClick={playLocal}>👨‍💻 Pass n&apos; Play</Button>
