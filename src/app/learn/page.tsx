@@ -161,7 +161,7 @@ function ImportGame() {
 
   return (
     <div className="flex flex-col gap-1">
-      <Label htmlFor="jfen">JFEN</Label>
+      <Label htmlFor="jfen">FEN</Label>
       <Input
         spellCheck={false}
         className="font-mono bg-white w-96"

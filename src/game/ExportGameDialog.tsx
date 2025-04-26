@@ -29,7 +29,7 @@ export default function ShareGameDialog({ G }: { G: GHQState }) {
           <DialogDescription>Save the current game</DialogDescription>
           <div className="flex flex-col gap-2">
             <div>
-              <Label htmlFor="jfen">JFEN</Label>
+              <Label htmlFor="jfen">FEN</Label>
               <Input
                 readOnly
                 spellCheck={false}
