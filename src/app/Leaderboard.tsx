@@ -4,6 +4,9 @@ import { API_URL } from "./live/config";
 import { ghqFetch } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
+import { StatusIndicator } from "@/components/StatusIndicator";
+import { useMatchmaking } from "@/components/MatchmakingProvider";
+import { OnlineUser } from "@/lib/types";
 
 interface User {
   id: string;
@@ -14,7 +17,9 @@ interface User {
 export default function Leaderboard() {
   const { isSignedIn, getToken } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [users, setUsers] = useState<User[]>([]);
+  const [rawUsers, setRawUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<OnlineUser[]>([]);
+  const { usersOnline: usersOnlineFromMatchmaking } = useMatchmaking();
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -30,10 +35,26 @@ export default function Leaderboard() {
       method: "GET",
     })
       .then((data) => {
-        setUsers(data.users ?? []);
+        setRawUsers(data.users ?? []);
       })
       .finally(() => setLoading(false));
   }, [isSignedIn]);
+
+  useEffect(() => {
+    const userStatusLookup = new Map<string, OnlineUser["status"]>();
+    for (const user of usersOnlineFromMatchmaking?.users ?? []) {
+      userStatusLookup.set(user.id, user.status);
+    }
+
+    const users: OnlineUser[] = rawUsers.map((user) => {
+      return {
+        ...user,
+        status: userStatusLookup.get(user.id) ?? "offline",
+      };
+    });
+
+    setUsers(users);
+  }, [usersOnlineFromMatchmaking, rawUsers]);
 
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -52,7 +73,10 @@ export default function Leaderboard() {
       <div className="flex flex-col">
         {users.map((user: User) => (
           <div key={user.id} className="rounded flex justify-between">
-            <div>{user.username ?? "Anonymous"}</div>
+            <div className="flex flex-row gap-2 items-center">
+              <StatusIndicator status={user.status} />
+              {user.username ?? "Anonymous"}
+            </div>
             <div>{user.elo}</div>
           </div>
         ))}

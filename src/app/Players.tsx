@@ -1,5 +1,6 @@
 "use client";
 
+import { StatusIndicator } from "@/components/StatusIndicator";
 import { UsersOnline } from "@/lib/types";
 
 export default function Players({
@@ -22,7 +23,10 @@ export default function Players({
       <div className="flex flex-col">
         {usersOnline.users.map((user) => (
           <div key={user.id} className="rounded flex justify-between">
-            <div>{user.username}</div>
+            <div className="flex flex-row gap-2 items-center">
+              <StatusIndicator status={user.status} />
+              {user.username}
+            </div>
             <div className="text-sm">{user.status}</div>
           </div>
         ))}

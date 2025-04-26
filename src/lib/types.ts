@@ -16,7 +16,7 @@ export interface User {
 }
 
 export interface OnlineUser extends User {
-  status: "in blitz queue" | "in rapid queue" | "online";
+  status: "in blitz queue" | "in rapid queue" | "online" | "offline";
 }
 
 export interface UsersOnline {
