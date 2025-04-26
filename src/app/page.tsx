@@ -12,6 +12,8 @@ import { Community } from "@/components/Community";
 import LearnBasics from "./learn/LearnBasics";
 import { GHQNight } from "@/components/GHQNight";
 import CorrespondenceView from "./CorrespondenceView";
+import Players from "./Players";
+import PlayersTab from "./PlayersTab";
 
 function App() {
   const router = useRouter();
@@ -63,7 +65,7 @@ function App() {
         <div className="col-span-1 flex flex-col gap-[1px] bg-gray-300">
           <GHQNight />
           <div className="p-4 bg-white">
-            <Leaderboard />
+            <PlayersTab />
           </div>
           <div className="p-4 bg-white">
             <LiveGamesList />

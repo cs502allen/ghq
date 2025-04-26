@@ -14,11 +14,13 @@ import { ghqFetch } from "@/lib/api";
 import { API_URL } from "@/app/live/config";
 import { TIME_CONTROLS } from "@/game/constants";
 import { playGameReadySound } from "@/game/audio";
+import { UsersOnline } from "@/lib/types";
 
 interface MatchmakingContextType {
   matchmakingMode: keyof typeof TIME_CONTROLS | null;
   startMatchmaking: (mode: keyof typeof TIME_CONTROLS) => void;
   cancelMatchmaking: () => void;
+  usersOnline: UsersOnline | null;
 }
 
 const MatchmakingContext = createContext<MatchmakingContextType | undefined>(
@@ -48,6 +50,7 @@ export const MatchmakingProvider: React.FC<{ children: ReactNode }> = ({
     keyof typeof TIME_CONTROLS | null
   >(null);
   const { isSignedIn, getToken } = useAuth();
+  const [usersOnline, setUsersOnline] = useState<UsersOnline | null>(null);
   const router = useRouter();
 
   const checkMatchmaking = useCallback(async () => {
@@ -95,9 +98,38 @@ export const MatchmakingProvider: React.FC<{ children: ReactNode }> = ({
     setMatchmakingMode(null);
   };
 
+  // Keep track of online users
+  useEffect(() => {
+    if (!isSignedIn) {
+      return;
+    }
+
+    const fetchOnlineUsers = () => {
+      ghqFetch<UsersOnline>({
+        url: `${API_URL}/users/online`,
+        getToken,
+        method: "GET",
+      }).then((data) => {
+        setUsersOnline(data);
+      });
+    };
+
+    fetchOnlineUsers();
+    const interval = setInterval(fetchOnlineUsers, 5000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [isSignedIn, getToken]);
+
   return (
     <MatchmakingContext.Provider
-      value={{ matchmakingMode, startMatchmaking, cancelMatchmaking }}
+      value={{
+        matchmakingMode,
+        startMatchmaking,
+        cancelMatchmaking,
+        usersOnline,
+      }}
     >
       {children}
     </MatchmakingContext.Provider>

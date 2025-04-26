@@ -15,7 +15,7 @@ import { authMiddleware, clerkClient } from "./server/auth";
 import { TIME_CONTROLS } from "./game/constants";
 import { matchLifecycle } from "./server/match-lifecycle";
 import bodyParser from "koa-bodyparser";
-import { MatchModel } from "./lib/types";
+import { MatchModel, OnlineUser, UsersOnline } from "./lib/types";
 
 const supabase = createClient(
   "https://wjucmtrnmjcaatbtktxo.supabase.co",
@@ -44,8 +44,10 @@ server.app.use(bodyParser());
 server.app.use(authMiddleware);
 
 const QUEUE_STALE_MS = 5_000;
+const ONLINE_USER_STALE_MS = 10_000;
 const blitzQueue: Map<string, number> = new Map();
 const rapidQueue: Map<string, number> = new Map();
+const usersOnline: Map<string, number> = new Map();
 
 const DEFAULT_TIME_CONTROL = "rapid";
 
@@ -870,4 +872,90 @@ function clerkUsernameOrRandomDefault(username?: string | null): string {
   const number = Math.floor(Math.random() * 1000);
 
   return `${adjective}${noun}${number}`;
+}
+
+server.router.get("/users/online", async (ctx) => {
+  const userId = ctx.state.auth.userId;
+  if (!userId) {
+    throw new Error("userId is required");
+  }
+
+  updateOnlineUsers(userId);
+
+  const res: UsersOnline = {
+    users: [],
+  };
+
+  const allUserIds = [];
+  for (const userId of blitzQueue.keys()) {
+    allUserIds.push(userId);
+  }
+  for (const userId of rapidQueue.keys()) {
+    allUserIds.push(userId);
+  }
+  for (const userId of usersOnline.keys()) {
+    allUserIds.push(userId);
+  }
+
+  const { data: users, error } = await supabase
+    .from("users")
+    .select("id, username, elo")
+    .in("id", allUserIds);
+
+  if (error) {
+    console.log({
+      message: "Error fetching users",
+      error,
+    });
+    ctx.throw(400, "Error fetching users");
+    return;
+  }
+
+  for (const user of users) {
+    let status: OnlineUser["status"] = "online";
+    if (blitzQueue.has(user.id)) {
+      status = "in blitz queue";
+    } else if (rapidQueue.has(user.id)) {
+      status = "in rapid queue";
+    }
+
+    res.users.push({
+      id: user.id,
+      username: user.username,
+      elo: user.elo,
+      status,
+    });
+  }
+
+  // Sort users with "online" status at the top
+  res.users.sort((a, b) => {
+    if (a.status === "online" && b.status !== "online") {
+      return -1;
+    }
+    if (a.status !== "online" && b.status === "online") {
+      return 1;
+    }
+    return 0;
+  });
+
+  ctx.body = JSON.stringify(res);
+});
+
+function updateOnlineUsers(userId: string) {
+  // Iterate through the online users
+  const now = Date.now();
+  for (const [userId, lastActive] of usersOnline.entries()) {
+    if (lastActive < Date.now() - ONLINE_USER_STALE_MS) {
+      console.log(`Removing stale user from online users`, userId);
+      usersOnline.delete(userId);
+    }
+  }
+
+  // If user isn't in the queue, add them to the queue.
+  const queuedUser = usersOnline.get(userId);
+  if (!queuedUser) {
+    console.log(`Adding user to online users`, userId);
+    usersOnline.set(userId, now);
+    console.log("Users in online users", usersOnline);
+  }
 }
