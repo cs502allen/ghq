@@ -57,6 +57,7 @@ export async function checkAndUpdateMatch({
     metadata: true,
   });
 
+  // Update inGameUsers since we're already fetching all match data and can check if the player is connected.
   for (const player of Object.values(metadata.players)) {
     if (player.name && player.isConnected) {
       inGameUsers.set(player.name, Date.now());
