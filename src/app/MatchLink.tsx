@@ -11,7 +11,7 @@ export function MatchLink({ game }: { game: MatchModel }) {
       href={`/live/${game.id}`}
       className="p-1 bg-white border border-white hover:border-blue-700 flex justify-between hover:bg-blue-100 rounded flex-col sm:flex-row"
     >
-      <div className="flex gap-1 items-center">
+      <div className="flex gap-1 items-center flex-wrap">
         <div
           className={classNames(
             game.player1 === game.winner && "text-blue-800"
@@ -31,7 +31,7 @@ export function MatchLink({ game }: { game: MatchModel }) {
         <span className="text-xs">({game.player2Elo})</span>
       </div>
 
-      <div className="flex gap-1 items-center text-xs text-gray-600">
+      <div className="flex gap-1 items-center text-xs text-gray-600 min-w-20 justify-end">
         {DateTime.fromISO(game.createdAt).toRelative()}
       </div>
     </Link>

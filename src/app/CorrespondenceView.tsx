@@ -132,7 +132,7 @@ function ReceivedChallengeRow({
   return (
     <div
       key={`${challenge.challenger.id}-${challenge.target.id}`}
-      className="p-1 bg-white rounded-lg flex justify-between items-center"
+      className="p-1 bg-white rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center"
     >
       <div className="flex items-center gap-1">
         <Mail className="h-4 w-4 mr-1" /> Received challenge from{" "}
@@ -162,7 +162,7 @@ function SentChallengeRow({ challenge }: { challenge: any }) {
   return (
     <div
       key={`${challenge.challenger.id}-${challenge.target.id}`}
-      className="p-1 bg-white rounded-lg flex justify-between items-center"
+      className="p-1 bg-white rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center"
     >
       <div className="flex items-center gap-1">
         <MailQuestion className="h-4 w-4 mr-1" />
