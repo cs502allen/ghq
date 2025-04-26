@@ -212,7 +212,7 @@ export function HistoryLog({
       <div className="font-bold text-lg">Activity</div>
       <div
         id="history-log-list"
-        className="overflow-y-auto border p-1 h-[600px] flex flex-col"
+        className="overflow-y-auto border p-1 h-[600px] flex flex-col rounded"
       >
         {deduplicatedMessages.map((msg) => (
           <div key={msg.message} className="inline-flex space-x-2 items-center">

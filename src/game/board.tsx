@@ -1055,16 +1055,16 @@ export function ReserveBank(props: {
         }}
         key={kind}
         className={classNames(
-          "col-span-1 select-none flex font-bold text-xl p-1 flex-col items-center justify-end",
+          "col-span-1 select-none flex font-bold p-1 flex-col items-center justify-end",
           props.player === "RED" ? "text-red-600" : "text-blue-600",
           {
             ["cursor-pointer"]: props.selectable && kind !== props.selectedKind,
           },
           {
-            ["hover:bg-gray-200 "]:
+            ["hover:bg-gray-200"]:
               props.selectable && props.selectedKind !== kind,
           },
-          { ["bg-gray-300 "]: props.selectedKind === kind }
+          { ["bg-gray-300"]: props.selectedKind === kind }
         )}
       >
         <img

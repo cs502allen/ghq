@@ -80,7 +80,7 @@ export default function Sidebar({
           </div>
         </div>
       ) : (
-        <div className="text-center flex items-center flex-col justify-center text-xl flex-1">
+        <div className="text-center flex items-center flex-col justify-center flex-1">
           <div
             className={classNames(
               ctx.currentPlayer === "0" ? "text-red-500" : "text-blue-500",
@@ -88,13 +88,13 @@ export default function Sidebar({
             )}
           >
             <div className="flex items-center gap-1 font-semibold">
-              <Swords className="w-6 h-6" /> {ctx.turn}{" "}
+              <Swords className="w-5 h-5" /> {ctx.turn}{" "}
             </div>
             <div>
               {currentPlayer === currentPlayerTurn ? "Your" : "Their"} Turn
             </div>
           </div>
-          <div className="text-lg text-gray-600 flex gap-1 justify-center items-center font-medium">
+          <div className="text-gray-600 flex gap-1 justify-center items-center font-medium">
             {3 - ctx.numMoves!} remaining move
             {ctx.numMoves !== 2 ? "s" : ""}{" "}
           </div>
