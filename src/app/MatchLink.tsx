@@ -15,7 +15,7 @@ export function MatchLink({ game }: { game: MatchModel }) {
         <div className="flex gap-1 items-center">
           <div
             className={classNames(
-              game.player1 === game.winner && "text-green-700"
+              game.player1 === game.winner && "text-blue-800"
             )}
           >
             {game.player1}
@@ -24,7 +24,7 @@ export function MatchLink({ game }: { game: MatchModel }) {
           <span className="text-gray-500"> vs.</span>
           <div
             className={classNames(
-              game.player2 === game.winner && "text-green-700"
+              game.player2 === game.winner && "text-blue-800"
             )}
           >
             {game.player2}
