@@ -20,13 +20,19 @@ const BoardArrow: React.FC<BoardArrowProps> = ({
   className,
 }) => {
   const strokeWidth = squareSize / 5;
-  const startX = from[1] * squareSize + squareSize / 2;
-  const startY = from[0] * squareSize + squareSize / 2;
-  const endX = to[1] * squareSize + squareSize / 2;
-  const endY = to[0] * squareSize + squareSize / 2;
+  const angle = Math.atan2(to[0] - from[0], to[1] - from[1]);
+  const isDiagonal = from[0] !== to[0] && from[1] !== to[1];
+  const offset = isDiagonal ? squareSize * 0.4 : squareSize * 0.2;
 
-  const arrowHeadSize = squareSize / 10;
-  const angle = Math.atan2(endY - startY, endX - startX);
+  const startX =
+    from[1] * squareSize + squareSize / 2 + Math.cos(angle) * offset;
+  const startY =
+    from[0] * squareSize + squareSize / 2 + Math.sin(angle) * offset;
+  const endX = to[1] * squareSize + squareSize / 2 - Math.cos(angle) * offset;
+  const endY = to[0] * squareSize + squareSize / 2 - Math.sin(angle) * offset;
+
+  const arrowHeadSize = squareSize / 20;
+  const arrowHeadWidth = arrowHeadSize * 0.7;
   const arrowHeadX = endX - arrowHeadSize * Math.cos(angle);
   const arrowHeadY = endY - arrowHeadSize * Math.sin(angle);
 
@@ -49,17 +55,14 @@ const BoardArrow: React.FC<BoardArrowProps> = ({
         x2={endX}
         y2={endY}
         strokeWidth={strokeWidth}
-        // strokeLinecap="round"
       />
       <polygon
         points={`${endX},${endY} ${
-          arrowHeadX + arrowHeadSize * Math.sin(angle)
-        },${arrowHeadY - arrowHeadSize * Math.cos(angle)} ${
-          arrowHeadX - arrowHeadSize * Math.sin(angle)
-        },${arrowHeadY + arrowHeadSize * Math.cos(angle)}`}
+          arrowHeadX + arrowHeadWidth * Math.sin(angle)
+        },${arrowHeadY - arrowHeadWidth * Math.cos(angle)} ${
+          arrowHeadX - arrowHeadWidth * Math.sin(angle)
+        },${arrowHeadY + arrowHeadWidth * Math.cos(angle)}`}
         strokeWidth={strokeWidth}
-        // strokeLinecap="round"
-        // strokeLinejoin="round"
       />
     </svg>
   );
