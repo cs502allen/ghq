@@ -15,16 +15,22 @@ export default function PlayersTab() {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-row gap-4 justify-center">
+      <div className="flex flex-row gap-2 justify-center text-gray-800 text-sm">
         <button
           onClick={() => setTab("thisMonth")}
-          className={cn(tab === "thisMonth" && "font-bold")}
+          className={cn(
+            tab === "thisMonth" && "font-bold underline underline-offset-2",
+            "rounded px-2 py-1 hover:bg-gray-100"
+          )}
         >
           Current Month
         </button>
         <button
           onClick={() => setTab("leaderboard")}
-          className={cn(tab === "leaderboard" && "font-bold")}
+          className={cn(
+            tab === "leaderboard" && "font-bold",
+            "rounded px-2 py-1 hover:bg-gray-100"
+          )}
         >
           Overall Rating
         </button>
@@ -32,7 +38,8 @@ export default function PlayersTab() {
           onClick={() => setTab("players")}
           className={cn(
             "flex flex-row gap-1 items-center",
-            tab === "players" && "font-bold"
+            tab === "players" && "font-bold",
+            "rounded px-2 py-1 hover:bg-gray-100"
           )}
         >
           Online
