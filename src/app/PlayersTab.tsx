@@ -1,32 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Leaderboard from "./Leaderboard";
 import Players from "./Players";
 import { cn } from "@/lib/utils";
-import { API_URL } from "./live/config";
-import { UsersOnline } from "@/lib/types";
-import { ghqFetch } from "@/lib/api";
-import { useAuth } from "@clerk/nextjs";
+import { useMatchmaking } from "@/components/MatchmakingProvider";
 
 export default function PlayersTab() {
-  const { isSignedIn, getToken } = useAuth();
   const [tab, setTab] = useState<"leaderboard" | "players">("leaderboard");
-  const [usersOnline, setUsersOnline] = useState<UsersOnline | null>(null);
-
-  useEffect(() => {
-    if (!isSignedIn) {
-      return;
-    }
-
-    ghqFetch<UsersOnline>({
-      url: `${API_URL}/users/online`,
-      getToken,
-      method: "GET",
-    }).then((data) => {
-      setUsersOnline(data);
-    });
-  }, [isSignedIn]);
+  const { usersOnline } = useMatchmaking();
 
   return (
     <div className="flex flex-col gap-2">
