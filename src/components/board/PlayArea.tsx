@@ -155,7 +155,9 @@ export default function PlayArea(
       <ControlsView
         {...props}
         isMyTurn={currentPlayer === currentPlayerTurn}
-        hasMoveLimitReached={hasMoveLimitReached(ctx)}
+        hasMoveLimitReached={
+          currentPlayer === currentPlayerTurn && hasMoveLimitReached(ctx)
+        }
         cancel={() => setUserActionState({})}
         replay={() => replay()}
       />
