@@ -65,8 +65,8 @@ export default function CorrespondenceView() {
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex justify-between items-center mb-1">
+    <div className="flex flex-col">
+      <div className="flex justify-between items-center mb-3">
         <div className="text-lg font-bold">Correspondence</div>
         <PlayFriendDialog />
       </div>
@@ -78,7 +78,7 @@ export default function CorrespondenceView() {
       )}
 
       {receivedChallenges.length > 0 && (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col">
           {receivedChallenges.map((challenge) => (
             <ReceivedChallengeRow
               key={`${challenge.challenger.id}-${challenge.target.id}`}
@@ -99,7 +99,7 @@ export default function CorrespondenceView() {
         )}
 
       {matches.length > 0 && (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col">
           {matches.map((game) => (
             <MatchLink key={game.id} game={game} />
           ))}
@@ -107,7 +107,7 @@ export default function CorrespondenceView() {
       )}
 
       {sentChallenges.length > 0 && (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col">
           {sentChallenges.map((challenge) => (
             <SentChallengeRow
               key={`${challenge.challenger.id}-${challenge.target.id}`}
@@ -132,7 +132,7 @@ function ReceivedChallengeRow({
   return (
     <div
       key={`${challenge.challenger.id}-${challenge.target.id}`}
-      className="py-2 px-3 bg-white border border-gray-200 rounded-lg shadow flex justify-between items-center"
+      className="p-1 bg-white rounded-lg flex justify-between items-center"
     >
       <div className="flex items-center gap-1">
         <Mail className="h-4 w-4 mr-1" /> Received challenge from{" "}
@@ -162,7 +162,7 @@ function SentChallengeRow({ challenge }: { challenge: any }) {
   return (
     <div
       key={`${challenge.challenger.id}-${challenge.target.id}`}
-      className="py-2 px-3 bg-white border border-gray-200 rounded-lg shadow flex justify-between items-center"
+      className="p-1 bg-white rounded-lg flex justify-between items-center"
     >
       <div className="flex items-center gap-1">
         <MailQuestion className="h-4 w-4 mr-1" />

@@ -94,7 +94,8 @@ function AuthSection() {
           <div className="flex gap-1">
             {userInfo && (
               <div>
-                {userInfo?.username ?? "Anonymous"} ({userInfo?.elo})
+                {userInfo?.username ?? "Anonymous"}{" "}
+                <span className="text-xs">({userInfo?.elo})</span>
               </div>
             )}
             <UserButton />
