@@ -47,6 +47,10 @@ export function getAllowedMoves({
   blueReserve: ReserveFleet;
   currentPlayerTurn: Player;
 }): AllowedMove[] {
+  if (thisTurnMoves.length >= 3) {
+    return [{ name: "Skip", args: [] }];
+  }
+
   const allMoves: AllowedMove[] = [];
 
   const thisTurnMoveCoordinates = new Set(
