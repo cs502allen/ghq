@@ -913,9 +913,9 @@ server.router.get("/users/online", async (ctx) => {
 
   for (const user of users) {
     let status: OnlineUser["status"] = "online";
-    if (blitzQueue.has(user.id)) {
+    if (isActiveInQueue(user.id, blitzQueue)) {
       status = "in blitz queue";
-    } else if (rapidQueue.has(user.id)) {
+    } else if (isActiveInQueue(user.id, rapidQueue)) {
       status = "in rapid queue";
     }
 
@@ -958,4 +958,8 @@ function updateOnlineUsers(userId: string) {
     usersOnline.set(userId, now);
     console.log("Users in online users", usersOnline);
   }
+}
+
+function isActiveInQueue(userId: string, queue: Map<string, number>): boolean {
+  return queue.has(userId);
 }
