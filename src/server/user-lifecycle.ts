@@ -1,10 +1,7 @@
-import { Player } from "@/game/engine";
-import { GHQState } from "@/game/engine";
-import { checkTimeForGameover } from "@/game/gameover-logic";
 import { OnlineUser, UsersOnline } from "@/lib/types";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { StorageAPI } from "boardgame.io";
-import { blitzQueue, rapidQueue } from "./matchmaking";
+import { blitzQueue, inGameUsers, rapidQueue } from "./matchmaking";
 
 const ONLINE_USER_STALE_MS = 10_000;
 
@@ -67,6 +64,8 @@ export async function userLifecycle({
       status = "in blitz queue";
     } else if (isActiveInQueue(user.id, rapidQueue)) {
       status = "in rapid queue";
+    } else if (isActiveInGame(user.id)) {
+      status = "in game";
     }
 
     res.users.push({
@@ -96,5 +95,18 @@ export function addUserToOnlineUsers(userId: string) {
 }
 
 function isActiveInQueue(userId: string, queue: Map<string, number>): boolean {
-  return queue.has(userId);
+  const lastActive = queue.get(userId);
+  if (!lastActive) {
+    return false;
+  }
+
+  return lastActive > Date.now() - 5_000;
+}
+
+function isActiveInGame(userId: string): boolean {
+  const lastActive = inGameUsers.get(userId);
+  if (!lastActive) {
+    return false;
+  }
+  return lastActive > Date.now() - 10_000;
 }

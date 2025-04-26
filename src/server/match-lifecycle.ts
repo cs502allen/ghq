@@ -3,6 +3,7 @@ import { GHQState } from "@/game/engine";
 import { checkTimeForGameover } from "@/game/gameover-logic";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { StorageAPI } from "boardgame.io";
+import { inGameUsers } from "./matchmaking";
 
 export async function matchLifecycle({
   db,
@@ -55,6 +56,12 @@ export async function checkAndUpdateMatch({
     state: true,
     metadata: true,
   });
+
+  for (const player of Object.values(metadata.players)) {
+    if (player.name && player.isConnected) {
+      inGameUsers.set(player.name, Date.now());
+    }
+  }
 
   // If the match has been aborted, update the gameover state (so the game framework understands the game is over).
   if (matchData.status === "ABORTED") {

@@ -15,7 +15,7 @@ import { authMiddleware, clerkClient } from "./server/auth";
 import { TIME_CONTROLS } from "./game/constants";
 import { matchLifecycle } from "./server/match-lifecycle";
 import bodyParser from "koa-bodyparser";
-import { MatchModel, OnlineUser, UsersOnline } from "./lib/types";
+import { MatchModel } from "./lib/types";
 import {
   addUserToOnlineUsers,
   getUsersOnlineResponse,
