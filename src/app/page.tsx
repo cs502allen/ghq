@@ -43,7 +43,7 @@ function App() {
         <div className="col-span-1 flex flex-col gap-[1px] bg-gray-300">
           <div className="flex flex-col gap-2 p-4 border-black bg-white">
             <div className="font-bold text-lg">Play a game</div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 justify-center items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 place-items-center">
               <PlayOnlineButton mode="blitz" />
               <PlayOnlineButton mode="rapid" />
               <Button onClick={startTutorial}>🙋‍♂️ Learn to Play</Button>
@@ -67,10 +67,9 @@ function App() {
           <div className="p-4 bg-white">
             <PlayersTab />
           </div>
-          <div className="p-4 bg-white">
+          <div className="p-4 bg-white flex-1">
             <LiveGamesList />
           </div>
-          <div className="p-4 flex flex-col gap-2 bg-white flex-1"></div>
         </div>
       </div>
     </div>

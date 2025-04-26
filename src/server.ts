@@ -28,6 +28,7 @@ import {
 } from "./server/user-lifecycle";
 import { blitzQueue, rapidQueue } from "./server/matchmaking";
 import { getUser } from "./lib/supabase";
+import { getMatchSummary } from "./server/match-summary";
 
 const supabase = createClient(
   "https://wjucmtrnmjcaatbtktxo.supabase.co",
@@ -658,6 +659,18 @@ server.router.get("/leaderboard", async (ctx) => {
   }
 
   ctx.body = JSON.stringify({ users });
+});
+
+server.router.get("/match-summary", async (ctx) => {
+  try {
+    const result = await getMatchSummary(supabase);
+    ctx.body = JSON.stringify(result);
+  } catch (error) {
+    ctx.throw(
+      400,
+      error instanceof Error ? error.message : "Error fetching match summary"
+    );
+  }
 });
 
 server.router.get("/users", async (ctx) => {
