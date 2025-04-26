@@ -44,10 +44,10 @@ function App() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 justify-center items-center">
               <PlayOnlineButton mode="normandy" />
               <PlayOnlineButton mode="rapid" />
-              <Button onClick={startTutorial}>🙋‍♂️ Learn Rules</Button>
+              <Button onClick={startTutorial}>🙋‍♂️ Learn to Play</Button>
               <Button onClick={playLocal}>👨‍💻 Pass n&apos; Play</Button>
               <Button onClick={playBot}>🤖 Play Bot</Button>
-              <Button onClick={goLearn}>📚 Puzzles</Button>
+              <Button onClick={goLearn}>📚 Rules & Puzzles</Button>
             </div>
           </div>
 
@@ -69,9 +69,6 @@ function App() {
           </div>
         </div>
       </div>
-      <Section heading="Basics">
-        <LearnBasics />
-      </Section>
     </div>
   );
 }
