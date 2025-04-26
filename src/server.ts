@@ -1,7 +1,12 @@
 require("dotenv").config();
 
 import { Server, Origins, FlatFile } from "boardgame.io/server";
-import { GameoverState, GHQState, newOnlineGHQGame } from "./game/engine";
+import {
+  GameoverState,
+  GHQState,
+  newOnlineGHQGame,
+  Player,
+} from "./game/engine";
 import { StorageAPI } from "boardgame.io";
 import Koa from "koa";
 import { createMatch } from "boardgame.io/src/server/util";
@@ -22,6 +27,7 @@ import {
   userLifecycle,
 } from "./server/user-lifecycle";
 import { blitzQueue, rapidQueue } from "./server/matchmaking";
+import { getUser } from "./lib/supabase";
 
 const supabase = createClient(
   "https://wjucmtrnmjcaatbtktxo.supabase.co",
@@ -53,9 +59,13 @@ const QUEUE_STALE_MS = 5_000;
 
 const DEFAULT_TIME_CONTROL = "rapid";
 
-setInterval(() => {
-  matchLifecycle({ supabase, db: server.db, onGameEnd });
-}, 10_000);
+const runMatchLifecycle = () => {
+  matchLifecycle({ supabase, db: server.db, onGameEnd }).finally(() => {
+    setTimeout(runMatchLifecycle, 10_000);
+  });
+};
+
+runMatchLifecycle();
 
 setInterval(() => {
   userLifecycle({ supabase, db: server.db });
@@ -504,11 +514,41 @@ function onGameEnd({ ctx, G }: { ctx: any; G: GHQState }): void | GHQState {
       }
     });
 
-  // Update user elos
+  updateUserElos({
+    player0Id,
+    player1Id,
+    status,
+    winner,
+    winnerId,
+  }).catch((error) => {
+    console.log({
+      message: "Error updating user elos",
+      error,
+    });
+  });
+}
+
+async function updateUserElos({
+  player0Id,
+  player1Id,
+  status,
+  winner,
+  winnerId,
+}: {
+  player0Id: string;
+  player1Id: string;
+  status: string;
+  winner: Player | undefined;
+  winnerId: string | null;
+}): Promise<void> {
+  const [player0, player1] = await Promise.all([
+    getUser(player0Id),
+    getUser(player1Id),
+  ]);
 
   const player0Elo = calculateElo(
-    G.elos["0"],
-    G.elos["1"],
+    player0.elo,
+    player1.elo,
     status === "DRAW" ? 0.5 : winner === "RED" ? 1 : 0
   );
 
@@ -527,8 +567,8 @@ function onGameEnd({ ctx, G }: { ctx: any; G: GHQState }): void | GHQState {
     });
 
   const player1Elo = calculateElo(
-    G.elos["1"],
-    G.elos["0"],
+    player1.elo,
+    player0.elo,
     status === "DRAW" ? 0.5 : winner === "BLUE" ? 1 : 0
   );
 
