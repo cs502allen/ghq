@@ -1,7 +1,7 @@
 export function Community() {
   return (
     <div className="flex flex-col gap-3">
-      <div className="text-2xl">Community</div>
+      <div className="text-lg font-bold">Community</div>
       <div className="text-sm">
         Every Tuesday at 8pm ET, we&apos;re live on Twitch{" "}
         <a

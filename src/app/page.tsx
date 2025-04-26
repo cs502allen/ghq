@@ -61,7 +61,7 @@ function App() {
         </div>
 
         <div className="col-span-1 flex flex-col gap-[2px] bg-gray-600">
-          {/* <GHQNight /> */}
+          <GHQNight />
           <div className="p-4 bg-white">
             <Leaderboard />
           </div>
