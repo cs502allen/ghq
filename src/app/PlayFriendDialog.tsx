@@ -84,7 +84,7 @@ export function PlayFriendDialog() {
   return (
     <Dialog onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button size="sm">
           <Handshake className="h-4 w-4" /> Play Friend
         </Button>
       </DialogTrigger>

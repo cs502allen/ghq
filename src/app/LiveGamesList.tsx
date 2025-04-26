@@ -57,7 +57,7 @@ export default function LiveGamesList() {
         </div>
       )}
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col">
         {pageGames.map((game: MatchModel) => (
           <MatchLink key={game.id} game={game} />
         ))}
@@ -66,6 +66,7 @@ export default function LiveGamesList() {
       <div className="flex justify-between">
         <Button
           variant="outline"
+          size="sm"
           onClick={() => page > 0 && setPage(page - 1)}
           disabled={page === 0}
         >
@@ -74,6 +75,7 @@ export default function LiveGamesList() {
         </Button>
         <Button
           variant="outline"
+          size="sm"
           onClick={() => setPage(page + 1)}
           disabled={page >= Math.ceil(games.length / 10) - 1}
         >

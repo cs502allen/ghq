@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "./live/Button";
+import Button from "./live/ButtonV2";
 import { PlayOnlineButton } from "./live/PlayOnlineButton";
 import { Learn } from "@/components/Learn";
 import Header from "@/components/Header";
@@ -12,6 +12,7 @@ import { Community } from "@/components/Community";
 import LearnBasics from "./learn/LearnBasics";
 import { GHQNight } from "@/components/GHQNight";
 import CorrespondenceView from "./CorrespondenceView";
+
 function App() {
   const router = useRouter();
 
@@ -38,42 +39,36 @@ function App() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
         <div className="col-span-1 flex flex-col gap-2">
-          <div className="flex flex-col gap-2 border rounded p-4 bg-slate-50">
+          <div className="flex flex-col gap-2 p-4 border-black">
             <div className="font-bold text-lg">Play a game</div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 justify-center items-center">
               <PlayOnlineButton mode="normandy" />
               <PlayOnlineButton mode="rapid" />
-              <Button onClick={startTutorial}>🙋‍♂️ Learn Rules</Button>
+              <Button onClick={startTutorial}>🙋‍♂️ Learn to Play</Button>
               <Button onClick={playLocal}>👨‍💻 Pass n&apos; Play</Button>
               <Button onClick={playBot}>🤖 Play Bot</Button>
-              <Button onClick={goLearn}>📚 Puzzles</Button>
+              <Button onClick={goLearn}>📚 Rules & Puzzles</Button>
             </div>
           </div>
 
-          {/* <div className="border rounded p-4 bg-slate-50 flex flex-col gap-2">
-            <Community />
-          </div> */}
-          <div className="border rounded p-4 bg-slate-50 flex flex-col gap-2">
+          <div className="p-4 flex flex-col gap-2">
             <Learn />
           </div>
-          <div className="border rounded p-4 bg-slate-50 flex flex-col gap-2">
+          <div className="p-4 flex flex-col gap-2">
             <CorrespondenceView />
           </div>
         </div>
 
         <div className="col-span-1 flex flex-col gap-2">
           {/* <GHQNight /> */}
-          <div className="border rounded p-4 bg-slate-50">
+          <div className="p-4">
             <Leaderboard />
           </div>
-          <div className="border rounded p-4 bg-slate-50">
+          <div className="p-4">
             <LiveGamesList />
           </div>
         </div>
       </div>
-      <Section heading="Basics">
-        <LearnBasics />
-      </Section>
     </div>
   );
 }
