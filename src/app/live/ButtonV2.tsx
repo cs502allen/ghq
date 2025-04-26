@@ -20,7 +20,7 @@ export default function Button({
 
   return (
     <button
-      className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 h-12 w-full border-2 border-blue-900 rounded"
+      className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 w-full border-2 border-blue-900 rounded max-w-60"
       onClick={doOnClick}
     >
       {loading ? <div>{_loadingText}</div> : children}
