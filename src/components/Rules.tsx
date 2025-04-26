@@ -29,7 +29,15 @@ export default function Rules() {
         >
           How To Play GHQ
         </a>{" "}
-        video).
+        video). Please support his work by{" "}
+        <a
+          className="text-blue-600 hover:text-blue-400"
+          href="https://www.kvmlshop.org/product/kurt-vonnegut-the-lost-board-game-ghq/877"
+          target="_blank"
+        >
+          buying a copy
+        </a>
+        .
       </div>
 
       <div>
