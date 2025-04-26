@@ -53,10 +53,7 @@ export default function Leaderboard() {
 
       <div className="flex flex-col">
         {users.map((user: User) => (
-          <div
-            key={user.id}
-            className="py-1 px-2 border-gray-200 rounded-lg hover:shadow hover:bg-white flex justify-between"
-          >
+          <div key={user.id} className="rounded flex justify-between">
             <div>{user.username ?? "Anonymous"}</div>
             <div>{user.elo}</div>
           </div>
