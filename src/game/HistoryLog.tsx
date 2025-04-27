@@ -207,16 +207,25 @@ export function HistoryLog({
     }
   }, [playerMessages]);
 
+  function handleClick(turn: number) {
+    const event = new CustomEvent("historyLogTurnClick", { detail: { turn } });
+    window.dispatchEvent(event);
+  }
+
   return (
     <div className="flex flex-col gap-1 p-2 h-[350px]">
       <div className="font-bold text-lg">Activity</div>
       <div
         id="history-log-list"
-        className="overflow-y-auto border p-1 h-[600px] flex flex-col rounded"
+        className="overflow-y-auto border h-[600px] flex flex-col rounded"
       >
         {deduplicatedMessages.map((msg) => (
-          <div key={msg.message} className="inline-flex space-x-2 items-center">
-            <span className="text-gray-600 text-sm">{msg.turn} </span>
+          <div
+            key={msg.message}
+            className="inline-flex space-x-2 items-center hover:bg-gray-100 py-0.5 px-1"
+            onClick={() => handleClick(msg.turn)}
+          >
+            <span className="text-gray-600 text-xs">{msg.turn} </span>
             {msg.reactNode ? msg.reactNode : <div>{msg.message}</div>}
           </div>
         ))}

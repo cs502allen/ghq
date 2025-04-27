@@ -200,5 +200,47 @@ export default function MultiplayerReplayCapability({
     [currentLogIndex, disableReplays]
   );
 
+  useEffect(() => {
+    const handleHistoryLogTurnClick = (event: CustomEvent) => {
+      if (disableReplays) {
+        return;
+      }
+
+      if (!onlineClient.log) {
+        return;
+      }
+
+      const log = nonAutomaticLogs(onlineClient.log);
+      const targetTurn = event.detail.turn;
+
+      let targetIndex = -1;
+      for (let i = 0; i < log.length; i++) {
+        if (log[i].turn === targetTurn) {
+          targetIndex = i;
+          break;
+        }
+      }
+
+      if (targetIndex >= 0) {
+        const state = rewind(targetIndex);
+        setCurrentLogIndex(targetIndex);
+        offlineClient.overrideGameState(state);
+        setUseOnlineGameClient(false);
+      }
+    };
+
+    window.addEventListener(
+      "historyLogTurnClick",
+      handleHistoryLogTurnClick as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        "historyLogTurnClick",
+        handleHistoryLogTurnClick as EventListener
+      );
+    };
+  }, [disableReplays, onlineClient.log, offlineClient, setUseOnlineGameClient]);
+
   return null;
 }
