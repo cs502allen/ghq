@@ -46,6 +46,8 @@ export default function Reserve({
 }) {
   const playerIndex = player === "RED" ? 0 : 1;
   const defaultUsername = `Player ${playerIndex + 1}`;
+  const userId = G.userIds?.[playerIndex];
+  const user = users.find((user) => user.id === userId);
 
   return (
     <>
@@ -70,8 +72,8 @@ export default function Reserve({
                   isConnected={matchData[playerIndex].isConnected}
                 />
               )}
-              {users[playerIndex] ? (
-                <Username user={users[playerIndex]} includeElo />
+              {user ? (
+                <Username user={user} includeElo />
               ) : (
                 <div>{defaultUsername}</div>
               )}
