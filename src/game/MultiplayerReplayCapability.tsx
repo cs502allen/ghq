@@ -45,7 +45,35 @@ export default function MultiplayerReplayCapability({
   }, [offlineClient, currentLogIndex]);
 
   function nonAutomaticLogs(log: any) {
-    return log.filter((logEntry: any) => !logEntry.automatic);
+    let moveStack: any[] = [];
+    let undoStack: any[] = [];
+    const result: any[] = [];
+    let currentTurn = -1;
+
+    for (const logEntry of log) {
+      if (logEntry.automatic) {
+        continue;
+      }
+
+      if (logEntry.turn !== currentTurn) {
+        result.push(...moveStack);
+        moveStack = [];
+        undoStack = [];
+        currentTurn = logEntry.turn;
+      }
+
+      // Filter out any moves that were undone.
+      if (logEntry.action.type === "UNDO") {
+        undoStack.push(moveStack.pop());
+      } else if (logEntry.action.type === "REDO") {
+        moveStack.push(undoStack.pop());
+      } else {
+        moveStack.push(logEntry);
+      }
+    }
+
+    result.push(...moveStack);
+    return result;
   }
 
   // This function gets the next log index to move to.
