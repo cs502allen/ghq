@@ -89,7 +89,11 @@ export default function Reserve({
                 active={currentPlayerTurn === player && !ctx.gameover}
               />
               <CountdownTimer
-                active={currentPlayerTurn === player && !ctx.gameover}
+                active={
+                  currentPlayerTurn === player &&
+                  !ctx.gameover &&
+                  !G.isReplayMode
+                }
                 player={player}
                 elapsed={player === "RED" ? G.redElapsed : G.blueElapsed}
                 startDate={G.turnStartTime}

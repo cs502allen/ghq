@@ -11,7 +11,6 @@ import Board from "./Board";
 import classNames from "classnames";
 import ControlsView from "./ControlsView";
 import useBoard from "./useBoard";
-import { useUsernames } from "./useUsernames";
 import { Settings } from "./SettingsMenu";
 import { useUsers } from "./useUsers";
 
