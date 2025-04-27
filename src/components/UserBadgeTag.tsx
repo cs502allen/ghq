@@ -1,4 +1,4 @@
-import { UserBadge } from "../lib/types";
+import { badgeToGamesPlayed, UserBadge } from "../lib/types";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { useState } from "react";
 
@@ -36,7 +36,11 @@ export default function UserBadgeTag({ badge }: { badge?: UserBadge }) {
         <div>{emojis[badge]}</div>
       </PopoverTrigger>
       <PopoverContent>
-        <p className="text-sm">{badgeNames[badge]}</p>
+        <div className="text-sm font-semibold">{badgeNames[badge]}</div>
+        <div className="text-xs">
+          Earned by playing {badgeToGamesPlayed(badge)} or more games this
+          month.
+        </div>
       </PopoverContent>
     </Popover>
   );
