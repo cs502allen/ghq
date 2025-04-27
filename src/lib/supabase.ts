@@ -28,6 +28,19 @@ export async function getUsernames(userIds: string[]): Promise<string[]> {
   return userIds.map((userId) => userIdsToUsernames[userId] ?? "Anonymous");
 }
 
+export async function getUsers(userIds: string[]): Promise<User[]> {
+  const { data, error } = await supabase
+    .from("users")
+    .select("id, username, elo, gamesThisMonth, badge")
+    .in("id", userIds);
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
 export async function getUser(userId: string): Promise<User> {
   const { data, error } = await supabase
     .from("users")
