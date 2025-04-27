@@ -18,7 +18,7 @@ export function GHQNight() {
         <div className="flex justify-between">
           <div className="text-lg font-bold">GHQ Tuesday 🪖 💣 💥</div>
           <div className="text-right flex items-end gap-1">
-            <div className="font-bold">7-9pm ET</div>
+            <div className="font-bold">8-10pm ET</div>
             <div className="text-sm">{getDaysUntil()}</div>
           </div>
         </div>
