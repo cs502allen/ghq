@@ -1,4 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import { UserBadge } from "@/lib/types";
 
 interface MatchStats {
   wins: number;
@@ -9,6 +10,7 @@ interface MatchStats {
 interface MatchSummary {
   userId: string;
   username: string;
+  badge: UserBadge;
   elo: number;
   wins: number;
   losses: number;
@@ -70,7 +72,7 @@ export async function getMatchSummary(
   const userIds = Array.from(stats.keys());
   const { data: users, error: usersError } = await supabase
     .from("users")
-    .select("id, username, elo")
+    .select("id, username, elo, gamesThisMonth, badge")
     .in("id", userIds);
 
   if (usersError) {
@@ -86,14 +88,21 @@ export async function getMatchSummary(
   }
 
   const userMap = new Map(
-    users.map((user) => [user.id, user.username ?? "Anonymous"])
+    users.map((user) => [
+      user.id,
+      {
+        username: user.username ?? "Anonymous",
+        badge: user.badge,
+      },
+    ])
   );
   const eloMap = new Map(users.map((user) => [user.id, user.elo]));
 
   const summary = Array.from(stats.entries()).map(([userId, stats]) => ({
     userId,
-    username: userMap.get(userId),
+    username: userMap.get(userId)?.username,
     elo: eloMap.get(userId),
+    badge: userMap.get(userId)?.badge,
     ...stats,
   }));
 

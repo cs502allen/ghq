@@ -10,6 +10,8 @@ import Link from "next/link";
 import { config } from "@/lib/config";
 import { ghqFetch } from "@/lib/api";
 import { API_URL } from "@/app/live/config";
+import UserBadgeTag from "./UserBadgeTag";
+import Username from "./Username";
 export default function Header() {
   return (
     <div className="flex justify-between">
@@ -98,10 +100,15 @@ function AuthSection() {
         <SignedIn>
           <div className="flex gap-1">
             {userInfo && (
-              <div>
-                {userInfo?.username ?? "Anonymous"}{" "}
-                <span className="text-xs">({userInfo?.elo})</span>
-              </div>
+              <Username
+                user={{
+                  id: userInfo.id,
+                  username: userInfo.username,
+                  elo: userInfo.elo,
+                  badge: userInfo.badge,
+                }}
+                includeElo
+              />
             )}
             <UserButton />
           </div>

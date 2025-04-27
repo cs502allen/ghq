@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { User } from "./types";
 
 export const supabase = createClient(
   "https://wjucmtrnmjcaatbtktxo.supabase.co",
@@ -27,16 +28,23 @@ export async function getUsernames(userIds: string[]): Promise<string[]> {
   return userIds.map((userId) => userIdsToUsernames[userId] ?? "Anonymous");
 }
 
-export interface User {
-  id: string;
-  username: string;
-  elo: number;
+export async function getUsers(userIds: string[]): Promise<User[]> {
+  const { data, error } = await supabase
+    .from("users")
+    .select("id, username, elo, gamesThisMonth, badge")
+    .in("id", userIds);
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
 }
 
 export async function getUser(userId: string): Promise<User> {
   const { data, error } = await supabase
     .from("users")
-    .select("id, username, elo")
+    .select("id, username, elo, gamesThisMonth, badge")
     .eq("id", userId)
     .single();
 
@@ -52,5 +60,7 @@ export async function getUser(userId: string): Promise<User> {
     id: data.id,
     username: data.username,
     elo: data.elo,
+    gamesThisMonth: data.gamesThisMonth,
+    badge: data.badge,
   };
 }

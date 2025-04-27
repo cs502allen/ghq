@@ -2,6 +2,7 @@
 
 import { StatusIndicator } from "@/components/StatusIndicator";
 import { UsersOnline } from "@/lib/types";
+import Username from "@/components/Username";
 
 export default function Players({
   usersOnline,
@@ -25,7 +26,14 @@ export default function Players({
           <div key={user.id} className="rounded flex justify-between">
             <div className="flex flex-row gap-2 items-center">
               <StatusIndicator status={user.status} />
-              {user.username}
+              <Username
+                user={{
+                  id: user.id,
+                  username: user.username,
+                  elo: user.elo,
+                  badge: user.badge,
+                }}
+              />
             </div>
             <div className="text-sm">{user.status}</div>
           </div>

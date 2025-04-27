@@ -16,6 +16,8 @@ import {
 import classNames from "classnames";
 import ChatIcon from "./ChatIcon";
 import LatestChatMessage from "./LatestChatMessage";
+import { User } from "@/lib/types";
+import Username from "@/components/Username";
 
 export default function Reserve({
   G,
@@ -25,7 +27,7 @@ export default function Reserve({
   currentPlayer,
   currentPlayerTurn,
   userActionState,
-  usernames,
+  users,
   selectReserve,
   sendChatMessage,
   chatMessages,
@@ -39,7 +41,7 @@ export default function Reserve({
   sendChatMessage: (message: string) => void;
   chatMessages: ChatMessage[];
   userActionState: UserActionState;
-  usernames: string[];
+  users: User[];
   selectReserve: (kind: keyof ReserveFleet) => void;
 }) {
   const playerIndex = player === "RED" ? 0 : 1;
@@ -68,8 +70,11 @@ export default function Reserve({
                   isConnected={matchData[playerIndex].isConnected}
                 />
               )}
-              {usernames[playerIndex] ?? defaultUsername} ({G.elos[playerIndex]}
-              )
+              {users[playerIndex] ? (
+                <Username user={users[playerIndex]} includeElo />
+              ) : (
+                <div>{defaultUsername}</div>
+              )}
             </div>
           )}
           {!G.isTutorial && (

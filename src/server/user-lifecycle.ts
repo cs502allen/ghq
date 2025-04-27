@@ -47,7 +47,7 @@ export async function userLifecycle({
 
   const { data: users, error } = await supabase
     .from("users")
-    .select("id, username, elo")
+    .select("id, username, elo, gamesThisMonth, badge")
     .in("id", allUserIds);
 
   if (error) {
@@ -72,6 +72,8 @@ export async function userLifecycle({
       id: user.id,
       username: user.username,
       elo: user.elo,
+      gamesThisMonth: user.gamesThisMonth,
+      badge: user.badge,
       status,
     });
   }

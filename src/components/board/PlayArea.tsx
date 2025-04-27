@@ -13,6 +13,7 @@ import ControlsView from "./ControlsView";
 import useBoard from "./useBoard";
 import { useUsernames } from "./useUsernames";
 import { Settings } from "./SettingsMenu";
+import { useUsers } from "./useUsers";
 
 export default function PlayArea(
   props: BoardProps<GHQState> & { className: string; settings: Settings }
@@ -41,7 +42,7 @@ export default function PlayArea(
     () => (playerID === null ? currentPlayerTurn : playerIdToPlayer(playerID)),
     [currentPlayerTurn, playerID]
   );
-  const { usernames } = useUsernames({ G });
+  const { users } = useUsers({ G });
 
   const isFlipped = useMemo(() => viewPlayerPref === "BLUE", [viewPlayerPref]);
 
@@ -108,7 +109,7 @@ export default function PlayArea(
         player={getOpponent(currentPlayer)}
         currentPlayer={currentPlayer}
         currentPlayerTurn={currentPlayerTurn}
-        usernames={usernames}
+        users={users}
         userActionState={userActionState}
         selectReserve={(kind) =>
           setUserActionState((userActionState) =>
@@ -140,7 +141,7 @@ export default function PlayArea(
         player={currentPlayer}
         currentPlayer={currentPlayer}
         currentPlayerTurn={currentPlayerTurn}
-        usernames={usernames}
+        users={users}
         userActionState={userActionState}
         selectReserve={(kind) =>
           setUserActionState((userActionState) =>
