@@ -6,13 +6,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { StatusIndicator } from "@/components/StatusIndicator";
 import { useMatchmaking } from "@/components/MatchmakingProvider";
-import { OnlineUser } from "@/lib/types";
-
-interface User {
-  id: string;
-  username: string;
-  elo: number;
-}
+import { OnlineUser, User } from "@/lib/types";
+import Username from "@/components/Username";
 
 export default function Leaderboard() {
   const { isSignedIn, getToken } = useAuth();
@@ -75,7 +70,14 @@ export default function Leaderboard() {
           <div key={user.id} className="rounded flex justify-between">
             <div className="flex flex-row gap-2 items-center">
               <StatusIndicator status={user.status} />
-              {user.username ?? "Anonymous"}
+              <Username
+                user={{
+                  id: user.id,
+                  username: user.username,
+                  elo: user.elo,
+                  badge: user.badge,
+                }}
+              />
             </div>
             <div>{user.elo}</div>
           </div>

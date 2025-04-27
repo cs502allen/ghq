@@ -13,7 +13,16 @@ export interface User {
   id: string;
   username: string;
   elo: number;
+  gamesThisMonth?: number;
+  badge?: UserBadge;
 }
+
+export type UserBadge =
+  | "recruit"
+  | "sergeant"
+  | "lieutenant"
+  | "captain"
+  | "commander";
 
 export interface OnlineUser extends User {
   status:

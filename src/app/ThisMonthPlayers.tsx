@@ -6,11 +6,13 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { StatusIndicator } from "@/components/StatusIndicator";
 import { useMatchmaking } from "@/components/MatchmakingProvider";
-import { OnlineUser } from "@/lib/types";
+import { OnlineUser, UserBadge } from "@/lib/types";
+import Username from "@/components/Username";
 
 interface MatchSummary {
   userId: string;
   username: string;
+  badge: UserBadge;
   elo: number;
   wins: number;
   losses: number;
@@ -79,7 +81,14 @@ export default function Leaderboard() {
           <div key={user.userId} className="rounded flex justify-between">
             <div className="flex flex-row gap-2 items-center">
               <StatusIndicator status={user.status ?? "offline"} />
-              {user.username ?? "Anonymous"}
+              <Username
+                user={{
+                  id: user.userId,
+                  username: user.username,
+                  elo: user.elo,
+                  badge: user.badge,
+                }}
+              />
             </div>
             <div className="flex flex-row gap-2 items-center">
               <span className="text-green-700">{user.wins}</span>

@@ -20,7 +20,7 @@ import { authMiddleware, clerkClient } from "./server/auth";
 import { TIME_CONTROLS } from "./game/constants";
 import { matchLifecycle } from "./server/match-lifecycle";
 import bodyParser from "koa-bodyparser";
-import { MatchModel } from "./lib/types";
+import { MatchModel, User } from "./lib/types";
 import {
   addUserToOnlineUsers,
   getUsersOnlineResponse,
@@ -29,6 +29,7 @@ import {
 import { blitzQueue, rapidQueue } from "./server/matchmaking";
 import { getUser } from "./lib/supabase";
 import { getMatchSummary } from "./server/match-summary";
+import { updateUserStats } from "./server/user-stats";
 
 const supabase = createClient(
   "https://wjucmtrnmjcaatbtktxo.supabase.co",
@@ -547,51 +548,42 @@ async function updateUserElos({
     getUser(player1Id),
   ]);
 
+  updateUserStats(player0);
   const player0Elo = calculateElo(
     player0.elo,
     player1.elo,
     status === "DRAW" ? 0.5 : winner === "RED" ? 1 : 0
   );
 
-  supabase
-    .from("users")
-    .update({ elo: player0Elo })
-    .eq("id", player0Id)
-    .then(({ error }) => {
-      if (error) {
-        console.log({
-          message: "Error updating winner's elo",
-          winnerId,
-          error,
-        });
-      }
-    });
-
+  updateUserStats(player1);
   const player1Elo = calculateElo(
     player1.elo,
     player0.elo,
     status === "DRAW" ? 0.5 : winner === "BLUE" ? 1 : 0
   );
 
-  supabase
-    .from("users")
-    .update({ elo: player1Elo })
-    .eq("id", player1Id)
-    .then(({ error }) => {
-      if (error) {
-        console.log({
-          message: "Error updating loser's elo",
-          player1Id,
-          error,
-        });
-      }
-    });
-}
+  const updatePlayer = (player: User, elo: number) => {
+    supabase
+      .from("users")
+      .update({
+        elo,
+        gamesThisMonth: player.gamesThisMonth || 0,
+        badge: player.badge || null,
+      })
+      .eq("id", player.id)
+      .then(({ error }) => {
+        if (error) {
+          console.log({
+            message: "Error updating winner's elo",
+            winnerId,
+            error,
+          });
+        }
+      });
+  };
 
-interface User {
-  id: string;
-  elo: number;
-  username: string;
+  updatePlayer(player0, player0Elo);
+  updatePlayer(player1, player1Elo);
 }
 
 async function getOrCreateUser(userId: string): Promise<User> {
@@ -646,7 +638,7 @@ async function getOrCreateUser(userId: string): Promise<User> {
 server.router.get("/leaderboard", async (ctx) => {
   const { data: users, error } = await supabase
     .from("users")
-    .select("id, username, elo")
+    .select("id, username, elo, gamesThisMonth, badge")
     .order("elo", { ascending: false })
     .limit(10);
 
@@ -865,7 +857,6 @@ server.router.post("/correspondence/accept", async (ctx) => {
 });
 
 function clerkUsernameOrRandomDefault(username?: string | null): string {
-  console.log("clerkUsernameOrRandomDefault", username);
   if (username && username.length > 0) {
     return username;
   }
