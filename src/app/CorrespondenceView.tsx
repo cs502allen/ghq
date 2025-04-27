@@ -132,28 +132,30 @@ function ReceivedChallengeRow({
   return (
     <div
       key={`${challenge.challenger.id}-${challenge.target.id}`}
-      className="p-1 bg-white rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center"
+      className="p-1 bg-white rounded-lg flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center"
     >
-      <div className="flex items-center gap-1">
-        <Mail className="h-4 w-4 mr-1" /> Received challenge from{" "}
+      <div className="flex items-center gap-1 px-2">
+        <Mail className="h-4 w-4 mr-1" /> Challenge from{" "}
         <span className="font-bold text-gray-700">
           {challenge.challenger.username}
         </span>
         !
       </div>
-      <Button
-        variant="outline"
-        className="h-6"
-        onClick={() => {
-          setAccepting(true);
-          acceptChallenge(challenge.challenger.id).finally(() =>
-            setAccepting(false)
-          );
-        }}
-        disabled={accepting}
-      >
-        Accept Challenge
-      </Button>
+      <div className="flex items-center gap-1 justify-end">
+        <Button
+          variant="outline"
+          className="h-7"
+          onClick={() => {
+            setAccepting(true);
+            acceptChallenge(challenge.challenger.id).finally(() =>
+              setAccepting(false)
+            );
+          }}
+          disabled={accepting}
+        >
+          Accept
+        </Button>
+      </div>
     </div>
   );
 }
@@ -162,16 +164,18 @@ function SentChallengeRow({ challenge }: { challenge: any }) {
   return (
     <div
       key={`${challenge.challenger.id}-${challenge.target.id}`}
-      className="p-1 bg-white rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center"
+      className="p-1 bg-white rounded-lg flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center"
     >
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 px-2">
         <MailQuestion className="h-4 w-4 mr-1" />
-        Sent challenge to{" "}
+        Challenged{" "}
         <span className="font-bold text-gray-700">
           {challenge.target.username}
         </span>
       </div>
-      <div className="text-sm text-gray-500">Awaiting response...</div>
+      <div className="flex items-center text-sm text-gray-500 justify-end">
+        Awaiting response...
+      </div>
     </div>
   );
 }
