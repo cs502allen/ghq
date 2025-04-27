@@ -22,7 +22,8 @@ export type UserBadge =
   | "sergeant"
   | "lieutenant"
   | "captain"
-  | "commander";
+  | "commander"
+  | "tralfamadorian";
 
 export interface OnlineUser extends User {
   status:

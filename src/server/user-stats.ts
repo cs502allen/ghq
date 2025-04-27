@@ -13,5 +13,7 @@ export function updateUserStats(user: User) {
     user.badge = "captain";
   } else if (user.gamesThisMonth > 20) {
     user.badge = "commander";
+  } else if (user.gamesThisMonth > 50) {
+    user.badge = "tralfamadorian";
   }
 }

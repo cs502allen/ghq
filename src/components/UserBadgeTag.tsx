@@ -15,6 +15,7 @@ export default function UserBadgeTag({ badge }: { badge?: UserBadge }) {
     lieutenant: "🎖️️️️",
     captain: "🎖️️️️🎖️️️️",
     commander: "🎖️️️️🎖️️️️🎖️️️️",
+    tralfamadorian: "👽",
   };
 
   const badgeNames: Record<UserBadge, string> = {
@@ -23,6 +24,7 @@ export default function UserBadgeTag({ badge }: { badge?: UserBadge }) {
     lieutenant: "Lieutenant",
     captain: "Captain",
     commander: "Commander",
+    tralfamadorian: "Tralfamadorian",
   };
 
   return (
