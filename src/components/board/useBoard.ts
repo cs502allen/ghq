@@ -93,6 +93,10 @@ export default function useBoard({
   useEffect(() => {
     if (G.isReplayMode) {
       const lastMove = G.thisTurnMoves[G.thisTurnMoves.length - 1];
+      if (!lastMove) {
+        return;
+      }
+
       if (lastMove.name === "Move" && lastMove.args[2]) {
         playCaptureSound();
       } else {
