@@ -3,12 +3,23 @@
 import { StatusIndicator } from "@/components/StatusIndicator";
 import { UsersOnline } from "@/lib/types";
 import Username from "@/components/Username";
+import { useAuth } from "@clerk/nextjs";
 
 export default function Players({
   usersOnline,
 }: {
   usersOnline: UsersOnline | null;
 }) {
+  const { isSignedIn, getToken } = useAuth();
+
+  if (!isSignedIn) {
+    return (
+      <div className="flex flex-col gap-2 w-full">
+        <div className="text-gray-600">Sign in to see online players!</div>
+      </div>
+    );
+  }
+
   if (!usersOnline) {
     return (
       <div className="flex flex-col gap-2 w-full">

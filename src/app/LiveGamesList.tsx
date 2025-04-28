@@ -47,7 +47,9 @@ export default function LiveGamesList() {
       <div className="font-bold text-lg">Recent games</div>
 
       {!loading && games.length === 0 && (
-        <div className="text-gray-600">No games found</div>
+        <div className="text-gray-600">
+          {isSignedIn ? "No games found" : "Sign in to see recent games!"}
+        </div>
       )}
       {loading && (
         <div className="flex flex-col gap-2">

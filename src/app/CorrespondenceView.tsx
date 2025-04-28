@@ -93,9 +93,7 @@ export default function CorrespondenceView() {
         matches.length === 0 &&
         sentChallenges.length === 0 &&
         receivedChallenges.length === 0 && (
-          <div className="text-sm text-gray-500">
-            No games or open challenges found
-          </div>
+          <div className="text-gray-600">No games or open challenges found</div>
         )}
 
       {matches.length > 0 && (
