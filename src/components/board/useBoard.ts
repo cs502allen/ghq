@@ -89,6 +89,18 @@ export default function useBoard({
     }
   }, [G.board]);
 
+  // In replay mode, don't animate the board state when the game state changes, just set it immediately.
+  useEffect(() => {
+    if (G.isReplayMode) {
+      const lastMove = G.thisTurnMoves[G.thisTurnMoves.length - 1];
+      if (lastMove.name === "Move" && lastMove.args[2]) {
+        playCaptureSound();
+      } else {
+        playMoveSound();
+      }
+    }
+  }, [G.thisTurnMoves]);
+
   // Actually make the move that's been chosen by the user.
   useEffect(() => {
     if (userActionState.chosenMove) {

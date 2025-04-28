@@ -1,25 +1,33 @@
-function playSound(filename: string, volume: number) {
-  if (typeof window !== "undefined") {
-    const audio = new Audio(filename);
-    audio.volume = volume;
-    audio.play().catch(() => {});
+function getAudioElement(audio: string): HTMLAudioElement | undefined {
+  if (typeof window === "undefined") {
+    return undefined;
   }
+
+  return {
+    move: new Audio("/move-piece.mp3"),
+    capture: new Audio("/capture-piece.mp3"),
+    nextTurn: new Audio("/swoosh.mp3"),
+    gameReady: new Audio("/cold-wind-blowing.mp3"),
+  }[audio];
 }
 
-function playSoundRateLimited(fileName: string, volume = 0.2) {
-  let lastPlayed = 0;
-  return () => {
-    if (Date.now() - lastPlayed > 100) {
-      playSound(fileName, volume);
-      lastPlayed = Date.now();
-    }
-  };
+function playSound(audioName: string, volume: number) {
+  const audio = getAudioElement(audioName);
+  if (!audio) {
+    return;
+  }
+
+  // If the audio is already playing, don't play it again within 50ms.
+  if (audio.currentTime > 0 && audio.currentTime < 0.05) {
+    return;
+  }
+
+  audio.volume = volume;
+  audio.currentTime = 0;
+  audio.play().catch(() => {});
 }
 
-export const playMoveSound = playSoundRateLimited("/move-piece.mp3");
-export const playCaptureSound = playSoundRateLimited("/capture-piece.mp3");
-export const playNextTurnSound = playSoundRateLimited("/swoosh.mp3", 0.15);
-export const playGameReadySound = playSoundRateLimited(
-  "/cold-wind-blowing.mp3",
-  1
-);
+export const playMoveSound = () => playSound("move", 0.2);
+export const playCaptureSound = () => playSound("capture", 0.2);
+export const playNextTurnSound = () => playSound("nextTurn", 0.15);
+export const playGameReadySound = () => playSound("gameReady", 1);
