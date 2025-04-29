@@ -29,7 +29,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const [matchId, setMatchId] = useState<string | null>(null);
   const [playerId, setPlayerId] = useState<string | undefined>();
   const [credentials, setCredentials] = useState<string>("");
-  const [disableReplays, setDisableReplays] = useState<boolean>(true);
+  const [disableReplays, setDisableReplays] = useState<boolean>(false);
   const [abandoned, setAbandoned] = useState<boolean>(false);
   const { isSignedIn, getToken } = useAuth();
 
@@ -121,7 +121,7 @@ function BottomOfflineBanner({
   return (
     !useOnlineGameClient && (
       <button
-        className="fixed bottom-0 left-0 w-full text-yellow-900 bg-yellow-200 hover:bg-yellow-300 p-1"
+        className="fixed bottom-0 left-0 w-full text-yellow-900 bg-yellow-200/80 hover:bg-yellow-300 p-1"
         onClick={() => setUseOnlineGameClient(true)}
       >
         You are currently reviewing this game in offline mode. Click here to
