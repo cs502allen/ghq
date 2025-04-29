@@ -36,11 +36,16 @@ export default function PlayArea(
     [ctx.currentPlayer]
   );
 
+  // TODO(tyler): allow spectators to choose which side to view
+  const defaultPlayerPOV = "RED";
+
   // Note: playerID is null in local play (non-multiplayer, non-bot), also when spectating, replaying, and tutorials.
-  const currentPlayer = useMemo(
-    () => (playerID === null ? currentPlayerTurn : playerIdToPlayer(playerID)),
-    [currentPlayerTurn, playerID]
-  );
+  const currentPlayer = useMemo(() => {
+    if (G.isReplayMode) {
+      return defaultPlayerPOV;
+    }
+    return playerID === null ? currentPlayerTurn : playerIdToPlayer(playerID);
+  }, [currentPlayerTurn, playerID, G.isReplayMode]);
   const { users } = useUsers({ G });
 
   const isFlipped = useMemo(() => viewPlayerPref === "BLUE", [viewPlayerPref]);
@@ -105,7 +110,7 @@ export default function PlayArea(
         G={G}
         ctx={ctx}
         matchData={matchData}
-        player={getOpponent(currentPlayer)}
+        player={isFlipped ? defaultPlayerPOV : getOpponent(defaultPlayerPOV)}
         currentPlayer={currentPlayer}
         currentPlayerTurn={currentPlayerTurn}
         users={users}
@@ -137,7 +142,7 @@ export default function PlayArea(
         G={G}
         ctx={ctx}
         matchData={matchData}
-        player={currentPlayer}
+        player={isFlipped ? getOpponent(defaultPlayerPOV) : defaultPlayerPOV}
         currentPlayer={currentPlayer}
         currentPlayerTurn={currentPlayerTurn}
         users={users}
