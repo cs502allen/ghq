@@ -13,8 +13,8 @@ export default function UserBadgeTag({ badge }: { badge?: UserBadge }) {
     recruit: "🔫",
     sergeant: "🪖️",
     lieutenant: "🎖️️️️",
-    captain: "🎖️️️️🎖️️️️",
-    commander: "🎖️️️️🎖️️️️🎖️️️️",
+    captain: "⭐",
+    commander: "💫",
     tralfamadorian: "👽",
   };
 
