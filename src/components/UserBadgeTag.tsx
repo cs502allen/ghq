@@ -10,8 +10,8 @@ export default function UserBadgeTag({ badge }: { badge?: UserBadge }) {
   }
 
   const emojis: Record<UserBadge, string> = {
-    recruit: "🪖️",
-    sergeant: "🪖🪖️",
+    recruit: "🔫",
+    sergeant: "🪖️",
     lieutenant: "🎖️️️️",
     captain: "🎖️️️️🎖️️️️",
     commander: "🎖️️️️🎖️️️️🎖️️️️",
