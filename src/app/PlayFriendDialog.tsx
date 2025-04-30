@@ -1,5 +1,4 @@
-import { CircleCheck, Handshake, Loader2, Send } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { CircleCheck, Loader2, Send } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -17,6 +16,8 @@ import { API_URL } from "./live/config";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import ButtonV2 from "./live/ButtonV2";
+import { Button } from "@/components/ui/button";
 
 interface User {
   id: string;
@@ -84,9 +85,9 @@ export function PlayFriendDialog() {
   return (
     <Dialog onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm">
-          <Handshake className="h-4 w-4" /> Play Friend
-        </Button>
+        <ButtonV2 size="sm" onClick={async () => setOpen(true)}>
+          🤝 Play Friend
+        </ButtonV2>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
