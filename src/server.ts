@@ -182,7 +182,7 @@ async function listMatches(userId?: string): Promise<MatchModel[]> {
   const query = supabase
     .from("matches")
     .select(
-      "id, created_at, player0_id, player1_id, player0_elo, player1_elo, winner_id, status"
+      "id, created_at, player0_id, player1_id, player0_elo, player1_elo, winner_id, status, current_turn_player_id"
     );
 
   if (userId) {
@@ -239,6 +239,9 @@ async function listMatches(userId?: string): Promise<MatchModel[]> {
         player2Elo: match.player1_elo,
         status: match.status,
         createdAt: match.created_at,
+        isYourTurn: userId
+          ? match.current_turn_player_id === userId
+          : undefined,
       });
     }
   }

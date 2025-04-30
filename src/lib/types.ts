@@ -7,6 +7,7 @@ export interface MatchModel {
   player2Elo: number;
   status: string;
   createdAt: string;
+  isYourTurn?: boolean;
 }
 
 export interface User {

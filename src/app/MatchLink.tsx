@@ -31,6 +31,24 @@ export function MatchLink({ game }: { game: MatchModel }) {
         <span className="text-xs">({game.player2Elo})</span>
       </div>
 
+      <div className="flex gap-1 items-center text-xs justify-end">
+        {game.isYourTurn !== undefined && (
+          <>
+            {game.isYourTurn ? (
+              <div className="flex gap-2 items-center text-blue-600">
+                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                Your turn
+              </div>
+            ) : (
+              <div className="flex gap-2 items-center text-gray-600">
+                <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+                Opponent&apos;s turn
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
       <div className="flex gap-1 items-center text-xs text-gray-600 min-w-20 justify-end">
         {DateTime.fromISO(game.createdAt).toRelative()}
       </div>
