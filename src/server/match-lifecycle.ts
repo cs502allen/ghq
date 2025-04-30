@@ -2,7 +2,7 @@ import { Player } from "@/game/engine";
 import { GHQState } from "@/game/engine";
 import { checkTimeForGameover } from "@/game/gameover-logic";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { StorageAPI } from "boardgame.io";
+import { State, StorageAPI } from "boardgame.io";
 import { inGameUsers } from "./matchmaking";
 
 export async function matchLifecycle({
@@ -39,7 +39,7 @@ export async function checkAndUpdateMatch({
 }) {
   const { data: matchData, error: matchError } = await supabase
     .from("matches")
-    .select("status")
+    .select("id, player0_id, player1_id, status, current_turn_player_id")
     .eq("id", matchId)
     .single();
 
@@ -56,6 +56,8 @@ export async function checkAndUpdateMatch({
     state: true,
     metadata: true,
   });
+
+  await updateMatchesWithCurrentTurnPlayerId({ supabase, matchData, state });
 
   // Update inGameUsers since we're already fetching all match data and can check if the player is connected.
   for (const player of Object.values(metadata.players)) {
@@ -89,5 +91,50 @@ export async function checkAndUpdateMatch({
     await db.setMetadata(matchId, metadata);
     console.log(`Updated gameover state for matchId=${matchId}.`);
     onGameEnd({ ctx: state.ctx, G: state.G });
+  }
+}
+
+async function updateMatchesWithCurrentTurnPlayerId({
+  supabase,
+  matchData,
+  state,
+}: {
+  supabase: SupabaseClient;
+  matchData: {
+    id: string;
+    player0_id: string;
+    player1_id: string;
+    status: string;
+    current_turn_player_id: string;
+  };
+  state: State<any>;
+}) {
+  const currentPlayerId =
+    state.ctx.currentPlayer === "0"
+      ? matchData.player0_id
+      : matchData.player1_id;
+
+  if (matchData.current_turn_player_id === currentPlayerId) {
+    return;
+  }
+
+  console.log({
+    message: "Updating matches with current turn player",
+    matchId: matchData.id,
+    currentPlayerId,
+  });
+
+  const { error } = await supabase
+    .from("matches")
+    .update({ current_turn_player_id: currentPlayerId })
+    .eq("id", matchData.id);
+
+  if (error) {
+    console.log({
+      message: "Error updating current turn player",
+      matchId: matchData.id,
+      currentPlayerId,
+      error,
+    });
   }
 }
