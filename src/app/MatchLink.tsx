@@ -32,7 +32,7 @@ export function MatchLink({ game }: { game: MatchModel }) {
       </div>
 
       <div className="flex gap-1 items-center text-xs justify-end">
-        {game.isYourTurn !== undefined && (
+        {game.isYourTurn !== undefined ? (
           <>
             {game.isYourTurn ? (
               <div className="flex gap-2 items-center text-blue-600">
@@ -46,11 +46,9 @@ export function MatchLink({ game }: { game: MatchModel }) {
               </div>
             )}
           </>
+        ) : (
+          DateTime.fromISO(game.createdAt).toRelative()
         )}
-      </div>
-
-      <div className="flex gap-1 items-center text-xs text-gray-600 min-w-20 justify-end">
-        {DateTime.fromISO(game.createdAt).toRelative()}
       </div>
     </Link>
   );
