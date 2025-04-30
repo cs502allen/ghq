@@ -8,12 +8,14 @@ const CountdownTimer = ({
   totalTimeAllowed,
   elapsed,
   player,
+  isReplayMode,
 }: {
   active: boolean;
   player: Player;
   elapsed: number;
   startDate: number;
   totalTimeAllowed: number;
+  isReplayMode: boolean;
 }) => {
   const [remainingTime, setRemainingTime] = useState(
     Math.max(0, totalTimeAllowed - elapsed - (Date.now() - startDate))
@@ -65,7 +67,11 @@ const CountdownTimer = ({
           player === "BLUE" ? "text-blue-300" : "text-red-300"
         )}
       >
-        <p>{formatTime(remainingTime)}</p>
+        {isReplayMode ? (
+          <p className="w-[72px] h-[32px]"> </p>
+        ) : (
+          <p>{formatTime(remainingTime)}</p>
+        )}
       </div>
     </div>
   );

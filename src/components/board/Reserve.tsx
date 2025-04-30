@@ -98,6 +98,7 @@ export default function Reserve({
                 elapsed={player === "RED" ? G.redElapsed : G.blueElapsed}
                 startDate={G.turnStartTime}
                 totalTimeAllowed={G.timeControl}
+                isReplayMode={G.isReplayMode ?? false}
               />
             </div>
           )}

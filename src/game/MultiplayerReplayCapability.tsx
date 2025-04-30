@@ -121,6 +121,8 @@ export default function MultiplayerReplayCapability({
       userIds: onlineInitialState?.G?.userIds,
       elos: onlineInitialState?.G?.elos,
       matchId: onlineInitialState?.G?.matchId,
+      timeControl: onlineInitialState?.G?.timeControl,
+      bonusTime: onlineInitialState?.G?.bonusTime,
       isOnline: true,
       isReplayMode: true,
     };
