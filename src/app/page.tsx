@@ -46,9 +46,9 @@ function App() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 place-items-center">
               <PlayOnlineButton mode="blitz" />
               <PlayOnlineButton mode="rapid" />
-              <Button onClick={startTutorial}>🙋‍♂️ Learn to Play</Button>
-              <Button onClick={playLocal}>👨‍💻 Pass n&apos; Play</Button>
               <Button onClick={playBot}>🤖 Play Bot</Button>
+              <Button onClick={playLocal}>👨‍💻 Pass n&apos; Play</Button>
+              <Button onClick={startTutorial}>🙋‍♂️ Learn to Play</Button>
               <Button onClick={goLearn}>📚 Rules & Puzzles</Button>
             </div>
           </div>

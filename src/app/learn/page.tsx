@@ -69,7 +69,7 @@ export default function Page() {
         )}
 
         {!loading && (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-8">
             <Section heading="Basics">
               <LearnBasics />
             </Section>

@@ -33,7 +33,7 @@ export default function Button({
       className={cn(
         "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 w-full border-2 border-blue-900 rounded",
         size === "sm" && "py-1 px-2 max-w-36 text-sm",
-        size === "md" && "py-2 px-3 max-w-60 text-base"
+        size === "md" && "py-2 px-3 max-w-80 text-base"
       )}
       onClick={doOnClick}
     >
