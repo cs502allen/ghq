@@ -104,13 +104,8 @@ server.router.post("/matchmaking", async (ctx) => {
     }
   }
 
-  // If user isn't in the queue, add them to the queue.
-  const queuedUser = queue.get(userId);
-  if (!queuedUser) {
-    console.log(`Adding user to ${mode} queue`, userId);
-    queue.set(userId, now);
-    console.log("Users in queue", queue);
-  }
+  // Refresh the user in the queue
+  queue.set(userId, now);
 
   // TODO(tyler): more complex matchmaking logic
   // TODO(tyler): clean up stale live games
