@@ -5,11 +5,9 @@ import UserMiniProfile from "./UserMiniProfile";
 export default function Username({
   user,
   includeElo,
-  allowMiniProfile,
 }: {
   user: User;
   includeElo?: boolean;
-  allowMiniProfile?: boolean;
 }) {
   const content = (
     <div className="flex gap-1 items-center">
@@ -19,9 +17,5 @@ export default function Username({
     </div>
   );
 
-  if (allowMiniProfile) {
-    return <UserMiniProfile user={user}>{content}</UserMiniProfile>;
-  }
-
-  return content;
+  return <UserMiniProfile user={user}>{content}</UserMiniProfile>;
 }

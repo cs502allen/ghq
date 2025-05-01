@@ -77,7 +77,6 @@ export default function Leaderboard() {
                   elo: user.elo,
                   badge: user.badge,
                 }}
-                allowMiniProfile={true}
               />
             </div>
             <div>{user.elo}</div>

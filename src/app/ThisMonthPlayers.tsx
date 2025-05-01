@@ -88,7 +88,6 @@ export default function Leaderboard() {
                   elo: user.elo,
                   badge: user.badge,
                 }}
-                allowMiniProfile={true}
               />
             </div>
             <div className="flex flex-row gap-2 items-center">
