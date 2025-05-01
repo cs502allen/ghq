@@ -1,7 +1,13 @@
 import { OnlineUser, UsersOnline } from "@/lib/types";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { StorageAPI } from "boardgame.io";
-import { blitzQueue, inGameUsers, rapidQueue } from "./matchmaking";
+import {
+  blitzQueue,
+  endgameQueue,
+  inGameUsers,
+  normandyQueue,
+  rapidQueue,
+} from "./matchmaking";
 
 const ONLINE_USER_STALE_MS = 10_000;
 
@@ -64,6 +70,10 @@ export async function userLifecycle({
       status = "in blitz queue";
     } else if (isActiveInQueue(user.id, rapidQueue)) {
       status = "in rapid queue";
+    } else if (isActiveInQueue(user.id, endgameQueue)) {
+      status = "in endgame queue";
+    } else if (isActiveInQueue(user.id, normandyQueue)) {
+      status = "in normandy queue";
     } else if (isActiveInGame(user.id)) {
       status = "in game";
     }

@@ -62,6 +62,37 @@ export const normandy: Variant = {
   ],
 };
 
+export const endgame: Variant = {
+  name: "endgame",
+  blueReserve: {
+    INFANTRY: 0,
+    ARMORED_INFANTRY: 0,
+    AIRBORNE_INFANTRY: 0,
+    ARTILLERY: 0,
+    ARMORED_ARTILLERY: 0,
+    HEAVY_ARTILLERY: 0,
+  },
+  redReserve: {
+    INFANTRY: 0,
+    ARMORED_INFANTRY: 0,
+    AIRBORNE_INFANTRY: 0,
+    ARTILLERY: 0,
+    ARMORED_ARTILLERY: 0,
+    HEAVY_ARTILLERY: 0,
+  },
+  board: [
+    [B.HQ, null, null, null, null, null, null, null],
+    [null, null, null, null, B.IN, null, null, null],
+    [null, null, B.AR, B.AR, null, B.IN, null, null],
+    [null, B.AI, null, null, null, null, null, null],
+    [null, null, null, null, null, null, R.AI, null],
+    [null, null, R.IN, null, R.AR, R.AR, null, null],
+    [null, null, null, R.IN, null, null, null, null],
+    [null, null, null, null, null, null, null, R.HQ],
+  ],
+};
+
 export const variants: Record<string, Variant> = {
   normandy,
+  endgame,
 };

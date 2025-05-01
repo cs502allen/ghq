@@ -3,6 +3,7 @@ import type { Game } from "boardgame.io";
 import { GHQGame, GHQState, ReserveFleet, Square } from "./engine";
 import { BoardArrowType } from "./BoardArrow";
 import { BoardState, FENtoBoardState } from "./notation";
+import { endgame } from "./variants";
 
 export const B: Record<string, Square> = {
   HQ: { type: "HQ", player: "BLUE" },
@@ -476,6 +477,15 @@ export const boards: Record<string, TutorialSetupData> = {
       ],
       redReserve: emptyReserveFleet,
       blueReserve: emptyReserveFleet,
+    },
+    category: "endgames",
+    boardArrows: [],
+  },
+  "Classic endgame": {
+    boardState: {
+      board: endgame.board,
+      redReserve: endgame.redReserve,
+      blueReserve: endgame.blueReserve,
     },
     category: "endgames",
     boardArrows: [],

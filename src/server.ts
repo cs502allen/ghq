@@ -26,7 +26,13 @@ import {
   getUsersOnlineResponse,
   userLifecycle,
 } from "./server/user-lifecycle";
-import { blitzQueue, rapidQueue } from "./server/matchmaking";
+import {
+  blitzQueue,
+  endgameQueue,
+  getQueue,
+  normandyQueue,
+  rapidQueue,
+} from "./server/matchmaking";
 import { getUser } from "./lib/supabase";
 import { getMatchSummary } from "./server/match-summary";
 import { updateUserStats } from "./server/user-stats";
@@ -93,7 +99,7 @@ server.router.post("/matchmaking", async (ctx) => {
     return;
   }
 
-  const queue = mode === "blitz" ? blitzQueue : rapidQueue;
+  const queue = getQueue(mode);
 
   // Iterate through the queue and remove stale users
   const now = Date.now();
@@ -169,6 +175,8 @@ server.router.delete("/matchmaking", (ctx) => {
 
   blitzQueue.delete(userId);
   rapidQueue.delete(userId);
+  endgameQueue.delete(userId);
+  normandyQueue.delete(userId);
 
   ctx.body = JSON.stringify({});
 });

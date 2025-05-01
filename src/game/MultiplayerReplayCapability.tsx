@@ -125,6 +125,10 @@ export default function MultiplayerReplayCapability({
       bonusTime: onlineInitialState?.G?.bonusTime,
       isOnline: true,
       isReplayMode: true,
+      variant: onlineInitialState?.G?.variant,
+      board: onlineInitialState?.G?.board,
+      redReserve: onlineInitialState?.G?.redReserve,
+      blueReserve: onlineInitialState?.G?.blueReserve,
     };
     setInitialState(initialState);
 
