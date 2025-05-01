@@ -36,6 +36,7 @@ import {
 import { getUser } from "./lib/supabase";
 import { getMatchSummary } from "./server/match-summary";
 import { updateUserStats } from "./server/user-stats";
+import { getUserSummary } from "./server/user-summary";
 
 const supabase = createClient(
   "https://wjucmtrnmjcaatbtktxo.supabase.co",
@@ -939,4 +940,15 @@ server.router.get("/users/online", async (ctx) => {
   addUserToOnlineUsers(userId);
 
   ctx.body = JSON.stringify(getUsersOnlineResponse());
+});
+
+server.router.get("/users/:userId", async (ctx) => {
+  const userId = ctx.state.auth.userId;
+  if (!userId) {
+    throw new Error("userId is required");
+  }
+
+  const user = await getUserSummary(supabase, ctx.params.userId);
+
+  ctx.body = JSON.stringify({ user });
 });
