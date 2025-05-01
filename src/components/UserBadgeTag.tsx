@@ -32,6 +32,7 @@ export default function UserBadgeTag({ badge }: { badge?: UserBadge }) {
       <PopoverTrigger
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
+        className="focus:outline-none focus:ring-0"
       >
         <div>{emojis[badge]}</div>
       </PopoverTrigger>
