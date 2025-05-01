@@ -6,17 +6,15 @@ import { PlayOnlineButton } from "./live/PlayOnlineButton";
 import { Learn } from "@/components/Learn";
 import Header from "@/components/Header";
 import LiveGamesList from "./LiveGamesList";
-import Leaderboard from "./Leaderboard";
-import { Section } from "./learn/page";
-import { Community } from "@/components/Community";
-import LearnBasics from "./learn/LearnBasics";
 import { GHQNight } from "@/components/GHQNight";
 import CorrespondenceView from "./CorrespondenceView";
-import Players from "./Players";
 import PlayersTab from "./PlayersTab";
+import { useState } from "react";
+import { Star } from "lucide-react";
 
 function App() {
   const router = useRouter();
+  const [showVariants, setShowVariants] = useState(false);
 
   async function playLocal() {
     router.push("/local");
@@ -42,7 +40,13 @@ function App() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 bg-gray-300 gap-[1px]">
         <div className="col-span-1 flex flex-col gap-[1px] bg-gray-300">
           <div className="flex flex-col gap-2 p-4 border-black bg-white">
-            <div className="font-bold text-lg">Play a game</div>
+            <div
+              className="flex items-center gap-2 font-bold text-lg cursor-pointer group"
+              onClick={() => setShowVariants(!showVariants)}
+            >
+              Play a game
+              <Star className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 place-items-center">
               <PlayOnlineButton mode="blitz" />
               <PlayOnlineButton mode="rapid" />
@@ -50,6 +54,13 @@ function App() {
               <Button onClick={playLocal}>👨‍💻 Pass n&apos; Play</Button>
               <Button onClick={startTutorial}>🙋‍♂️ Learn to Play</Button>
               <Button onClick={goLearn}>📚 Rules & Puzzles</Button>
+
+              {showVariants && (
+                <>
+                  <PlayOnlineButton mode="endgame" />
+                  <PlayOnlineButton mode="normandy" />
+                </>
+              )}
             </div>
           </div>
 

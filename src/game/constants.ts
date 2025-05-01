@@ -21,4 +21,5 @@ export const TIME_CONTROLS: Record<string, TimeControl> = {
   blitz: { time: 3 * 60 * 1000, bonus: 6 * 1000 },
   correspondence: { time: 0, bonus: 0 },
   normandy: { time: 15 * 60 * 1000, bonus: 10 * 1000, variant: "normandy" },
+  endgame: { time: 1 * 60 * 1000, bonus: 6 * 1000, variant: "endgame" },
 };
