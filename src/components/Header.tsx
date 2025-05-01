@@ -108,6 +108,7 @@ function AuthSection() {
                   badge: userInfo.badge,
                 }}
                 includeElo
+                allowMiniProfile={true}
               />
             )}
             <UserButton />
