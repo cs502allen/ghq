@@ -1,6 +1,33 @@
 import { Coordinate, GHQState, Player, Units } from "@/game/engine";
+import { getOpponent } from "./board-moves";
+import { PlayerPiece } from "./board-moves";
+import { isInfantry } from "./capture-logic";
 
+// @deprecated
 export function movesForActivePiece(
+  coordinate: Coordinate,
+  board: GHQState["board"]
+): Coordinate[] {
+  const piece = board[coordinate[0]] && board[coordinate[0]][coordinate[1]];
+
+  if (!piece) {
+    return [];
+  }
+
+  const { allowedSquares, squaresWithAdjacentEnemyInfantry } = getPlayerPieces(
+    board,
+    piece.player,
+    false
+  );
+  return movesForActivePieceV2(
+    coordinate,
+    board,
+    allowedSquares,
+    squaresWithAdjacentEnemyInfantry
+  );
+}
+
+export function movesForActivePieceV2(
   coordinate: Coordinate,
   board: GHQState["board"],
   allowedSquares: Record<string, boolean>,
@@ -166,4 +193,67 @@ export function bombardedSquares(board: GHQState["board"]): Bombarded {
   });
 
   return bombarded;
+}
+
+export function getPlayerPieces(
+  board: GHQState["board"],
+  currentPlayerTurn: Player,
+  enforceZoneOfControl: boolean
+): {
+  playerPieces: PlayerPiece[];
+  allowedSquares: Record<string, boolean>;
+  squaresWithAdjacentEnemyInfantry: Record<string, boolean>;
+} {
+  const playerPieces: PlayerPiece[] = [];
+  const allowedSquares: Record<string, boolean> = {};
+  const squaresWithAdjacentEnemyInfantry: Record<string, boolean> = {};
+
+  const bombardedCoordinates = bombardedSquares(board);
+  const opponent = getOpponent(currentPlayerTurn);
+
+  for (let x = 0; x < board.length; x++) {
+    for (let y = 0; y < board[x].length; y++) {
+      const piece = board[x][y];
+      if (piece && piece.player === currentPlayerTurn) {
+        playerPieces.push({
+          piece,
+          coordinate: [x, y],
+        });
+      } else if (
+        piece &&
+        piece.player !== currentPlayerTurn &&
+        isInfantry(piece)
+      ) {
+        const adjacentDirections = [
+          [-1, 0],
+          [0, -1],
+          [0, 1],
+          [1, 0],
+        ];
+
+        for (const [dx, dy] of adjacentDirections) {
+          const adjacentX = x + dx;
+          const adjacentY = y + dy;
+
+          if (
+            adjacentX >= 0 &&
+            adjacentX < 8 &&
+            adjacentY >= 0 &&
+            adjacentY < 8
+          ) {
+            const adjacentKey = `${adjacentX},${adjacentY}`;
+            squaresWithAdjacentEnemyInfantry[adjacentKey] =
+              enforceZoneOfControl;
+          }
+        }
+      }
+
+      // If the square is not occupied by a piece and is not bombarded by the opponent, it is allowed to be moved to
+      if (!piece && !bombardedCoordinates[`${x},${y}`]?.[opponent]) {
+        allowedSquares[`${x},${y}`] = true;
+      }
+    }
+  }
+
+  return { playerPieces, allowedSquares, squaresWithAdjacentEnemyInfantry };
 }
