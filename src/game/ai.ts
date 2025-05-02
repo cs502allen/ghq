@@ -14,6 +14,7 @@ export const ai: Game<GHQState>["ai"] = {
       blueReserve: G.blueReserve,
       currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
       thisTurnMoves: G.thisTurnMoves,
+      enforceZoneOfControl: G.enforceZoneOfControl,
     });
     return allowedMoves.map(({ name, args }) => ({ move: name, args }));
   },

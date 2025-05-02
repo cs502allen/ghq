@@ -69,6 +69,7 @@ export default function PlayArea(
       blueReserve: G.blueReserve,
       currentPlayerTurn,
       thisTurnMoves: G.thisTurnMoves,
+      enforceZoneOfControl: G.enforceZoneOfControl,
     });
   }, [
     G.board,

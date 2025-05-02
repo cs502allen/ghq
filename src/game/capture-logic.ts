@@ -337,7 +337,7 @@ function isAlreadyEngaged(
   return !!engagedInfantry[`${coord[0]},${coord[1]}`];
 }
 
-function isInfantry(square?: Square): boolean {
+export function isInfantry(square?: Square): boolean {
   return !!square && Units[square.type].canCapture;
 }
 
