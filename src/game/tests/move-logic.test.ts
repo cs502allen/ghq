@@ -1,5 +1,9 @@
 import { describe, expect, it } from "@jest/globals";
-import { movesForActivePiece } from "@/game/move-logic";
+import {
+  getPlayerPieces,
+  movesForActivePiece,
+  movesForActivePieceV2,
+} from "@/game/move-logic";
 import {
   Blue,
   initialBoardSetup,
@@ -9,6 +13,15 @@ import {
   initialBoardSetupWithAnArmored,
   Red,
 } from "@/game/tests/test-boards";
+import { B, R } from "../variants";
+import { Board, Coordinate, Square } from "../engine";
+
+const _ = null;
+const O = true;
+const I = R.IN;
+const F = R.AI;
+const i = B.IN;
+const f = B.AI;
 
 describe("computing allowed moves", () => {
   it("can compute allowed when surrounded on all but one side", () => {
@@ -404,4 +417,105 @@ describe("computing allowed moves", () => {
           ]
       `);
   });
+
+  it("[GHQ-201] Moving a regular infantry from an engaged square, to an unengaged square.", () => {
+    expectMoves(
+      [
+        [_, i, _, _, _, _, _, _],
+        [i, I, O, _, _, _, _, _],
+        [I, O, O, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [1, 1]
+    );
+  });
+
+  it("[GHQ-202] Moving an armored infantry from an engaged square, through an unengaged square, to square where it can capture.", () => {
+    expectMoves(
+      [
+        [_, O, _, O, i, _, _, _],
+        [_, O, O, _, I, _, _, _],
+        [i, F, O, O, _, _, _, _],
+        [_, O, O, _, _, _, _, _],
+        [_, O, _, O, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [2, 1]
+    );
+  });
+
+  it("[GHQ-301] Moving a regular infantry from an engaged square to an engaged square.", () => {
+    expectMoves(
+      [
+        [_, i, _, _, _, _, _, _],
+        [i, I, O, _, _, _, _, _],
+        [I, O, I, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [1, 1]
+    );
+  });
 });
+
+type SOM = Square | boolean | null;
+
+type BoardAndExpectedMoves = [
+  [SOM, SOM, SOM, SOM, SOM, SOM, SOM, SOM],
+  [SOM, SOM, SOM, SOM, SOM, SOM, SOM, SOM],
+  [SOM, SOM, SOM, SOM, SOM, SOM, SOM, SOM],
+  [SOM, SOM, SOM, SOM, SOM, SOM, SOM, SOM],
+  [SOM, SOM, SOM, SOM, SOM, SOM, SOM, SOM],
+  [SOM, SOM, SOM, SOM, SOM, SOM, SOM, SOM],
+  [SOM, SOM, SOM, SOM, SOM, SOM, SOM, SOM],
+  [SOM, SOM, SOM, SOM, SOM, SOM, SOM, SOM]
+];
+
+function expectMoves(
+  boardAndExpectedMoves: BoardAndExpectedMoves,
+  piece: Coordinate
+) {
+  // Construct board from boardAndExpectedMoves (remove booleans)
+  const board: Board = boardAndExpectedMoves.map((row) =>
+    row.map((square) => {
+      if (typeof square === "boolean") return null;
+      return square as Square;
+    })
+  ) as Board;
+
+  // Construct expected allowable moves from boardAndExpectedMoves (only keep booleans and null)
+  const expectedAllowableMoves: (boolean | null)[][] =
+    boardAndExpectedMoves.map((row) =>
+      row.map((square) => (typeof square === "boolean" ? square : null))
+    );
+
+  const expectedMoves = expectedAllowableMoves
+    .map((row, y) => row.map((allowable, x) => (allowable ? [y, x] : null)))
+    .flat()
+    .filter(Boolean);
+
+  const { allowedSquares, squaresWithAdjacentEnemyInfantry } = getPlayerPieces(
+    board,
+    "RED",
+    true
+  );
+  const moves = movesForActivePieceV2(
+    piece,
+    board,
+    allowedSquares,
+    squaresWithAdjacentEnemyInfantry
+  );
+
+  expect(moves.length).toBe(expectedMoves.length);
+  expect(moves).toEqual(expect.arrayContaining(expectedMoves));
+  expect(expectedMoves).toEqual(expect.arrayContaining(moves));
+}
