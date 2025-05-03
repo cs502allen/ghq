@@ -616,6 +616,22 @@ describe("computing allowed moves", () => {
       [6, 7]
     );
   });
+
+  it("[GHQ-403] HQ shouldn't create a zone of control.", () => {
+    expectMoves(
+      [
+        [q, I, _, _, _, _, _, _],
+        [O, _, _, _, _, _, _, _],
+        [I, i, _, _, _, _, _, _],
+        [i, I, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [2, 0]
+    );
+  });
 });
 
 type SOM = Square | boolean | null;
