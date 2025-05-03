@@ -183,25 +183,39 @@ server.router.delete("/matchmaking", (ctx) => {
 });
 
 server.router.get("/matches", async (ctx) => {
-  const matches = await listMatches();
+  const userId = (ctx.request.query.userId as string) ?? undefined;
+  const isCorrespondence =
+    (ctx.request.query.isCorrespondence as string) === "true";
+
+  const matches = await listMatches({
+    userId,
+    isCorrespondence,
+  });
   ctx.body = JSON.stringify({ matches });
 });
 
-async function listMatches(userId?: string): Promise<MatchModel[]> {
-  const query = supabase
+async function listMatches({
+  userId,
+  isCorrespondence,
+}: {
+  userId?: string;
+  isCorrespondence?: boolean;
+}): Promise<MatchModel[]> {
+  let query = supabase
     .from("matches")
     .select(
       "id, created_at, player0_id, player1_id, player0_elo, player1_elo, winner_id, status, current_turn_player_id"
     );
 
   if (userId) {
-    query
-      .or(`player0_id.eq.${userId},player1_id.eq.${userId}`)
-      .eq("is_correspondence", true)
-      .order("created_at", { ascending: false });
-  } else {
-    query.order("created_at", { ascending: false }).limit(100);
+    query = query.or(`player0_id.eq.${userId},player1_id.eq.${userId}`);
   }
+
+  if (isCorrespondence) {
+    query = query.eq("is_correspondence", true);
+  }
+
+  query = query.order("created_at", { ascending: false }).limit(100);
 
   const { data: matchesData, error: matchesError } = await query;
 
@@ -248,7 +262,7 @@ async function listMatches(userId?: string): Promise<MatchModel[]> {
         player2Elo: match.player1_elo,
         status: match.status,
         createdAt: match.created_at,
-        isYourTurn: userId
+        isYourTurn: isCorrespondence
           ? match.current_turn_player_id === userId
           : undefined,
       });
@@ -708,7 +722,7 @@ server.router.get("/correspondence/matches", async (ctx) => {
     throw new Error("userId is required");
   }
 
-  const matches = await listMatches(userId);
+  const matches = await listMatches({ userId, isCorrespondence: true });
   ctx.body = JSON.stringify({ matches });
 });
 

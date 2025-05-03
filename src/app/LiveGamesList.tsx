@@ -10,11 +10,12 @@ import { MatchLink } from "./MatchLink";
 import { MatchModel } from "@/lib/types";
 
 export default function LiveGamesList() {
-  const { isSignedIn, getToken } = useAuth();
+  const { isSignedIn, getToken, userId } = useAuth();
   const [loading, setLoading] = useState(true);
   const [games, setGames] = useState<MatchModel[]>([]);
   const [page, setPage] = useState(0);
   const [pageGames, setPageGames] = useState<MatchModel[]>([]);
+  const [filterUserId, setFilterUserId] = useState<string>("");
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -25,7 +26,7 @@ export default function LiveGamesList() {
     setLoading(true);
 
     ghqFetch<{ matches: MatchModel[] }>({
-      url: `${API_URL}/matches`,
+      url: `${API_URL}/matches?userId=${filterUserId}`,
       getToken,
       method: "GET",
     })
@@ -34,7 +35,7 @@ export default function LiveGamesList() {
         setPage(0);
       })
       .finally(() => setLoading(false));
-  }, [isSignedIn]);
+  }, [isSignedIn, filterUserId]);
 
   useEffect(() => {
     const start = page * 10;
@@ -44,7 +45,19 @@ export default function LiveGamesList() {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="font-bold text-lg">Recent games</div>
+      <div className="font-bold text-lg flex items-center gap-2 justify-between">
+        Recent games
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-5 text-gray-500"
+          onClick={() =>
+            filterUserId ? setFilterUserId("") : setFilterUserId(userId ?? "")
+          }
+        >
+          {filterUserId ? "My games" : "All games"}
+        </Button>
+      </div>
 
       {!loading && games.length === 0 && (
         <div className="text-gray-600">
