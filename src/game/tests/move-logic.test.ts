@@ -425,7 +425,7 @@ describe("computing allowed moves", () => {
       `);
   });
 
-  it("[GHQ-201] Moving a regular infantry from an engaged square, to an unengaged square.", () => {
+  it("[GHQ-101] Moving a regular infantry from an engaged square, to an unengaged square.", () => {
     expectMoves(
       [
         [_, i, _, _, _, _, _, _],
@@ -441,7 +441,7 @@ describe("computing allowed moves", () => {
     );
   });
 
-  it("[GHQ-202] Moving an armored infantry from an engaged square, through an unengaged square, to square where it can capture.", () => {
+  it("[GHQ-102] Moving an armored infantry from an engaged square, through an unengaged square, to square where it can capture.", () => {
     expectMoves(
       [
         [_, O, _, O, i, _, _, _],
@@ -457,7 +457,7 @@ describe("computing allowed moves", () => {
     );
   });
 
-  it("[GHQ-203] Moving a regular infantry from and engaged square to a square where it can capture an artillery.", () => {
+  it("[GHQ-103] Moving a regular infantry from and engaged square to a square where it can capture an artillery.", () => {
     expectMoves(
       [
         [_, O, r, _, _, _, _, _],
@@ -473,7 +473,23 @@ describe("computing allowed moves", () => {
     );
   });
 
-  it("[GHQ-205] Moving an armored infantry from an unengaged square, through a square where it could become engaged, to an unengaged square.", () => {
+  it("[GHQ-104] Moving an armored infantry from an unengaged square, through a square where it could capture, to an unengaged square.", () => {
+    expectMoves(
+      [
+        [_, O, _, O, _, _, _, _],
+        [f, O, O, _, _, _, _, _],
+        [I, F, O, O, _, _, _, _],
+        [O, O, O, _, _, _, _, _],
+        [_, O, _, O, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [2, 1]
+    );
+  });
+
+  it("[GHQ-106] Moving an armored infantry from an unengaged square, through a square where it could become engaged, to an unengaged square.", () => {
     expectMoves(
       [
         [f, _, O, _, O, _, _, _],
@@ -489,7 +505,7 @@ describe("computing allowed moves", () => {
     );
   });
 
-  it("[GHQ-206] Moving an armored infantry from an unengaged square, through a square where it could become engaged, to an engaged square.", () => {
+  it("[GHQ-106] Moving an armored infantry from an unengaged square, through a square where it could become engaged, to an engaged square.", () => {
     expectMoves(
       [
         [O, i, O, _, O, _, _, _],
@@ -505,7 +521,7 @@ describe("computing allowed moves", () => {
     );
   });
 
-  it("[GHQ-301] Moving a regular infantry from an engaged square to an engaged square.", () => {
+  it("[GHQ-107] Moving a regular infantry from an engaged square to an engaged square.", () => {
     expectMoves(
       [
         [_, i, _, _, _, _, _, _],
@@ -521,7 +537,7 @@ describe("computing allowed moves", () => {
     );
   });
 
-  it("[GHQ-302] Moving a regular infantry from an engaged square to a square where it can capture an infantry.", () => {
+  it("[GHQ-107] Moving a regular infantry from an engaged square to a square where it can capture an infantry.", () => {
     expectMoves(
       [
         [_, _, i, I, _, _, _, _],
@@ -537,7 +553,7 @@ describe("computing allowed moves", () => {
     );
   });
 
-  it("[GHQ-303] Moving an armored infantry from an engaged square, through an engaged square, to a square where it can capture.", () => {
+  it("[GHQ-108] Moving an armored infantry from an engaged square, through an engaged square, to a square where it can capture.", () => {
     expectMoves(
       [
         [_, _, _, _, _, _, _, _],
@@ -553,7 +569,7 @@ describe("computing allowed moves", () => {
     );
   });
 
-  it("[GHQ-304] Moving an armored infantry from an engaged square, through an engaged square, to square where it can capture.", () => {
+  it("[GHQ-110] Moving an armored infantry from an engaged square, through an engaged square, to square where it can capture.", () => {
     expectMoves(
       [
         [_, _, _, i, _, _, _, _],
@@ -569,7 +585,7 @@ describe("computing allowed moves", () => {
     );
   });
 
-  it("[GHQ-305] Moving an infantry from a potentially engaged square to a square where it it capture an infantry.", () => {
+  it("[GHQ-111] Moving an infantry from a potentially engaged square to a square where it it capture an infantry.", () => {
     expectMoves(
       [
         [_, _, _, _, _, _, _, _],
@@ -585,7 +601,7 @@ describe("computing allowed moves", () => {
     );
   });
 
-  it("[GHQ-401] Armored infantry mobility.", () => {
+  it("[GHQ-112] Armored infantry mobility.", () => {
     expectMoves(
       [
         [_, _, _, _, _, _, _, _],
@@ -601,7 +617,7 @@ describe("computing allowed moves", () => {
     );
   });
 
-  it("[GHQ-402] Regular infantry trapped (stalemate).", () => {
+  it("[GHQ-113] Regular infantry trapped (stalemate).", () => {
     expectMoves(
       [
         [_, _, _, _, _, _, _, _],
@@ -617,7 +633,7 @@ describe("computing allowed moves", () => {
     );
   });
 
-  it("[GHQ-403] HQ shouldn't create a zone of control.", () => {
+  it("[GHQ-114] HQ shouldn't create a zone of control.", () => {
     expectMoves(
       [
         [q, I, _, _, _, _, _, _],
