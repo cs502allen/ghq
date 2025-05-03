@@ -13,16 +13,19 @@ import {
   initialBoardSetupWithAnArmored,
   Red,
 } from "@/game/tests/test-boards";
-import { B, R } from "../variants";
 import { Board, Coordinate, Square } from "../engine";
 
-const _ = null;
-const O = true;
-const I = R.IN;
-const F = R.AI;
-const i = B.IN;
-const f = B.AI;
-const r = B.AR;
+const _ = null; // empty square
+const O = true; // square that can be moved to
+
+// Red pieces (indicated by uppercase)
+const I: Square = { type: "INFANTRY", player: "RED" };
+const F: Square = { type: "ARMORED_INFANTRY", player: "RED" };
+
+// Blue pieces (indicated by lowercase)
+const i: Square = { type: "INFANTRY", player: "BLUE" };
+const f: Square = { type: "ARMORED_INFANTRY", player: "BLUE" };
+const r: Square = { type: "ARTILLERY", player: "BLUE", orientation: 180 };
 
 describe("computing allowed moves", () => {
   it("can compute allowed when surrounded on all but one side", () => {
