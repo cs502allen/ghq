@@ -19,13 +19,16 @@ const _ = null; // empty square
 const O = true; // square that can be moved to
 
 // Red pieces (indicated by uppercase)
+const Q: Square = { type: "HQ", player: "RED" };
 const I: Square = { type: "INFANTRY", player: "RED" };
 const F: Square = { type: "ARMORED_INFANTRY", player: "RED" };
 
 // Blue pieces (indicated by lowercase)
+const q: Square = { type: "HQ", player: "BLUE" };
 const i: Square = { type: "INFANTRY", player: "BLUE" };
 const f: Square = { type: "ARMORED_INFANTRY", player: "BLUE" };
 const r: Square = { type: "ARTILLERY", player: "BLUE", orientation: 180 };
+const x: Square = { type: "ARTILLERY", player: "BLUE", orientation: 0 };
 
 describe("computing allowed moves", () => {
   it("can compute allowed when surrounded on all but one side", () => {
@@ -563,6 +566,54 @@ describe("computing allowed moves", () => {
         [_, _, _, _, _, _, _, _],
       ],
       [2, 0]
+    );
+  });
+
+  it("[GHQ-305] Moving an infantry from a potentially engaged square to a square where it it capture an infantry.", () => {
+    expectMoves(
+      [
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, i, I, _, _, _],
+        [_, _, i, I, O, _, _, _],
+        [_, i, I, O, O, _, _, _],
+        [_, I, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [2, 3]
+    );
+  });
+
+  it("[GHQ-401] Armored infantry mobility.", () => {
+    expectMoves(
+      [
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, x, _, i, i, _, _, _],
+        [_, O, O, F, _, _, _, _],
+        [_, i, _, O, _, i, _, _],
+        [_, _, _, O, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [3, 3]
+    );
+  });
+
+  it("[GHQ-402] Regular infantry trapped (stalemate).", () => {
+    expectMoves(
+      [
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, i, _],
+        [_, _, _, _, _, _, i, I],
+        [_, _, _, _, _, _, i, Q],
+      ],
+      [6, 7]
     );
   });
 });
