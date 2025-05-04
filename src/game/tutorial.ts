@@ -513,6 +513,8 @@ export function newTutorialGHQGame({
       timeControl: 0,
       redTurnStartBoard: board,
       blueTurnStartBoard: board,
+      redReserve,
+      blueReserve,
       board: board,
     };
   };

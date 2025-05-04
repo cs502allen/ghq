@@ -23,6 +23,7 @@ import { Input } from "../ui/input";
 import { boardToFEN } from "@/game/notation";
 import Header from "../Header";
 import { Button } from "../ui/button";
+import EditReservesDialog from "./EditReservesDialog";
 
 export function Editor() {
   const { measureRef, squareSize, pieceSize } = useBoardDimensions();
@@ -39,9 +40,10 @@ export function Editor() {
   const [fen, setFen] = useState<string>("");
   const [analysisUrl, setAnalysisUrl] = useState<string>("");
   const [board, setBoard] = useState<Board>(defaultBoard);
-
-  const redReserve = defaultReserveFleet;
-  const blueReserve = defaultReserveFleet;
+  const [redReserve, setRedReserve] =
+    useState<ReserveFleet>(defaultReserveFleet);
+  const [blueReserve, setBlueReserve] =
+    useState<ReserveFleet>(defaultReserveFleet);
 
   useEffect(() => {
     let animationFrameId: number;
@@ -266,6 +268,14 @@ export function Editor() {
         <Button variant="outline" onClick={() => setBoard(defaultBoard)}>
           Reset to default
         </Button>
+        <EditReservesDialog
+          redReserve={redReserve}
+          blueReserve={blueReserve}
+          onSave={(newRedReserve, newBlueReserve) => {
+            setRedReserve(newRedReserve);
+            setBlueReserve(newBlueReserve);
+          }}
+        />
       </div>
 
       <div className="flex flex-col gap-2 mt-2 w-[360px] lg:w-[600px]">
