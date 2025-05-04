@@ -52,6 +52,7 @@ function isPlayerOutOfMoves(G: GHQState, player: Player): boolean {
     blueReserve: G.blueReserve,
     currentPlayerTurn: player,
     thisTurnMoves: G.thisTurnMoves,
+    enforceZoneOfControl: G.enforceZoneOfControl,
   });
 
   return allowedMoves.length === 0;

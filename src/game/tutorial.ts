@@ -503,44 +503,17 @@ export function newTutorialGHQGame({
 }): Game<GHQState> {
   const game = { ...GHQGame };
 
-  game.setup = ({ ctx }, setupData) => {
+  const oldSetup = game.setup;
+  game.setup = ({ ctx, ...plugins }, setupData) => {
+    if (!oldSetup) throw new Error("No setup function found");
+    const state = oldSetup({ ctx, ...plugins }, setupData);
     return {
+      ...state,
       isTutorial,
-      startTime: Date.now(),
-      turnStartTime: Date.now(),
-      blueElapsed: 0,
-      redElapsed: 0,
-      bonusTime: 0,
       timeControl: 0,
-      lastPlayerMoves: [],
       redTurnStartBoard: board,
       blueTurnStartBoard: board,
       board: board,
-      thisTurnMoves: [],
-      lastTurnBoards: [],
-      thisTurnBoards: [],
-      eval: 0,
-      redReserve,
-      blueReserve,
-      userIds: {
-        "0": setupData?.players?.["0"] || "Player 1",
-        "1": setupData?.players?.["1"] || "Player 2",
-      },
-      elos: {
-        "0": setupData?.elos?.["0"] || 1000,
-        "1": setupData?.elos?.["1"] || 1000,
-      },
-      matchId: setupData?.matchId || "",
-      lastTurnMoves: {
-        "0": [],
-        "1": [],
-      },
-      lastTurnCaptures: {
-        "0": [],
-        "1": [],
-      },
-      historyLog: [],
-      has4MovesPerTurn: true,
     };
   };
 

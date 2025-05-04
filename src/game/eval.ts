@@ -42,6 +42,7 @@ export interface EvalBoardState {
   currentPlayerTurn: Player;
   thisTurnMoves: AllowedMove[];
   isReplayMode?: boolean;
+  enforceZoneOfControl?: boolean;
 }
 
 function updateScoresForCaptures({
@@ -52,6 +53,7 @@ function updateScoresForCaptures({
   thisTurnMoves,
   scores,
   calculateOpponent,
+  enforceZoneOfControl = false,
 }: EvalBoardState & {
   scores: Record<Player, number>;
   calculateOpponent: boolean;
@@ -64,6 +66,7 @@ function updateScoresForCaptures({
       ? getOpponent(currentPlayerTurn)
       : currentPlayerTurn,
     thisTurnMoves,
+    enforceZoneOfControl: enforceZoneOfControl,
   });
   for (const move of allowedMoves) {
     if (move.name === "Move" && move.args.length === 3) {
@@ -100,6 +103,7 @@ export function calculateEval({
   currentPlayerTurn,
   thisTurnMoves,
   isReplayMode,
+  enforceZoneOfControl = false,
 }: EvalBoardState): number {
   if (isReplayMode) {
     return 0;
@@ -118,6 +122,7 @@ export function calculateEval({
     thisTurnMoves,
     scores,
     calculateOpponent: false,
+    enforceZoneOfControl,
   });
 
   updateScoresForCaptures({
@@ -128,6 +133,7 @@ export function calculateEval({
     thisTurnMoves,
     scores,
     calculateOpponent: true,
+    enforceZoneOfControl,
   });
 
   const freeCaptured = freeInfantryCaptures(

@@ -201,6 +201,10 @@ export interface GHQState {
   // Flag that indicates if this game engine has 4 moves per turn. This is used to determine how to process moves in replay mode.
   // This was added on 2025-04-24.
   has4MovesPerTurn?: boolean;
+
+  // Flag that indicates if this game engine has zone of control. This is used to determine if the player can move to a square that is adjacent to an enemy infantry.
+  // This was added on 2025-05-02.
+  enforceZoneOfControl?: boolean;
 }
 
 export interface GameoverState {
@@ -371,6 +375,7 @@ const MoveAndOrient: Move<GHQState> = (
   G.eval = calculateEval({
     ...G,
     currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
+    enforceZoneOfControl: G.enforceZoneOfControl ?? false,
   });
 };
 
@@ -579,6 +584,7 @@ export const GHQGame: Game<GHQState> = {
       },
       historyLog: [],
       has4MovesPerTurn: true,
+      enforceZoneOfControl: true,
     };
   },
   turn: {

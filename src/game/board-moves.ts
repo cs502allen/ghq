@@ -11,7 +11,11 @@ import {
   ReserveFleet,
   Units,
 } from "./engine";
-import { movesForActivePiece, spawnPositionsForPlayer } from "./move-logic";
+import {
+  getPlayerPieces,
+  movesForActivePieceV2,
+  spawnPositionsForPlayer,
+} from "./move-logic";
 
 export interface PlayerPiece {
   piece: NonNullSquare;
@@ -40,12 +44,14 @@ export function getAllowedMoves({
   blueReserve,
   currentPlayerTurn,
   thisTurnMoves,
+  enforceZoneOfControl = true,
 }: {
   board: GHQState["board"];
   thisTurnMoves: AllowedMove[];
   redReserve: ReserveFleet;
   blueReserve: ReserveFleet;
   currentPlayerTurn: Player;
+  enforceZoneOfControl?: boolean;
 }): AllowedMove[] {
   if (thisTurnMoves.length >= 3) {
     return [{ name: "Skip", args: [] }];
@@ -59,8 +65,15 @@ export function getAllowedMoves({
     )
   );
 
+  const { playerPieces, allowedSquares, squaresWithAdjacentEnemyInfantry } =
+    getPlayerPieces(board, currentPlayerTurn, enforceZoneOfControl);
+
   // Find all reinforce moves available
-  const spawnPositions = spawnPositionsForPlayer(board, currentPlayerTurn);
+  const spawnPositions = spawnPositionsForPlayer(
+    board,
+    currentPlayerTurn,
+    allowedSquares
+  );
 
   const reserve = currentPlayerTurn === "RED" ? redReserve : blueReserve;
   for (const [unitType, quantity] of Object.entries(reserve)) {
@@ -94,9 +107,13 @@ export function getAllowedMoves({
     }
   }
 
-  const playerPieces = getPlayerPieces(board, currentPlayerTurn);
   for (const playerPiece of playerPieces) {
-    const moves = movesForActivePiece(playerPiece.coordinate, board);
+    const moves = movesForActivePieceV2(
+      playerPiece.coordinate,
+      board,
+      allowedSquares,
+      squaresWithAdjacentEnemyInfantry
+    );
 
     // Artillery can decide to stay in the same place
     if (isPieceArtillery(playerPiece.piece)) {
@@ -151,25 +168,6 @@ export function getAllowedMoves({
   return allMoves;
 }
 
-function getPlayerPieces(
-  board: GHQState["board"],
-  currentPlayerTurn: Player
-): PlayerPiece[] {
-  const playerPieces: PlayerPiece[] = [];
-  for (let x = 0; x < board.length; x++) {
-    for (let y = 0; y < board[x].length; y++) {
-      const piece = board[x][y];
-      if (piece && piece.player === currentPlayerTurn) {
-        playerPieces.push({
-          piece,
-          coordinate: [x, y],
-        });
-      }
-    }
-  }
-  return playerPieces;
-}
-
 export function isPieceArtillery(piece: NonNullSquare) {
   return (
     piece.type === "ARTILLERY" ||
@@ -185,6 +183,7 @@ export function isMoveAllowed(G: GHQState, ctx: Ctx, move: AllowedMove) {
     blueReserve: G.blueReserve,
     currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
     thisTurnMoves: G.thisTurnMoves,
+    enforceZoneOfControl: G.enforceZoneOfControl,
   });
 
   const candidateMove = moveToNotation(move);

@@ -129,6 +129,7 @@ export default function MultiplayerReplayCapability({
       board: onlineInitialState?.G?.board,
       redReserve: onlineInitialState?.G?.redReserve,
       blueReserve: onlineInitialState?.G?.blueReserve,
+      enforceZoneOfControl: onlineInitialState?.G?.enforceZoneOfControl,
     };
     setInitialState(initialState);
 

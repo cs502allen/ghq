@@ -1,6 +1,9 @@
 import { describe, expect, it } from "@jest/globals";
-import { GHQState } from "@/game/engine";
-import { movesForActivePiece } from "@/game/move-logic";
+import {
+  getPlayerPieces,
+  movesForActivePiece,
+  movesForActivePieceV2,
+} from "@/game/move-logic";
 import {
   Blue,
   initialBoardSetup,
@@ -10,6 +13,22 @@ import {
   initialBoardSetupWithAnArmored,
   Red,
 } from "@/game/tests/test-boards";
+import { Board, Coordinate, Square } from "../engine";
+
+const _ = null; // empty square
+const O = true; // square that can be moved to
+
+// Red pieces (indicated by uppercase)
+const Q: Square = { type: "HQ", player: "RED" };
+const I: Square = { type: "INFANTRY", player: "RED" };
+const F: Square = { type: "ARMORED_INFANTRY", player: "RED" };
+
+// Blue pieces (indicated by lowercase)
+const q: Square = { type: "HQ", player: "BLUE" };
+const i: Square = { type: "INFANTRY", player: "BLUE" };
+const f: Square = { type: "ARMORED_INFANTRY", player: "BLUE" };
+const r: Square = { type: "ARTILLERY", player: "BLUE", orientation: 180 };
+const x: Square = { type: "ARTILLERY", player: "BLUE", orientation: 0 };
 
 describe("computing allowed moves", () => {
   it("can compute allowed when surrounded on all but one side", () => {
@@ -405,4 +424,281 @@ describe("computing allowed moves", () => {
           ]
       `);
   });
+
+  it("[GHQ-101] Moving a regular infantry from an engaged square, to an unengaged square.", () => {
+    expectMoves(
+      [
+        [_, i, _, _, _, _, _, _],
+        [i, I, O, _, _, _, _, _],
+        [I, O, O, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [1, 1]
+    );
+  });
+
+  it("[GHQ-102] Moving an armored infantry from an engaged square, through an unengaged square, to square where it can capture.", () => {
+    expectMoves(
+      [
+        [_, O, _, O, i, _, _, _],
+        [_, O, O, _, I, _, _, _],
+        [i, F, O, O, _, _, _, _],
+        [_, O, O, _, _, _, _, _],
+        [_, O, _, O, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [2, 1]
+    );
+  });
+
+  it("[GHQ-103] Moving a regular infantry from and engaged square to a square where it can capture an artillery.", () => {
+    expectMoves(
+      [
+        [_, O, r, _, _, _, _, _],
+        [i, I, _, _, _, _, _, _],
+        [_, O, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [1, 1]
+    );
+  });
+
+  it("[GHQ-104] Moving an armored infantry from an unengaged square, through a square where it could capture, to an unengaged square.", () => {
+    expectMoves(
+      [
+        [_, O, _, O, _, _, _, _],
+        [f, O, O, _, _, _, _, _],
+        [I, F, O, O, _, _, _, _],
+        [O, O, O, _, _, _, _, _],
+        [_, O, _, O, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [2, 1]
+    );
+  });
+
+  it("[GHQ-106] Moving an armored infantry from an unengaged square, through a square where it could become engaged, to an unengaged square.", () => {
+    expectMoves(
+      [
+        [f, _, O, _, O, _, _, _],
+        [_, f, O, O, _, _, _, _],
+        [I, O, F, O, O, _, _, _],
+        [_, O, O, O, _, _, _, _],
+        [O, _, O, _, O, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [2, 2]
+    );
+  });
+
+  it("[GHQ-106] Moving an armored infantry from an unengaged square, through a square where it could become engaged, to an engaged square.", () => {
+    expectMoves(
+      [
+        [O, i, O, _, O, _, _, _],
+        [i, O, O, O, _, _, _, _],
+        [I, O, F, O, O, _, _, _],
+        [_, O, O, O, _, _, _, _],
+        [O, _, O, _, O, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [2, 2]
+    );
+  });
+
+  it("[GHQ-107] Moving a regular infantry from an engaged square to an engaged square.", () => {
+    expectMoves(
+      [
+        [_, i, _, _, _, _, _, _],
+        [i, I, O, _, _, _, _, _],
+        [I, O, I, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [1, 1]
+    );
+  });
+
+  it("[GHQ-107] Moving a regular infantry from an engaged square to a square where it can capture an infantry.", () => {
+    expectMoves(
+      [
+        [_, _, i, I, _, _, _, _],
+        [i, I, _, _, _, _, _, _],
+        [_, O, O, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [1, 1]
+    );
+  });
+
+  it("[GHQ-108] Moving an armored infantry from an engaged square, through an engaged square, to a square where it can capture.", () => {
+    expectMoves(
+      [
+        [_, _, _, _, _, _, _, _],
+        [i, _, r, _, _, _, _, _],
+        [F, r, _, _, _, _, _, _],
+        [O, _, _, _, _, _, _, _],
+        [O, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [2, 0]
+    );
+  });
+
+  it("[GHQ-110] Moving an armored infantry from an engaged square, through an engaged square, to square where it can capture.", () => {
+    expectMoves(
+      [
+        [_, _, _, i, _, _, _, _],
+        [i, _, _, I, _, _, _, _],
+        [F, O, O, _, _, _, _, _],
+        [O, O, _, _, _, _, _, _],
+        [O, _, O, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [2, 0]
+    );
+  });
+
+  it("[GHQ-111] Moving an infantry from a potentially engaged square to a square where it it capture an infantry.", () => {
+    expectMoves(
+      [
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, i, I, _, _, _],
+        [_, _, i, I, O, _, _, _],
+        [_, i, I, O, O, _, _, _],
+        [_, I, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [2, 3]
+    );
+  });
+
+  it("[GHQ-112] Armored infantry mobility.", () => {
+    expectMoves(
+      [
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, x, _, i, i, _, _, _],
+        [_, O, O, F, _, _, _, _],
+        [_, i, _, O, _, i, _, _],
+        [_, _, _, O, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [3, 3]
+    );
+  });
+
+  it("[GHQ-113] Regular infantry trapped (stalemate).", () => {
+    expectMoves(
+      [
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, i, _],
+        [_, _, _, _, _, _, i, I],
+        [_, _, _, _, _, _, i, Q],
+      ],
+      [6, 7]
+    );
+  });
+
+  it("[GHQ-114] HQ shouldn't create a zone of control.", () => {
+    expectMoves(
+      [
+        [q, I, _, _, _, _, _, _],
+        [O, _, _, _, _, _, _, _],
+        [I, i, _, _, _, _, _, _],
+        [i, I, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+        [_, _, _, _, _, _, _, _],
+      ],
+      [2, 0]
+    );
+  });
 });
+
+type SOM = Square | boolean | null;
+
+type BoardAndExpectedMoves = [
+  [SOM, SOM, SOM, SOM, SOM, SOM, SOM, SOM],
+  [SOM, SOM, SOM, SOM, SOM, SOM, SOM, SOM],
+  [SOM, SOM, SOM, SOM, SOM, SOM, SOM, SOM],
+  [SOM, SOM, SOM, SOM, SOM, SOM, SOM, SOM],
+  [SOM, SOM, SOM, SOM, SOM, SOM, SOM, SOM],
+  [SOM, SOM, SOM, SOM, SOM, SOM, SOM, SOM],
+  [SOM, SOM, SOM, SOM, SOM, SOM, SOM, SOM],
+  [SOM, SOM, SOM, SOM, SOM, SOM, SOM, SOM]
+];
+
+function expectMoves(
+  boardAndExpectedMoves: BoardAndExpectedMoves,
+  piece: Coordinate
+) {
+  // Construct board from boardAndExpectedMoves (remove booleans)
+  const board: Board = boardAndExpectedMoves.map((row) =>
+    row.map((square) => {
+      if (typeof square === "boolean") return null;
+      return square as Square;
+    })
+  ) as Board;
+
+  // Construct expected allowable moves from boardAndExpectedMoves (only keep booleans and null)
+  const expectedAllowableMoves: (boolean | null)[][] =
+    boardAndExpectedMoves.map((row) =>
+      row.map((square) => (typeof square === "boolean" ? square : null))
+    );
+
+  const expectedMoves = expectedAllowableMoves
+    .map((row, y) => row.map((allowable, x) => (allowable ? [y, x] : null)))
+    .flat()
+    .filter(Boolean);
+
+  const { allowedSquares, squaresWithAdjacentEnemyInfantry } = getPlayerPieces(
+    board,
+    "RED",
+    true
+  );
+  const moves = movesForActivePieceV2(
+    piece,
+    board,
+    allowedSquares,
+    squaresWithAdjacentEnemyInfantry
+  );
+
+  expect(moves.length).toBe(expectedMoves.length);
+  expect(moves).toEqual(expect.arrayContaining(expectedMoves));
+  expect(expectedMoves).toEqual(expect.arrayContaining(moves));
+}
