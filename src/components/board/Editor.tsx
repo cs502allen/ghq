@@ -186,9 +186,9 @@ export function Editor() {
         {selectedAction === "MOVE" && selectedSquare && (
           <img
             className={cn(selectedSquare.player === "BLUE" && "rotate-180")}
-            src={`/${Units[selectedSquare.type].imagePathPrefix}-${
-              selectedSquare.player
-            }.png`}
+            src={`/${
+              Units[selectedSquare.type].imagePathPrefix
+            }-${selectedSquare.player.toLowerCase()}.png`}
             width={pieceSize * 0.7}
             height={pieceSize * 0.7}
             draggable="false"
@@ -198,7 +198,9 @@ export function Editor() {
         {selectedAction === "PLACE" && selectedReserve && (
           <img
             className={cn(selectedPlayer === "BLUE" && "rotate-180")}
-            src={`/${Units[selectedReserve].imagePathPrefix}-${selectedPlayer}.png`}
+            src={`/${
+              Units[selectedReserve].imagePathPrefix
+            }-${selectedPlayer?.toLowerCase()}.png`}
             width={pieceSize * 0.7}
             height={pieceSize * 0.7}
             draggable="false"
