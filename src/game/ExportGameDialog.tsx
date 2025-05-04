@@ -16,6 +16,18 @@ import { Label } from "@/components/ui/label";
 import { boardToFEN } from "./notation";
 
 export default function ShareGameDialog({ G }: { G: GHQState }) {
+  const url = new URL(window.location.toString());
+  url.pathname = "/learn";
+  url.searchParams.set(
+    "jfen",
+    boardToFEN({
+      board: G.board,
+      redReserve: G.redReserve,
+      blueReserve: G.blueReserve,
+    })
+  );
+  const learnUrl = url.toString();
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -42,6 +54,18 @@ export default function ShareGameDialog({ G }: { G: GHQState }) {
                   redReserve: G.redReserve,
                   blueReserve: G.blueReserve,
                 })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="jfen">Analysis</Label>
+              <Input
+                readOnly
+                spellCheck={false}
+                className="font-mono"
+                type="url"
+                id="fen-url"
+                placeholder=""
+                value={learnUrl}
               />
             </div>
             <div>
