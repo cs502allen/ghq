@@ -1,5 +1,5 @@
 import { getAllowedMoves, isPieceArtillery } from "./board-moves";
-import { freeInfantryCaptures } from "./capture-logic";
+import { freeInfantryCaptures, isInfantry } from "./capture-logic";
 import { AllowedMove, Board, Player, ReserveFleet } from "./engine";
 import { bombardedSquares } from "./move-logic";
 
@@ -58,38 +58,39 @@ function updateScoresForCaptures({
   scores: Record<Player, number>;
   calculateOpponent: boolean;
 }) {
-  const allowedMoves = getAllowedMoves({
-    board,
-    redReserve,
-    blueReserve,
-    currentPlayerTurn: calculateOpponent
-      ? getOpponent(currentPlayerTurn)
-      : currentPlayerTurn,
-    thisTurnMoves,
-    enforceZoneOfControl: enforceZoneOfControl,
-  });
-  for (const move of allowedMoves) {
-    if (move.name === "Move" && move.args.length === 3) {
-      const [from, , capture] = move.args;
-      if (!capture) {
+  const player = calculateOpponent
+    ? getOpponent(currentPlayerTurn)
+    : currentPlayerTurn;
+
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
+      const piece = board[i][j];
+      if (!piece || piece.player !== player || !isPieceArtillery(piece)) {
         continue;
       }
-      const fromPiece = board[from[0]][from[1]];
-      if (fromPiece === null) {
-        console.warn("From piece is null", move);
-        continue;
+
+      const adjacentSquares = [
+        [i - 1, j],
+        [i + 1, j],
+        [i, j - 1],
+        [i, j + 1],
+      ];
+
+      for (const [x, y] of adjacentSquares) {
+        if (x < 0 || x >= board.length || y < 0 || y >= board[x].length) {
+          continue;
+        }
+
+        const adjacentPiece = board[x][y];
+        if (
+          adjacentPiece &&
+          adjacentPiece.player !== player &&
+          isInfantry(adjacentPiece)
+        ) {
+          scores[player] -= unitScores[piece.type] * 0.5;
+          break;
+        }
       }
-      const capturePiece = board[capture[0]][capture[1]];
-      if (capturePiece === null) {
-        console.warn("Capture piece is null", move);
-        continue;
-      }
-      const captureScore = unitScores[capturePiece.type];
-      if (!captureScore) {
-        console.warn("No score for piece", move);
-        continue;
-      }
-      scores[fromPiece.player] += captureScore;
     }
   }
 
@@ -156,6 +157,15 @@ export function calculateEval({
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board[i].length; j++) {
       const square = board[i][j];
+
+      // If a player bombards a square, give them points for it
+      if (bombarded[`${i},${j}`]?.RED) {
+        scores.RED += bombardGradient[i][j];
+      }
+      if (bombarded[`${i},${j}`]?.BLUE) {
+        scores.BLUE += bombardGradient[i][j];
+      }
+
       if (square === null) {
         continue;
       }
@@ -175,20 +185,12 @@ export function calculateEval({
 
       scores[square.player] += thisSquareValue;
 
-      // If a player bombards a square, give them points for it
-      if (bombarded[`${i},${j}`]?.RED) {
-        scores.RED += bombardGradient[i][j];
-      }
-      if (bombarded[`${i},${j}`]?.BLUE) {
-        scores.BLUE += bombardGradient[i][j];
-      }
-
       // If a player bombards a square with an enemy piece in it, reduce the enemy's score
       if (bombarded[`${i},${j}`]?.RED && square.player === "BLUE") {
-        scores.BLUE -= thisSquareValue;
+        scores.BLUE += thisSquareValue * 0.5;
       }
       if (bombarded[`${i},${j}`]?.BLUE && square.player === "RED") {
-        scores.RED -= thisSquareValue;
+        scores.RED += thisSquareValue * 0.5;
       }
 
       // Add points if this piece has some good captures
