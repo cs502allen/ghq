@@ -1,0 +1,6 @@
+services:
+  - name: playghq
+    type: web
+    runtime: docker
+    build:
+      dockerfile: Dockerfile
