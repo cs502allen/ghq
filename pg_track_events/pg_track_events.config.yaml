@@ -1,0 +1,15 @@
+# Mapping from Table Changes to Analytics Events
+# Documentation: https://
+track:
+  users.insert:
+    event: "SIGNUP"
+    properties:
+      email: "new.username"
+
+# Destionations for events with glob filters
+# Documentation: https://
+destinations:
+  posthog:
+    apiKey: "$POSTHOG_API_KEY"
+    filter: "*"
+ignore: {}
