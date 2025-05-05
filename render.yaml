@@ -1,5 +1,13 @@
+# Exported from Render on 2025-05-05T17:36:08Z
 services:
-  - name: playghq
-    type: web
+  - type: web
+    name: playghq
     runtime: docker
+    repo: https://github.com/acunniffe/ghq
+    plan: starter
+    region: oregon
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
+    autoDeployTrigger: commit
     rootDir: .
+version: "1"
