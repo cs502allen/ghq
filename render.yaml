@@ -20,6 +20,5 @@ services:
     dockerContext: ./
     dockerfilePath: ./Dockerfile
     autoDeployTrigger: commit
-    dockerCommand: pg_track_events_agent
     rootDir: ./pg_track_events
 version: "1"
