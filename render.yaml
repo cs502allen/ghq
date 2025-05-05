@@ -17,8 +17,7 @@ services:
     repo: https://github.com/acunniffe/ghq
     plan: starter
     region: oregon
-    dockerContext: ./
-    dockerfilePath: ./Dockerfile
     autoDeployTrigger: commit
-    rootDir: ./pg_track_events
+    dockerContext: ./pg_track_events
+    dockerfilePath: ./pg_track_events/Dockerfile
 version: "1"
