@@ -1,5 +1,7 @@
 "use client";
 
+import { BookText } from "lucide-react";
+
 export default function Rules() {
   return (
     <div className="flex flex-col gap-3 text-sm">
@@ -41,15 +43,14 @@ export default function Rules() {
       </div>
 
       <div>
-        This website is being actively developed on{" "}
         <a
-          className="text-blue-600 hover:text-blue-400"
-          href="https://github.com/acunniffe/ghq"
+          className="text-blue-600 hover:text-blue-400 flex items-center gap-1"
+          href="https://github.com/acunniffe/ghq/releases"
           target="_blank"
         >
-          GitHub
+          <BookText className="w-4 h-4" />
+          Release Notes
         </a>
-        .
       </div>
     </div>
   );
