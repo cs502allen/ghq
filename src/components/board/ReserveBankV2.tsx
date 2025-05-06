@@ -16,6 +16,7 @@ export function ReserveBankV2(props: {
     "ARTILLERY",
     "ARMORED_ARTILLERY",
     "HEAVY_ARTILLERY",
+    "HQ",
   ] as (keyof ReserveFleet)[];
 
   const reserves = kinds.flatMap((kind) => {
@@ -45,5 +46,5 @@ export function ReserveBankV2(props: {
     );
   }
 
-  return <div className="grid flex-1 grid-cols-6 gap-1">{reserves}</div>;
+  return <div className="flex flex-1 gap-1">{reserves}</div>;
 }
