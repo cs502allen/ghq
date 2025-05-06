@@ -9,4 +9,7 @@ track:
 # Destionations for events with glob filters
 # Documentation: https://
 
+destinations:
+  posthog:
+    apiKey: "$POSTHOG_API_KEY"
 ignore: {}
