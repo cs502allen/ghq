@@ -10,6 +10,6 @@ track:
 # Documentation: https://
 
 destinations:
-  posthog:
-    apiKey: "$POSTHOG_API_KEY"
+  mixpanel:
+    projectToken: "$MIXPANEL_TOKEN"
 ignore: {}
