@@ -1,4 +1,10 @@
-import { GHQState, NonNullSquare, Orientation, ReserveFleet } from "./engine";
+import {
+  GHQState,
+  NonNullSquare,
+  Orientation,
+  Player,
+  ReserveFleet,
+} from "./engine";
 
 export function rowIndexToRank(index: number): number {
   if (index < 0 || index > 7) {
@@ -49,6 +55,7 @@ export interface BoardState {
   board: GHQState["board"];
   redReserve: ReserveFleet;
   blueReserve: ReserveFleet;
+  currentPlayerTurn?: Player;
 }
 
 // Inspired by https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
