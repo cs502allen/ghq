@@ -48,8 +48,18 @@ export default function Rules() {
           href="https://github.com/acunniffe/ghq/releases"
           target="_blank"
         >
-          <BookText className="w-4 h-4" />
-          Release Notes
+          📓 Release Notes
+        </a>
+      </div>
+
+      <div>
+        👾 Join us on{" "}
+        <a
+          className="text-blue-600 hover:text-blue-400"
+          href="https://discord.gg/MDaTYTdG5e"
+          target="_blank"
+        >
+          Discord!
         </a>
       </div>
     </div>
