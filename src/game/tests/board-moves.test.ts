@@ -14,7 +14,7 @@ const TESTS: Test[] = [
     description: "initial board state",
     boardFEN: "qr↓6/iii5/8/8/8/8/5III/6R↑Q IIIIIFFFPRRTH IIIIIFFFPRRTH",
     expectedMovesUCI:
-      "rih8 rih7 rih6 rih5 rih4 rih3 rfh8 rfh7 rfh6 rfh5 rfh4 rfh3 rph8 rph7 rph6 rph5 rph4 rph3 rrh8 rrh7 rrh6 rrh5 rrh4 rrh3 rth8 rth7 rth6 rth5 rth4 rth3 rhh8 rhh7 rhh6 rhh5 rhh4 rhh3 g3f4 g3f3 g3f2 g3g4 g3h4 g3h3 g2f3 g2f2 g2f1 g2h3 g1f2 g1f1 h2h3↑ h2h3↗ h2h3→ h2h3↘ h2h3↓ h2h3↙ h2h3← h2h3↖ h2h2↗ h2h2→ h2h2↘ h2h2↓ h2h2↙ h2h2← h2h2↖",
+      "ria1 rib1 ric1 rid1 rie1 rif1 rfa1 rfb1 rfc1 rfd1 rfe1 rff1 rpa1 rpb1 rpc1 rpd1 rpe1 rpf1 rra1 rrb1 rrc1 rrd1 rre1 rrf1 rta1 rtb1 rtc1 rtd1 rte1 rtf1 rha1 rhb1 rhc1 rhd1 rhe1 rhf1 f2e3 f2f3 f2g3 f2e2 f2e1 f2f1 g2f3 g2g3 g2h3 g2f1 h2g3 h2h3 g1f1↑ g1f1↗ g1f1→ g1f1↘ g1f1↓ g1f1↙ g1f1← g1f1↖ g1g1↗ g1g1→ g1g1↘ g1g1↓ g1g1↙ g1g1← g1g1↖",
   },
 ];
 

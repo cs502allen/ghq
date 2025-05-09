@@ -6,7 +6,7 @@ describe("UCI notation", () => {
   it("can serialize and deserialize a reinforcement move", () => {
     const move: AllowedMove = {
       name: "Reinforce",
-      args: ["INFANTRY", [0, 7], [0, 6]],
+      args: ["INFANTRY", [7, 0], [6, 0]],
     };
 
     const uci = allowedMoveToUci(move);
@@ -21,7 +21,7 @@ describe("UCI notation", () => {
       name: "Move",
       args: [
         [0, 0],
-        [0, 1],
+        [1, 0],
       ],
     };
 
@@ -37,8 +37,8 @@ describe("UCI notation", () => {
       name: "Move",
       args: [
         [0, 0],
-        [0, 1],
-        [0, 2],
+        [1, 0],
+        [2, 0],
       ],
     };
 
@@ -52,7 +52,7 @@ describe("UCI notation", () => {
   it("can serialize and deserialize a move with an orientation", () => {
     const move: AllowedMove = {
       name: "MoveAndOrient",
-      args: [[0, 0], [0, 1], 90],
+      args: [[0, 0], [1, 0], 90],
     };
 
     const uci = allowedMoveToUci(move);

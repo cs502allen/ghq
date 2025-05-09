@@ -32,8 +32,7 @@ function colIndexToFile(index: number): string {
   return files[index];
 }
 
-// NOTE(tyler): the order of args is somehow messed up, but i think it's correct
-function coordinateToSquare([col, row]: [number, number]): string {
+function coordinateToSquare([row, col]: [number, number]): string {
   const rank = rowIndexToRank(row);
   const file = colIndexToFile(col);
 
@@ -50,7 +49,7 @@ function squareToCoordinate(square: string): Coordinate {
   const col = file.charCodeAt(0) - "a".charCodeAt(0);
   // Convert rank (1-8) to x coordinate (0-7)
   const row = 8 - rank;
-  return [col, row];
+  return [row, col];
 }
 
 export function allowedMoveToUci(move: AllowedMove): string {
