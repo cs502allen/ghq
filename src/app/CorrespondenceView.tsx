@@ -35,7 +35,19 @@ export default function CorrespondenceView() {
     })
       .then((data) => {
         const matches = data.matches ?? [];
-        setMatches(matches.filter((m) => m.status === null));
+        setMatches(
+          matches
+            .filter((m) => m.status === null)
+            .sort((a, b) => {
+              if (a.isYourTurn !== b.isYourTurn) {
+                return a.isYourTurn ? -1 : 1;
+              }
+              return (
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+              );
+            })
+        );
       })
       .finally(() => setLoading(false));
 
