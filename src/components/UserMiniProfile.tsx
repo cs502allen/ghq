@@ -38,7 +38,7 @@ export default function UserMiniProfile({
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open}>
       <PopoverTrigger
         onMouseEnter={() => {
           setOpen(true);
@@ -58,7 +58,7 @@ export default function UserMiniProfile({
           <div className="flex flex-col">
             <div className="flex flex-row gap-2 items-center">
               <div className="font-semibold">{fullUser?.username}</div>
-              <UserBadgeTag badge={fullUser?.badge} />
+              <UserBadgeTag badge={fullUser?.badge} showTitle />
             </div>
             <div className="grid grid-cols-2 gap-x-4">
               <div className="text-sm text-gray-500">Rating</div>

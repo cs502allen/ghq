@@ -1,10 +1,12 @@
 import { badgeToGamesPlayed, UserBadge } from "../lib/types";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { useState } from "react";
 
-export default function UserBadgeTag({ badge }: { badge?: UserBadge }) {
-  const [open, setOpen] = useState(false);
-
+export default function UserBadgeTag({
+  showTitle,
+  badge,
+}: {
+  showTitle?: boolean;
+  badge?: UserBadge;
+}) {
   if (!badge) {
     return null;
   }
@@ -28,21 +30,9 @@ export default function UserBadgeTag({ badge }: { badge?: UserBadge }) {
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        className="focus:outline-none focus:ring-0"
-      >
-        <div>{emojis[badge]}</div>
-      </PopoverTrigger>
-      <PopoverContent>
-        <div className="text-sm font-semibold">{badgeNames[badge]}</div>
-        <div className="text-xs">
-          Earned by playing {badgeToGamesPlayed(badge)} or more games this
-          month.
-        </div>
-      </PopoverContent>
-    </Popover>
+    <div className="flex items-center gap-1 text-xs">
+      <div>{emojis[badge]}</div>
+      {showTitle && <div>{badgeNames[badge]}</div>}
+    </div>
   );
 }
