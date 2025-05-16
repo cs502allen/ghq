@@ -1,3 +1,4 @@
+import { isPieceArtillery } from "./board-moves";
 import {
   AllowedMove,
   GHQState,
@@ -239,7 +240,9 @@ function pieceToString(piece: NonNullSquare): string {
   const unit =
     piece.player === "RED" ? symbol.toUpperCase() : symbol.toLowerCase();
   const rotation =
-    piece.orientation !== undefined ? degreesToCardinal(piece.orientation) : "";
+    piece.orientation !== undefined && isPieceArtillery(piece)
+      ? degreesToCardinal(piece.orientation)
+      : "";
 
   return `${unit}${rotation}`;
 }
