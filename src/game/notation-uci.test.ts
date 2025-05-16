@@ -87,4 +87,14 @@ describe("UCI notation", () => {
     const deserialized = allowedMoveFromUci(uci);
     expect(deserialized).toEqual(move);
   });
+
+  it("can deserialize and serialize moves from a sample game", () => {
+    const gameMoves = require("../game/tests/testdata/game1.json");
+    for (const moveUCI of gameMoves) {
+      const move = allowedMoveFromUci(moveUCI);
+      const moveUCI2 = allowedMoveToUci(move);
+      console.log(moveUCI, moveUCI2);
+      expect(moveUCI2).toEqual(moveUCI);
+    }
+  });
 });

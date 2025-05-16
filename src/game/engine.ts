@@ -13,6 +13,8 @@ import { TIME_CONTROLS } from "./constants";
 import { variants } from "./variants";
 import { FENtoBoardState } from "./notation";
 
+const deepCopy = (obj: any) => JSON.parse(JSON.stringify(obj));
+
 export const Units: {
   [key: string]: {
     mobility: 1 | 2;
@@ -88,6 +90,7 @@ export type AllowedMove =
   | ReinforceMove
   | MoveMove
   | MoveAndOrientMove
+  | AutoCaptureMove
   | SkipMove;
 
 export interface ReinforceMove {
@@ -107,6 +110,11 @@ export interface MoveMove {
 export interface MoveAndOrientMove {
   name: "MoveAndOrient";
   args: [from: Coordinate, to: Coordinate, orientation?: Orientation];
+}
+
+export interface AutoCaptureMove {
+  name: "AutoCapture";
+  args: [autoCaptureType: "bombard" | "free", capturePreference: Coordinate];
 }
 
 export interface SkipMove {
@@ -206,6 +214,9 @@ export interface GHQState {
   // Flag that indicates if this game engine has zone of control. This is used to determine if the player can move to a square that is adjacent to an enemy infantry.
   // This was added on 2025-05-02.
   enforceZoneOfControl?: boolean;
+
+  isV2?: boolean;
+  v2state?: string;
 }
 
 export interface GameoverState {
@@ -214,8 +225,8 @@ export interface GameoverState {
   reason: string;
 }
 
-const Reinforce: Move<GHQState> = (
-  { G, ctx, log },
+const Reinforce: Move<GHQState, any> = (
+  { G, ctx, log, engine },
   unitType: keyof ReserveFleet,
   to: Coordinate,
   capturePreference?: Coordinate
@@ -227,10 +238,15 @@ const Reinforce: Move<GHQState> = (
   const reserve = ctx.currentPlayer === "0" ? G.redReserve : G.blueReserve;
   if (
     !G.isReplayMode &&
-    !isMoveAllowed(G, ctx, {
-      name: "Reinforce",
-      args: [unitType, to, capturePreference],
-    })
+    !isMoveAllowed(
+      G,
+      ctx,
+      {
+        name: "Reinforce",
+        args: [unitType, to, capturePreference],
+      },
+      engine
+    )
   ) {
     return INVALID_MOVE;
   }
@@ -380,41 +396,6 @@ const MoveAndOrient: Move<GHQState> = (
   });
 };
 
-const ChangeOrientation: Move<GHQState> = (
-  { G, ctx, log },
-  on: Coordinate,
-  orientation: Orientation
-) => {
-  if (hasMoveLimitReached(ctx)) {
-    return INVALID_MOVE;
-  }
-
-  const piece = G.board[on[0]][on[1]];
-  if (
-    !G.isReplayMode &&
-    !isMoveAllowed(G, ctx, {
-      name: "MoveAndOrient",
-      args: [on, on, orientation],
-    })
-  ) {
-    return INVALID_MOVE;
-  }
-  G.thisTurnBoards.push(JSON.parse(JSON.stringify(G.board)));
-
-  piece!.orientation = orientation;
-  G.board[on[0]][on[1]] = piece;
-  G.lastTurnMoves[ctx.currentPlayer as "0" | "1"].push(on);
-  G.thisTurnMoves.push({
-    name: "MoveAndOrient",
-    args: [on, on, orientation],
-  });
-  log.setMetadata({ pieceType: piece?.type });
-  G.eval = calculateEval({
-    ...G,
-    currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
-  });
-};
-
 const Skip: Move<GHQState> = {
   noLimit: true,
   move: ({ G, events }) => {
@@ -465,7 +446,6 @@ const AcceptDraw: Move<GHQState> = {
 export const GameMoves = {
   Reinforce,
   Move,
-  ChangeOrientation,
   MoveAndOrient,
   Skip,
   Resign,
@@ -543,10 +523,8 @@ export const emptyReserveFleet: ReserveFleet = {
 export const GHQGame: Game<GHQState> = {
   setup: ({ ctx, ...plugins }, setupData) => {
     const variant = variants[setupData?.variant];
-    let redReserve =
-      variant?.redReserve ?? structuredClone(defaultReserveFleet);
-    let blueReserve =
-      variant?.blueReserve ?? structuredClone(defaultReserveFleet);
+    let redReserve = variant?.redReserve ?? deepCopy(defaultReserveFleet);
+    let blueReserve = variant?.blueReserve ?? deepCopy(defaultReserveFleet);
     let board = variant?.board ?? defaultBoard;
 
     // Override using FEN if provided
@@ -759,4 +737,39 @@ export function newLocalGHQGame(): Game<GHQState> {
 
 export function hasMoveLimitReached(ctx: Ctx) {
   return ctx.numMoves !== undefined && ctx.numMoves >= 3;
+}
+
+export function ctxPlayerToPlayer(ctx: Ctx) {
+  return ctx.currentPlayer === "0" ? "RED" : "BLUE";
+}
+
+export function isMoveCapture(move: AllowedMove) {
+  if (move.name === "Move" && move.args[2]) {
+    return true;
+  }
+  if (move.name === "Reinforce" && move.args[2]) {
+    return true;
+  }
+  if (move.name === "AutoCapture" && move.args[0] === "free") {
+    return true;
+  }
+
+  return false;
+}
+
+export function getCapturePreference(move: AllowedMove) {
+  if (move.name === "Move" && move.args[2]) {
+    return move.args[2];
+  }
+  if (move.name === "Reinforce" && move.args[2]) {
+    return move.args[2];
+  }
+  if (move.name === "AutoCapture" && move.args[0] === "free") {
+    return move.args[1];
+  }
+  if (move.name === "AutoCapture" && move.args[0] === "bombard") {
+    return move.args[1];
+  }
+
+  return undefined;
 }

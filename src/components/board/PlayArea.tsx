@@ -13,6 +13,7 @@ import ControlsView from "./ControlsView";
 import useBoard from "./useBoard";
 import { Settings } from "./SettingsMenu";
 import { useUsers } from "./useUsers";
+import { hasMoveLimitReachedV2 } from "@/game/engine-v2";
 
 export default function PlayArea(
   props: BoardProps<GHQState> & { className: string; settings: Settings }
@@ -28,6 +29,7 @@ export default function PlayArea(
     settings,
     sendChatMessage,
     chatMessages,
+    plugins,
   } = props;
   const [userActionState, setUserActionState] = useState<UserActionState>({});
   const [viewPlayerPref, setViewPlayerPref] = useState<Player>("RED");
@@ -60,7 +62,7 @@ export default function PlayArea(
   }, [G.isPassAndPlayMode, playerID, currentPlayerTurn, settings]);
 
   const possibleAllowedMoves = useMemo(() => {
-    if (hasMoveLimitReached(ctx)) {
+    if (hasMoveLimitReachedV2(G)) {
       return [];
     }
     return getAllowedMoves({
@@ -70,6 +72,8 @@ export default function PlayArea(
       currentPlayerTurn,
       thisTurnMoves: G.thisTurnMoves,
       enforceZoneOfControl: G.enforceZoneOfControl,
+      v2state: G.v2state,
+      engine: plugins?.engine?.api,
     });
   }, [
     G.board,
@@ -162,7 +166,7 @@ export default function PlayArea(
         {...props}
         isMyTurn={currentPlayer === currentPlayerTurn}
         hasMoveLimitReached={
-          currentPlayer === currentPlayerTurn && hasMoveLimitReached(ctx)
+          currentPlayer === currentPlayerTurn && hasMoveLimitReachedV2(G)
         }
         cancel={() => setUserActionState({})}
         replay={() => replay()}

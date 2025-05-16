@@ -14,8 +14,18 @@ import { GHQState } from "./engine";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Label } from "@/components/ui/label";
 import { boardToFEN } from "./notation";
+import { Ctx, LogEntry } from "boardgame.io";
+import { historyToPGN } from "./history";
 
-export default function ShareGameDialog({ G }: { G: GHQState }) {
+export default function ShareGameDialog({
+  G,
+  ctx,
+  log,
+}: {
+  G: GHQState;
+  ctx: Ctx;
+  log: LogEntry[];
+}) {
   const url = new URL(window.location.toString());
   url.pathname = "/learn";
   url.searchParams.set(
@@ -24,8 +34,11 @@ export default function ShareGameDialog({ G }: { G: GHQState }) {
       board: G.board,
       redReserve: G.redReserve,
       blueReserve: G.blueReserve,
+      thisTurnMoves: G.thisTurnMoves,
+      currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
     })
   );
+  url.searchParams.set("pgn", historyToPGN(log));
   const learnUrl = url.toString();
 
   return (
@@ -53,6 +66,8 @@ export default function ShareGameDialog({ G }: { G: GHQState }) {
                   board: G.board,
                   redReserve: G.redReserve,
                   blueReserve: G.blueReserve,
+                  thisTurnMoves: G.thisTurnMoves,
+                  currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
                 })}
               />
             </div>
@@ -82,6 +97,18 @@ export default function ShareGameDialog({ G }: { G: GHQState }) {
                     ? window.location.toString()
                     : ""
                 }
+              />
+            </div>
+            <div>
+              <Label htmlFor="pgn">PGN</Label>
+              <Input
+                readOnly
+                spellCheck={false}
+                className="font-mono"
+                type="text"
+                id="pgn"
+                placeholder=""
+                value={historyToPGN(log)}
               />
             </div>
           </div>

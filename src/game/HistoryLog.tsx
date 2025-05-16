@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import {
+  AllowedMove,
   Coordinate,
   GameoverState,
   GHQState,
@@ -23,6 +24,7 @@ import {
   SkipForward,
   User,
 } from "lucide-react";
+import { allowedMoveFromUci } from "./notation-uci";
 
 export function HistoryLog({
   systemMessages,
@@ -51,11 +53,20 @@ export function HistoryLog({
   const playerMessages = filteredLog
     .filter((entry) => entry.action.type === "MAKE_MOVE")
     .map((entry) => {
-      const { playerID, type, args } = entry.action.payload;
+      let { playerID, type, args } = entry.action.payload;
       const player = playerID === "0" ? "RED" : "BLUE";
       let description = type;
       let reactNode: ReactNode | null = null;
       const pieceType = entry?.metadata?.pieceType?.toLowerCase() ?? "piece";
+
+      // Shim for UCI moves
+      if (entry.metadata?.uci) {
+        const move = allowedMoveFromUci(entry.metadata?.uci);
+        if (move) {
+          type = move.name;
+          args = move.args;
+        }
+      }
 
       if (type === "Move") {
         const [from, to] = args;
@@ -116,6 +127,8 @@ export function HistoryLog({
       } else if (type === "Resign") {
         description = "resigned";
         reactNode = playerResign({ player, description });
+      } else if (type === "AutoCapture") {
+        return null;
       } else {
         reactNode = playerAction({
           player,
@@ -128,7 +141,8 @@ export function HistoryLog({
         message: `${player} ${description}`,
         reactNode,
       };
-    });
+    })
+    .filter((m) => m !== null);
 
   const systemCaptureMessages =
     systemMessages?.flatMap(

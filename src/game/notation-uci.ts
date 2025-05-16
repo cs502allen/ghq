@@ -90,6 +90,23 @@ export function allowedMoveToUci(move: AllowedMove): string {
     return result;
   }
 
+  if (move.name === "AutoCapture") {
+    const [autoCaptureType, capturePreference] = move.args;
+    let result = "s";
+    if (autoCaptureType === "bombard") {
+      if (!capturePreference) {
+        throw new Error("capturePreference is required for auto-capture");
+      }
+      result += "b" + coordinateToSquare(capturePreference);
+    } else if (autoCaptureType === "free") {
+      if (!capturePreference) {
+        throw new Error("capturePreference is required for auto-capture");
+      }
+      result += "f" + coordinateToSquare(capturePreference);
+    }
+    return result;
+  }
+
   return "";
 }
 
@@ -139,6 +156,36 @@ export function allowedMoveFromUci(uci: string): AllowedMove {
       name: "Reinforce",
       args: [unitType!, to!, capturePreference],
     };
+  }
+
+  if (uci.startsWith("s")) {
+    if (uci.length < 3) {
+      throw new Error("invalid auto-capture move: too short");
+    }
+
+    if (uci[1] === "b" && uci.length >= 4) {
+      try {
+        const capturePreference = squareToCoordinate(uci.slice(2, 4));
+        return {
+          name: "AutoCapture",
+          args: ["bombard", capturePreference],
+        };
+      } catch (e) {
+        throw new Error(`invalid capture square: ${uci.slice(2, 4)}`);
+      }
+    } else if (uci[1] === "f" && uci.length >= 4) {
+      try {
+        const capturePreference = squareToCoordinate(uci.slice(2, 4));
+        return {
+          name: "AutoCapture",
+          args: ["free", capturePreference],
+        };
+      } catch (e) {
+        throw new Error(`invalid capture square: ${uci.slice(2, 4)}`);
+      }
+    } else {
+      throw new Error(`invalid auto-capture type: ${uci[1]}`);
+    }
   }
 
   if (uci.length >= 4) {

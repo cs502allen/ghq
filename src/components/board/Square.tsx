@@ -64,6 +64,7 @@ export function getSquareState({
   userActionState,
   rightClicked,
   boardEngagements,
+  allowedMoves,
 }: {
   currentPlayer: Player;
   board: Board;
@@ -77,11 +78,14 @@ export function getSquareState({
   userActionState: UserActionState | null;
   rightClicked: Set<string>;
   boardEngagements: BoardEngagements;
+  allowedMoves: AllowedMove[];
 }): SquareState {
+  // TODO(tyler): add allowed moves so we can check if there are start of turn free captures
   const coord: Coordinate = [rowIndex, colIndex];
   const hoveredCoord = userActionState?.hoveredCoordinate ?? [-1, -1];
   const { isMovable, isCaptureCandidate } = getMoveAndCaptureCandidates(
     coord,
+    allowedMoves,
     userActionState?.candidateMoves,
     userActionState?.chosenMoves,
     userActionState?.hoveredCoordinate
@@ -354,7 +358,9 @@ function getMoveDestination(move: AllowedMove): Coordinate | undefined {
   if (["Move", "MoveAndOrient", "Reinforce"].includes(move.name)) {
     return move.args[1];
   }
-
+  if (move.name === "AutoCapture" && move.args[0] === "free") {
+    return move.args[2];
+  }
   return undefined;
 }
 
@@ -367,6 +373,7 @@ function getCaptureLocation(move: AllowedMove): Coordinate | undefined {
 
 function getMoveAndCaptureCandidates(
   coord: Coordinate,
+  allowedMoves: AllowedMove[],
   candidateMoves: AllowedMove[] = [],
   chosenMoves: AllowedMove[] = [],
   hoveredCoordinate?: Coordinate
@@ -401,6 +408,16 @@ function getMoveAndCaptureCandidates(
     }
   }
 
+  for (const move of allowedMoves) {
+    if (
+      move.name === "AutoCapture" &&
+      move.args[0] === "free" &&
+      areCoordsEqual(coord, move.args[1])
+    ) {
+      isCaptureCandidate = true;
+    }
+  }
+
   return { isMovable, isCaptureCandidate };
 }
 
@@ -408,7 +425,9 @@ function getMoveOrigin(move: AllowedMove): Coordinate | undefined {
   if (move.name === "Move" || move.name === "MoveAndOrient") {
     return move.args[0];
   }
-
+  if (move.name === "AutoCapture" && move.args[0] === "free") {
+    return move.args[1];
+  }
   return undefined;
 }
 
