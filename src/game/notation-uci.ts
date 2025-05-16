@@ -60,13 +60,13 @@ export function allowedMoveToUci(move: AllowedMove): string {
   if (move.name === "Reinforce") {
     let result = "r";
     const [unitType, to, capturePreference] = move.args;
-    if (unitType !== undefined) {
+    if (unitType) {
       result += unitToSymbol[unitType].toLowerCase();
     }
-    if (to !== undefined) {
+    if (to) {
       result += coordinateToSquare(to);
     }
-    if (capturePreference !== undefined) {
+    if (capturePreference) {
       result += "x" + coordinateToSquare(capturePreference);
     }
     return result;
@@ -75,7 +75,7 @@ export function allowedMoveToUci(move: AllowedMove): string {
   if (move.name === "Move") {
     const [from, to, capturePreference] = move.args;
     let result = coordinateToSquare(from) + coordinateToSquare(to);
-    if (capturePreference !== undefined) {
+    if (capturePreference) {
       result += "x" + coordinateToSquare(capturePreference);
     }
     return result;
@@ -84,7 +84,7 @@ export function allowedMoveToUci(move: AllowedMove): string {
   if (move.name === "MoveAndOrient") {
     const [from, to, orientation] = move.args;
     let result = coordinateToSquare(from) + coordinateToSquare(to);
-    if (orientation !== undefined) {
+    if (orientation) {
       result += orientationToCardinal(orientation);
     }
     return result;
