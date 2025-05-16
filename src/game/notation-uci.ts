@@ -84,7 +84,7 @@ export function allowedMoveToUci(move: AllowedMove): string {
   if (move.name === "MoveAndOrient") {
     const [from, to, orientation] = move.args;
     let result = coordinateToSquare(from) + coordinateToSquare(to);
-    if (orientation) {
+    if (orientation !== undefined && orientation !== null) {
       result += orientationToCardinal(orientation);
     }
     return result;
