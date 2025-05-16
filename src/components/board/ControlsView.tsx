@@ -43,10 +43,7 @@ export default function ControlsView({
     () => isMyTurn && lastLog && lastLog.action.type === "UNDO",
     [lastLog, isMyTurn]
   );
-  const canSkip = useMemo(
-    () => isMyTurn && ctx.numMoves && ctx.numMoves > 0,
-    [ctx.numMoves, isMyTurn]
-  );
+  const canSkip = useMemo(() => isMyTurn, [ctx.numMoves, isMyTurn]);
   const canReplay = useMemo(
     () => isMyTurn && ctx.turn > 1,
     [ctx.turn, isMyTurn]

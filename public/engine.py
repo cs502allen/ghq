@@ -1410,9 +1410,8 @@ class BaseBoard:
                 for orientation in range(8):
                     yield Move.move_and_orient(from_square, to_square, orientation)
 
-        # allow skip if we've made at least one move
-        if self.turn_moves > 0:
-            yield Move.skip()
+        # users can always skip
+        yield Move.skip()
 
     def generate_legal_captures(self, from_mask: Bitboard = BB_ALL, to_mask: Bitboard = BB_ALL) -> Iterator[Move]:
         our_artillery = self.occupied_co[self.turn] & self._all_artillery()
