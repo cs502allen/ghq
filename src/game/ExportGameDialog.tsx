@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Share } from "lucide-react";
+import { Share, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GHQState } from "./engine";
@@ -26,20 +26,25 @@ export default function ShareGameDialog({
   ctx: Ctx;
   log: LogEntry[];
 }) {
+  const fen = boardToFEN({
+    board: G.board,
+    redReserve: G.redReserve,
+    blueReserve: G.blueReserve,
+    thisTurnMoves: G.thisTurnMoves,
+    currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
+  });
   const url = new URL(window.location.toString());
   url.pathname = "/learn";
-  url.searchParams.set(
-    "jfen",
-    boardToFEN({
-      board: G.board,
-      redReserve: G.redReserve,
-      blueReserve: G.blueReserve,
-      thisTurnMoves: G.thisTurnMoves,
-      currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
-    })
-  );
+  url.searchParams.set("jfen", fen);
   url.searchParams.set("pgn", historyToPGN(log));
   const learnUrl = url.toString();
+
+  function handlePlayBot() {
+    const url = new URL(window.location.toString());
+    url.pathname = "/bot";
+    url.searchParams.set("fen", fen);
+    window.open(url.toString(), "_blank");
+  }
 
   return (
     <Dialog>
@@ -110,6 +115,11 @@ export default function ShareGameDialog({
                 placeholder=""
                 value={historyToPGN(log)}
               />
+            </div>
+            <div>
+              <Button onClick={handlePlayBot}>
+                <Swords /> Play bot from this position
+              </Button>
             </div>
           </div>
         </DialogHeader>

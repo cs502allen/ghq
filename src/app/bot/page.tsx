@@ -9,24 +9,28 @@ import { newGHQGameV2 } from "@/game/engine-v2";
 import { useEngine } from "@/game/engine-v2";
 import { Loader2 } from "lucide-react";
 import { WorkerBot } from "./worker-bot-v2";
+import { useSearchParams } from "next/navigation";
 
 export default function Page() {
   const [client, setClient] = useState<any | null>(null);
   const [App, setApp] = useState<any | null>(null);
   const { engine } = useEngine();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (!engine) {
       return;
     }
 
+    const fen = searchParams.get("fen") as string | undefined;
+
     const AppComponent = Client({
-      game: newGHQGameV2({ engine, type: "bot" }),
+      game: newGHQGameV2({ engine, type: "bot", fen }),
       board: GHQBoardV2,
       multiplayer: Local({ bots: { "1": WorkerBot } }),
     });
     setApp(() => AppComponent);
-  }, [engine]);
+  }, [engine, searchParams]);
 
   if (!App) {
     return (
