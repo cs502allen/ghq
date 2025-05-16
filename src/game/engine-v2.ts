@@ -262,11 +262,18 @@ export function newGHQGameV2({
       },
     },
     turn: {
-      minMoves: 1,
+      minMoves: 0,
       maxMoves: 0,
-      onBegin: ({ ctx, G, log }) => {
+      onBegin: ({ ctx, G, log, events }) => {
         if (!G.v2state) {
           throw new Error("v2state is not defined");
+        }
+
+        // If it's already the next player's turn, end the turn without sending a move.
+        const boardState = FENtoBoardState(G.v2state);
+        if (boardState.currentPlayerTurn !== ctxPlayerToPlayer(ctx)) {
+          events.endTurn();
+          return;
         }
 
         G.lastPlayerMoves = G.thisTurnMoves;

@@ -739,7 +739,7 @@ export function hasMoveLimitReached(ctx: Ctx) {
   return ctx.numMoves !== undefined && ctx.numMoves >= 3;
 }
 
-export function ctxPlayerToPlayer(ctx: Ctx) {
+export function ctxPlayerToPlayer(ctx: Ctx): Player {
   return ctx.currentPlayer === "0" ? "RED" : "BLUE";
 }
 
