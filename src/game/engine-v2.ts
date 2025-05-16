@@ -211,7 +211,11 @@ export function newGHQGameV2({
       };
     },
     endIf: ({ G, ctx }) => {
-      return getGameoverState(G, ctx.currentPlayer === "0" ? "RED" : "BLUE");
+      return getGameoverState(
+        G,
+        ctx.currentPlayer === "0" ? "RED" : "BLUE",
+        board
+      );
     },
     minPlayers: 2,
     maxPlayers: 2,

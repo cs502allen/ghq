@@ -17,7 +17,6 @@ import {
   spawnPositionsForPlayer,
 } from "./move-logic";
 import { GameV2 } from "./engine-v2";
-import { allowedMoveFromUci, allowedMoveToUci } from "./notation-uci";
 
 export interface PlayerPiece {
   piece: NonNullSquare;

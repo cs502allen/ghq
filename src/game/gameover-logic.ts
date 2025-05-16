@@ -1,9 +1,11 @@
 import { getAllowedMoves, getOpponent } from "./board-moves";
 import { GameoverState, GHQState, Player } from "./engine";
+import { GameV2 } from "./engine-v2";
 
 export function getGameoverState(
   G: GHQState,
-  currentPlayerTurn: Player
+  currentPlayerTurn: Player,
+  engine?: GameV2
 ): GameoverState | undefined {
   // No gameover during replays
   if (G.isReplayMode) {
@@ -24,8 +26,8 @@ export function getGameoverState(
     return newWinner("RED", "by HQ capture");
   }
 
-  if (isPlayerOutOfMoves(G, getOpponent(currentPlayerTurn))) {
-    return newWinner(currentPlayerTurn, "by trapping HQ");
+  if (isPlayerOutOfMoves(G, getOpponent(currentPlayerTurn), engine)) {
+    return { status: "DRAW", reason: "stalemate" };
   }
 
   return undefined;
@@ -45,7 +47,11 @@ export function isHqOnBoard(board: GHQState["board"], player: Player): boolean {
   );
 }
 
-function isPlayerOutOfMoves(G: GHQState, player: Player): boolean {
+function isPlayerOutOfMoves(
+  G: GHQState,
+  player: Player,
+  engine?: GameV2
+): boolean {
   const allowedMoves = getAllowedMoves({
     board: G.board,
     redReserve: G.redReserve,
@@ -53,6 +59,8 @@ function isPlayerOutOfMoves(G: GHQState, player: Player): boolean {
     currentPlayerTurn: player,
     thisTurnMoves: G.thisTurnMoves,
     enforceZoneOfControl: G.enforceZoneOfControl,
+    v2state: G.v2state,
+    engine,
   });
 
   return allowedMoves.length === 0;
