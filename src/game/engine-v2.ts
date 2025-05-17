@@ -19,6 +19,9 @@ import { INVALID_MOVE } from "boardgame.io/core";
 import { calculateEval } from "./eval";
 import { LogAPI } from "boardgame.io/src/plugins/plugin-log";
 import { getGameoverState } from "./gameover-logic";
+import { printWelcome } from "@/lib/console";
+
+printWelcome();
 
 export interface GameEngine {
   Move: {

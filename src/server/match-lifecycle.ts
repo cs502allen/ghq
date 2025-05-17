@@ -39,7 +39,9 @@ export async function checkAndUpdateMatch({
 }) {
   const { data: matchData, error: matchError } = await supabase
     .from("matches")
-    .select("id, player0_id, player1_id, status, current_turn_player_id")
+    .select(
+      "id, player0_id, player1_id, status, current_turn_player_id, is_correspondence"
+    )
     .eq("id", matchId)
     .single();
 
@@ -52,12 +54,37 @@ export async function checkAndUpdateMatch({
     return;
   }
 
+  // Just query state.ctx.currentPlayer instead of fetching entire state for correspondence games.
+  // Since we dont really need to check for time-based game over in correspondence games.
+  // TODO(tyler): We may need a longer interval on abandons/timeouts on correspondence games in the future.
+  if (matchData.is_correspondence) {
+    const { data: ctx, error: gameError } = await supabase
+      .from("Games")
+      .select("state->ctx->currentPlayer")
+      .eq("id", matchId)
+      .single();
+
+    if (gameError || !ctx) {
+      console.log({
+        message: "Error fetching game",
+        matchId,
+        gameError: gameError ?? "unknown error",
+      });
+      return;
+    }
+
+    await updateMatchesWithCurrentTurnPlayerId({
+      supabase,
+      matchData,
+      ctxCurrentPlayer: ctx.currentPlayer as string,
+    });
+    return;
+  }
+
   const { state, metadata } = await db.fetch(matchId, {
     state: true,
     metadata: true,
   });
-
-  await updateMatchesWithCurrentTurnPlayerId({ supabase, matchData, state });
 
   // Update inGameUsers since we're already fetching all match data and can check if the player is connected.
   for (const player of Object.values(metadata.players)) {
@@ -97,7 +124,7 @@ export async function checkAndUpdateMatch({
 async function updateMatchesWithCurrentTurnPlayerId({
   supabase,
   matchData,
-  state,
+  ctxCurrentPlayer,
 }: {
   supabase: SupabaseClient;
   matchData: {
@@ -107,12 +134,10 @@ async function updateMatchesWithCurrentTurnPlayerId({
     status: string;
     current_turn_player_id: string;
   };
-  state: State<any>;
+  ctxCurrentPlayer: string;
 }) {
   const currentPlayerId =
-    state.ctx.currentPlayer === "0"
-      ? matchData.player0_id
-      : matchData.player1_id;
+    ctxCurrentPlayer === "0" ? matchData.player0_id : matchData.player1_id;
 
   if (matchData.current_turn_player_id === currentPlayerId) {
     return;
