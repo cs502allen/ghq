@@ -187,6 +187,7 @@ export function newGHQGameV2({
     G.redReserve = boardState.redReserve;
     G.blueReserve = boardState.blueReserve;
     G.v2state = fen;
+    G.thisTurnMoves = boardState.thisTurnMoves ?? [];
 
     G.eval = calculateEval({
       ...G,

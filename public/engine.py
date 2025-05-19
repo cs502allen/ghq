@@ -732,6 +732,7 @@ class BaseBoard:
     reserves: Tuple[ReserveFleet, ReserveFleet]
     turn: Color
     turn_moves: int
+    turn_auto_moves: int
     turn_pieces: Bitboard
     orientation_bit0: Bitboard
     orientation_bit1: Bitboard
@@ -745,6 +746,61 @@ class BaseBoard:
 
     # optional game state
     move_stack: List[Move]
+
+    @classmethod
+    def deserialize(cls, data: List[int]) -> "BaseBoard":
+        board = cls()
+        board.occupied = int(data[0])
+        board.occupied_co = [int(data[1]), int(data[2])]
+        board.infantry = int(data[3])
+        board.armored_infantry = int(data[4])
+        board.airborne_infantry = int(data[5])
+        board.artillery = int(data[6])
+        board.armored_artillery = int(data[7])
+        board.heavy_artillery = int(data[8])
+        board.hq = int(data[9])
+        board.reserves = [ReserveFleet.from_ints(data[10:16]), ReserveFleet.from_ints(data[16:22])]
+        board.turn = bool(data[22])
+        board.turn_moves = int(data[23])
+        board.turn_pieces = int(data[24])
+        board.orientation_bit0 = int(data[25])
+        board.orientation_bit1 = int(data[26])
+        board.orientation_bit2 = int(data[27])
+        board.bombarded_co = [int(data[28]), int(data[29])]
+        board.adjacent_infantry_squares_co = [int(data[30]), int(data[31])]
+        board.free_capture_clusters = int(data[32])
+        board.free_capture_enemies = int(data[33])
+        board.free_capture_num_allowed = int(data[34])
+        board.turn_auto_moves = int(data[35])
+        return board
+
+    def serialize(self) -> List[int]:
+        return [
+            self.occupied,
+            self.occupied_co[RED],
+            self.occupied_co[BLUE],
+            self.infantry,
+            self.armored_infantry,
+            self.airborne_infantry,
+            self.artillery,
+            self.armored_artillery,
+            self.heavy_artillery,
+            self.hq,
+            *self.reserves[RED].to_ints(),
+            *self.reserves[BLUE].to_ints(),
+            self.turn,
+            self.turn_moves,
+            self.turn_pieces,
+            self.orientation_bit0,
+            self.orientation_bit1,
+            self.orientation_bit2,
+            *self.bombarded_co,
+            *self.adjacent_infantry_squares_co,
+            self.free_capture_clusters,
+            self.free_capture_enemies,
+            self.free_capture_num_allowed,
+            self.turn_auto_moves,
+        ]
 
     def __init__(self, board_fen: Optional[str] = STARTING_FEN) -> None:
         self._reset_board()
@@ -772,6 +828,7 @@ class BaseBoard:
         self.reserves = [ReserveFleet(), ReserveFleet()]
         self.turn = RED
         self.turn_moves = 0
+        self.turn_auto_moves = 0
         self.turn_pieces = BB_EMPTY
         self.orientation_bit0 = BB_EMPTY  # First bit of orientation
         self.orientation_bit1 = BB_EMPTY  # Second bit of orientation
@@ -981,11 +1038,14 @@ class BaseBoard:
         if turn_moves_fen != "-":
             moves = turn_moves_fen.split(",")
             self.turn_moves = len(moves)
+            self.turn_auto_moves = 0
             for move_uci in moves:
                 move = Move.from_uci(move_uci)
                 self.move_stack.append(move)
                 if move.to_square is not None:
                     self.turn_pieces |= BB_SQUARES[move.to_square]
+                if move.auto_capture_type is not None:
+                    self.turn_auto_moves += 1
 
     def board_fen(self) -> str:
         builder = []
@@ -1015,8 +1075,9 @@ class BaseBoard:
         turn_fen = "r" if self.turn == RED else "b"
 
         turn_moves = ""
-        if self.turn_moves > 0:
-            turn_moves = ",".join([m.uci() for m in self.move_stack[-self.turn_moves:]])
+        turns_this_move = self.turn_moves + self.turn_auto_moves
+        if turns_this_move > 0:
+            turn_moves = ",".join([m.uci() for m in self.move_stack[-turns_this_move:]])
         else:
             turn_moves = "-"
 
@@ -1586,7 +1647,7 @@ class BaseBoard:
             elif move.auto_capture_type == "bombard":
                 self._do_captures(move)
 
-            # we don't want to increment turn_moves here because we're not making a move
+            self.turn_auto_moves += 1
             return
 
         # Increment turn moves.
@@ -1600,6 +1661,7 @@ class BaseBoard:
         if self.turn_moves == 3 or move.name == "Skip":
             self.turn = not self.turn
             self.turn_moves = 0
+            self.turn_auto_moves = 0
             self.turn_pieces = BB_EMPTY
             self.end_of_turn_occupied_enemy_infantry = self.occupied_co[not self.turn] & self.infantry
 

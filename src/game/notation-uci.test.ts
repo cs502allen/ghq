@@ -93,7 +93,7 @@ describe("UCI notation", () => {
     for (const moveUCI of gameMoves) {
       const move = allowedMoveFromUci(moveUCI);
       const moveUCI2 = allowedMoveToUci(move);
-      console.log(moveUCI, moveUCI2);
+      // console.log(moveUCI, moveUCI2);
       expect(moveUCI2).toEqual(moveUCI);
     }
   });

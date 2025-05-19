@@ -319,7 +319,7 @@ describe("legal moves", () => {
       const expectedMoves = test.expectedMovesUCI.split(" ");
       const actualMoves = moves.map(allowedMoveToUci);
 
-      console.log(actualMoves.join(" "));
+      // console.log(actualMoves.join(" "));
 
       expect(actualMoves.length).toEqual(expectedMoves.length);
       expect(actualMoves).toEqual(expect.arrayContaining(expectedMoves));
