@@ -9,6 +9,7 @@ import { MatchLink } from "./MatchLink";
 import { MatchModel } from "@/lib/types";
 import RatedBadge from "@/components/RatedBadge";
 import Link from "next/link";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 interface Challenge {
   challenger: {
@@ -33,8 +34,13 @@ export default function CorrespondenceView() {
   const [receivedChallenges, setReceivedChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
+  const yourTurnCount = matches.filter((match) => match.isYourTurn).length;
+  usePageTitle(yourTurnCount > 0 ? yourTurnCount.toString() : "");
+
   useEffect(() => {
     fetchMatchesAndChallenges();
+    const interval = setInterval(fetchMatchesAndChallenges, 60_000);
+    return () => clearInterval(interval);
   }, [isSignedIn]);
 
   async function fetchMatchesAndChallenges() {
