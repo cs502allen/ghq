@@ -82,7 +82,7 @@ addFrame({
 
 addFrame({
   slug: "reserve-intro",
-  heading: "Each players get a set of Reserve pieces",
+  heading: "Each player gets a set of Reserve pieces",
   details: "These begin off-board and can be deployed as part of one's turn",
   board: defaultBoard,
   disablePlay: true,
