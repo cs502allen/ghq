@@ -53,7 +53,7 @@ function addFrame(frame: TutorialFrame) {
 addFrame({
   slug: "hq",
   heading: "GHQ is played by two players on an 8x8 board",
-  details: "The goal of the game is to capture your opponent's HQ (the star)️ ",
+  details: "The goal of the game is to capture your opponent's HQ (the star)️.",
   disablePlay: true,
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
@@ -73,7 +73,7 @@ addFrame({
   slug: "setup",
   heading: "The game starts with these pieces on the board",
   details:
-    "The arrow pieces are called Infantry. The tanks piece is called Artillery",
+    "The arrow pieces are called Infantry. The tank pieces are called Artillery.",
   board: defaultBoard,
   disablePlay: true,
   redReserve: emptyReserveFleet,
@@ -83,7 +83,7 @@ addFrame({
 addFrame({
   slug: "reserve-intro",
   heading: "Each player gets a set of Reserve pieces",
-  details: "These begin off-board and can be deployed as part of one's turn",
+  details: "These begin off-board and can be deployed as part of one's turn.",
   board: defaultBoard,
   disablePlay: true,
 });
@@ -99,7 +99,7 @@ addFrame({
 addFrame({
   slug: "moving-infantry",
   heading: "Infantry can move one square in any direction",
-  details: "Try moving a piece on the tutorial board",
+  details: "Try moving a piece on the tutorial board.",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -156,7 +156,7 @@ addFrame({
   slug: "moving-artillery",
   heading: "Move and Aim Artillery",
   details:
-    "Every time you move Artillery, you also get to aim it. Point it at the enemy HQ ",
+    "Every time you move Artillery, you also get to aim it. Point it at the enemy HQ.",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -188,7 +188,7 @@ addFrame({
   slug: "heavy-artillery",
   heading:
     "Each Player gets one Heavy Artillery (shoots far) and one Armored Artillery (moves fast)",
-  details: "Try moving them to see their abilities",
+  details: "Try moving them to see their abilities.",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -238,9 +238,9 @@ addFrame({
 
 addFrame({
   slug: "deploying",
-  heading: "Now deploy some Reinforcements ",
+  heading: "Now deploy some Reinforcements",
   details:
-    "Click a piece in your reserve and then choose any square on the back rank to deploy it",
+    "Click a piece in your Reserve and then choose any square on the back rank to deploy it.",
   redReserve: defaultReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -264,7 +264,7 @@ addFrame({
 addFrame({
   slug: "capturing-1",
   heading: "Capturing Infantry",
-  details: "Infantry cannot capture other Infantry on their own ",
+  details: "Infantry cannot capture other Infantry on their own.",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -291,7 +291,7 @@ addFrame({
   slug: "capturing-2",
   heading: "Outnumber the enemy to Capture their Infantry",
   details:
-    "Together Infantry can capture enemy Infantry. A two on one will win the piece. Try to capture the Blue Infantry",
+    "Together Infantry can capture enemy Infantry. A two-on-one will win the piece. Try to capture the Blue Infantry.",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -322,7 +322,7 @@ addFrame({
   slug: "capturing-3",
   heading: "Infantry can defend each other too",
   details:
-    "Because Blue's Infantry are defending each other, there's no way to get a two on one on either of them. They're playing solid GHQ",
+    "Because Blue's Infantry are defending each other, there's no way to get a two-on-one on either of them. They're playing solid GHQ.",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -369,9 +369,9 @@ addFrame({
 
 addFrame({
   slug: "capturing-artillery",
-  heading: "Artillery is easier to capture.",
+  heading: "Artillery is easier to capture",
   details:
-    "A single Infantry captures artillery if you move next to it. Note: diagonal does not count. ",
+    "A single Infantry captures artillery if you move next to it. Note: diagonal does not count.",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -401,7 +401,7 @@ addFrame({
   slug: "capturing-artillery-defended",
   heading: "Defending Artillery",
   details:
-    "Artillery can be defended using Infantry because Infantry will 'engage' (attack) each other first. The same move won't work here",
+    "Artillery can be defended using Infantry because Infantry will 'engage' (attack) each other first. The same move won't work here.",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -496,7 +496,7 @@ addFrame({
   slug: "airborne-2",
   heading: "Captures like any other Infantry",
   details:
-    "What makes the Airborne so deadly is that it captures just like any other Infantry. Undefended Artillery beware! Try capturing Blue's Heavy ",
+    "What makes the Airborne so deadly is that it captures just like any other Infantry. Undefended Artillery beware! Try capturing Blue's Heavy.",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -529,8 +529,8 @@ addFrame({
 addFrame({
   slug: "airborne-3",
   heading:
-    "You can also use it to get unexpected two on one's against Infantry",
-  details: "Team up with your Basic Infantry to Capture Red's Armored Infantry",
+    "You can also use it to get unexpected two-on-one's against Infantry",
+  details: "Team up with your Basic Infantry to Capture Red's Armored Infantry.",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -593,7 +593,7 @@ addFrame({
   slug: "summary",
   heading: "That's GHQ",
   details:
-    "3 Moves a Turn. Capture Infantry with 2:1s. Defend your Artillery. Have fun! If all goes well your game will end like this. To finish this tutorial capture the enemy HQ!!! ",
+    "3 Moves a Turn. Capture Infantry with 2:1s. Defend your Artillery. Have fun! If all goes well your game will end like this. To finish this tutorial capture the enemy HQ!!!",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
