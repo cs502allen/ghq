@@ -9,6 +9,7 @@ import {
   getCapturePreference,
   GHQGame,
   GHQState,
+  Player,
   SkipMove,
   Square,
   UnitType,
@@ -59,6 +60,11 @@ export class GameV2 {
 
   defaultBoardFen(): string {
     return this.engine.BaseBoard().board_fen();
+  }
+
+  currentPlayerTurn(boardFen: string): Player {
+    const board = this.engine.BaseBoard(boardFen);
+    return board.is_red_turn() ? "RED" : "BLUE";
   }
 }
 
@@ -187,7 +193,8 @@ export function newGHQGameV2({
     G.redReserve = boardState.redReserve;
     G.blueReserve = boardState.blueReserve;
     G.v2state = fen;
-    G.thisTurnMoves = boardState.thisTurnMoves ?? [];
+    // TODO(tyler): figure out how to get this to work without overriding thisTurnMoves on the player's final turn
+    // G.thisTurnMoves = boardState.thisTurnMoves ?? [];
 
     G.eval = calculateEval({
       ...G,
@@ -227,6 +234,10 @@ export function newGHQGameV2({
       push: ({ G, ctx, log }, move) => {
         if (!G.v2state) {
           throw new Error("v2state is not defined");
+        }
+
+        if (ctxPlayerToPlayer(ctx) !== board.currentPlayerTurn(G.v2state)) {
+          return INVALID_MOVE;
         }
 
         if (!board.isLegalMove(G.v2state, move)) {
