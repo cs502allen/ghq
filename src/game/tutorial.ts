@@ -266,42 +266,16 @@ export const boards: Record<string, TutorialSetupData> = {
     category: "puzzles",
     boardArrows: [],
   },
-  // "Capture two infantry": {
-  //   boardState: {
-  //     board: [
-  //       [B.HQ, null, null, null, B.IN, null, null, null],
-  //       [null, null, null, B.IN, R.IN, null, null, null],
-  //       [null, null, B.IN, R.IN, null, R.IN, null, null],
-  //       [null, B.IN, R.IN, null, null, null, null, null],
-  //       [B.IN, R.IN, null, null, null, null, null, null],
-  //       [R.IN, null, null, null, null, null, null, null],
-  //       [null, null, null, null, null, null, null, null],
-  //       [null, null, null, null, null, null, null, R.HQ],
-  //     ],
-  //     redReserve: emptyReserveFleet,
-  //     blueReserve: emptyReserveFleet,
-  //   },
-  //   category: "puzzles",
-  //   boardArrows: [],
-  // },
-  // "Capture HQ!": {
-  //   boardState: {
-  //     board: [
-  //       [B.HQ, null, B.IN, null, null, null, null, null],
-  //       [B.IN, null, null, null, null, null, null, null],
-  //       [R.IN, null, B.IN, null, null, null, null, null],
-  //       [null, R.AI, null, null, null, null, null, null],
-  //       [null, null, null, null, null, null, null, null],
-  //       [null, null, null, null, null, null, null, null],
-  //       [null, null, null, null, null, null, null, null],
-  //       [null, null, null, null, null, null, R.AB, R.HQ],
-  //     ],
-  //     redReserve: emptyReserveFleet,
-  //     blueReserve: emptyReserveFleet,
-  //   },
-  //   category: "puzzles",
-  //   boardArrows: [],
-  // },
+  "Capture two infantry": {
+    fen: "q2F4/r→7/2f1i3/2I1F3/8/8/8/7Q IIIIIFFFPRRTH iiiiifffprrth r -",
+    category: "puzzles",
+    boardArrows: [],
+  },
+  "Capture HQ!": {
+    fen: "q1f5/8/IF6/8/8/8/8/6PQ IIIIIFFFPRRTH iiiiifffprrth r -",
+    category: "puzzles",
+    boardArrows: [],
+  },
   "Collapse the center line": {
     boardState: {
       board: [
@@ -534,6 +508,12 @@ export function getBoardInfo(
 
   if (boardType) {
     const data = boards[boardType];
+
+    if ('fen' in data && data.fen) {
+      const boardState = FENtoBoardState(data.fen);
+      return { ...data, boardState };
+    }
+
     const fen = boardToFEN(data.boardState);
     return { ...data, fen };
   }
