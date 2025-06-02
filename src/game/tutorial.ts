@@ -509,7 +509,7 @@ export function getBoardInfo(
   if (boardType) {
     const data = boards[boardType];
 
-    if ('fen' in data && data.fen) {
+    if (data?.fen) {
       const boardState = FENtoBoardState(data.fen);
       return { ...data, boardState };
     }
