@@ -30,6 +30,17 @@ export function getGameoverState(
     return { status: "DRAW", reason: "stalemate" };
   }
 
+  if (engine && G.v2state) {
+    const outcome = engine.getOutcome(G.v2state);
+    if (outcome) {
+      return {
+        status: outcome.winner ? "WIN" : "DRAW",
+        winner: outcome.winner,
+        reason: outcome.termination,
+      };
+    }
+  }
+
   return undefined;
 }
 

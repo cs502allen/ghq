@@ -99,7 +99,7 @@ export default function ControlsView({
       />
       <ActionButton
         Icon={SkipForward}
-        tooltip='Skip or confirm the remainder of your turn after making at least one move (shortcut: ".")'
+        tooltip='Skip or confirm the remainder of your turn. If both players skip without making any moves, the game is a draw. (shortcut: ".")'
         onClick={doSkip}
         disabled={!canSkip}
         className={

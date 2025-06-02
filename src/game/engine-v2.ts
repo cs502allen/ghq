@@ -90,6 +90,25 @@ export class GameV2 {
     const board = this.engine.BaseBoard.deserialize(v2state);
     return board.is_red_turn() ? "RED" : "BLUE";
   }
+
+  getOutcome(
+    v2state: string
+  ): { winner?: Player; termination: string } | undefined {
+    const board = this.engine.BaseBoard.deserialize(v2state);
+    const outcome = board.outcome();
+    if (!outcome) {
+      return undefined;
+    }
+
+    let winner: Player | undefined;
+    if (outcome.winner === false) {
+      winner = "RED";
+    } else if (outcome.winner === true) {
+      winner = "BLUE";
+    }
+
+    return { winner, termination: outcome.termination };
+  }
 }
 
 export interface PythonMove {
@@ -104,6 +123,7 @@ export interface PythonBoard {
   is_legal: (move: PythonMove) => boolean;
   is_red_turn: () => boolean;
   is_blue_turn: () => boolean;
+  outcome: () => { winner?: boolean; termination: string } | undefined;
 }
 
 export interface PythonPlayer {

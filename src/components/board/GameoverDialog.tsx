@@ -37,7 +37,9 @@ export default function GameoverDialog({
             <div>
               {gameover?.winner
                 ? `${toTitleCase(gameover.winner)} won ${gameover.reason}!`
-                : "Game ended in a draw"}
+                : `Game ended in a draw${
+                    gameover?.reason ? ` by ${gameover.reason}` : ""
+                  }`}
             </div>
 
             <div className="flex gap-1">

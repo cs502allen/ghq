@@ -847,7 +847,7 @@ class BaseBoard:
         # b = signed char (8 bits) for turn state
         # I = unsigned int (32 bits) for reserve counts
         packed = struct.pack(
-            ">21Q3b12I",  # big-endian format
+            ">21Q3b12I2b",  # big-endian format
             # units
             self.occupied,
             self.infantry,
@@ -880,6 +880,8 @@ class BaseBoard:
             # reserve
             *self.reserves[0].to_ints(),
             *self.reserves[1].to_ints(),
+            self.did_offer_draw,
+            self.did_accept_draw,
         )
         return base64.b64encode(zlib.compress(packed)).decode()
 
@@ -889,7 +891,7 @@ class BaseBoard:
         decompressed = zlib.decompress(base64.b64decode(data))
 
         # Unpack the byte array back into integers
-        values = struct.unpack(">21Q3b12I", decompressed)
+        values = struct.unpack(">21Q3b12I2b", decompressed)
 
         board = cls(skip_init=True)
 
@@ -930,10 +932,12 @@ class BaseBoard:
             ReserveFleet.from_ints(values[30:36])
         ]
 
-        # Initialize empty lists
+        # move state
+        board.did_offer_draw = values[36]
+        board.did_accept_draw = values[37]
+
+        # move stack
         board.move_stack = []
-        board.did_offer_draw = False
-        board.did_accept_draw = False
 
         return board
 
@@ -1962,10 +1966,10 @@ class BaseBoard:
             return Outcome("hq capture", BLUE)
         if self._is_hq_captured(BLUE):
             return Outcome("hq capture", RED)
-        if not any(self.generate_legal_moves()):
+        if self.turn_moves == 0 and not any(self.generate_legal_moves()):
             return Outcome("stalemate", None)
         if self.did_offer_draw and self.did_accept_draw:
-            return Outcome("draw", None)
+            return Outcome("double skip", None)
 
         return None
 
