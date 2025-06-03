@@ -381,7 +381,7 @@ export function newGHQGameV2({
           throw new Error("v2state is not defined");
         }
 
-        const board = engine.BaseBoard(G.v2state);
+        const board = engine.BaseBoard.deserialize(G.v2state);
         if (board.is_red_turn()) {
           return [
             {
