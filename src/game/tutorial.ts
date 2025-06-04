@@ -514,8 +514,8 @@ export function getBoardInfo(
       return { ...data, boardState };
     }
 
-    if (data.boardState) {
-      const fen = boardToFEN(data.boardState);
+    if (!data.fen && !data.boardState) {
+      throw new Error("either 'fen' or 'boardState' must be defined");
     }
     
     return { ...data, fen };
