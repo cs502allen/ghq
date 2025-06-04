@@ -40,7 +40,7 @@ const emptyReserveFleet: ReserveFleet = {
 };
 
 export interface TutorialSetupData {
-  boardState: BoardState;
+  boardState?: BoardState;
   category: "capturing" | "puzzles" | "endgames";
   boardArrows: BoardArrowType[];
   fen?: string;
@@ -514,7 +514,10 @@ export function getBoardInfo(
       return { ...data, boardState };
     }
 
-    const fen = boardToFEN(data.boardState);
+    if (data.boardState) {
+      const fen = boardToFEN(data.boardState);
+    }
+    
     return { ...data, fen };
   }
 
