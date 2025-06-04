@@ -16,6 +16,7 @@ import AbandonButton from "./AbandonButton";
 import SettingsMenu, { Settings } from "./SettingsMenu";
 import { Swords } from "lucide-react";
 import { Ctx } from "boardgame.io";
+import { config } from "@/lib/config";
 
 export default function Sidebar({
   G,
@@ -118,7 +119,7 @@ export default function Sidebar({
               </>
             ) : (
               <>
-                <AbandonButton matchId={G.matchId} />
+                {config.useClerk && <AbandonButton matchId={G.matchId} />}
                 <ShareGameDialog G={G} ctx={ctx} log={log} />
                 <SettingsMenu settings={settings} setSettings={setSettings} />
               </>

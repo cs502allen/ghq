@@ -30,7 +30,6 @@ export default function ShareGameDialog({
     board: G.board,
     redReserve: G.redReserve,
     blueReserve: G.blueReserve,
-    thisTurnMoves: G.thisTurnMoves,
     currentPlayerTurn: ctx.currentPlayer === "0" ? "RED" : "BLUE",
   });
   const url = new URL(window.location.toString());

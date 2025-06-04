@@ -1,8 +1,8 @@
 "use client";
 import React, { PropsWithChildren, useContext, useState } from "react";
-import { BoardState } from "@/game/notation";
-import { GHQState, HistoryItem } from "@/game/engine";
+import { GHQState } from "@/game/engine";
 import { LogEntry } from "boardgame.io";
+
 const emptyBoard: GHQState["board"] = [
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
@@ -24,6 +24,7 @@ const LatestMoveContext = React.createContext<{
 export function LatestMoveProvider(props: PropsWithChildren) {
   const [board, setBoard] = useState<GHQState["board"]>(emptyBoard);
   const [moves, setMoves] = useState<LogEntry[]>([]);
+
   return (
     <LatestMoveContext.Provider value={{ board, moves, setMoves, setBoard }}>
       {props.children}

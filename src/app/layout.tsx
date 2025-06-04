@@ -43,14 +43,16 @@ export default function RootLayout({
   if (!config.useClerk) {
     return (
       <BoardArrowProvider>
-        <html lang="en">
-          <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-          >
-            {children}
-            <Toaster />
-          </body>
-        </html>
+        <LatestMoveProvider>
+          <html lang="en">
+            <body
+              className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+            >
+              {children}
+              <Toaster />
+            </body>
+          </html>
+        </LatestMoveProvider>
       </BoardArrowProvider>
     );
   }
