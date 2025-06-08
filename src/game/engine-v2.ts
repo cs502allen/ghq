@@ -459,7 +459,6 @@ function applyBotOptions(state: GHQState) {
 }
 
 function applyLocalOptions(state: GHQState) {
-  state.isOnline = true;
   state.timeControl = 0;
   state.bonusTime = 0;
 }
