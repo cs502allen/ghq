@@ -263,6 +263,10 @@ export function newGHQGameV2({
         applyBotOptions(state);
       }
 
+      if (type === "local") {
+        applyLocalOptions(state);
+      }
+
       return {
         ...state,
         isV2: true,
@@ -450,6 +454,11 @@ export async function loadEngine(loadPyodide: () => Promise<any>) {
 
 function applyBotOptions(state: GHQState) {
   state.isOnline = true;
+  state.timeControl = 0;
+  state.bonusTime = 0;
+}
+
+function applyLocalOptions(state: GHQState) {
   state.timeControl = 0;
   state.bonusTime = 0;
 }
