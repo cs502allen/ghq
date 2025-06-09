@@ -17,6 +17,7 @@ import SettingsMenu, { Settings } from "./SettingsMenu";
 import { Swords } from "lucide-react";
 import { Ctx } from "boardgame.io";
 import { config } from "@/lib/config";
+import { numMovesThisTurn } from "@/game/engine-v2";
 
 export default function Sidebar({
   G,
@@ -41,6 +42,7 @@ export default function Sidebar({
     () => (playerID === null ? currentPlayerTurn : playerIdToPlayer(playerID)),
     [currentPlayerTurn, playerID]
   );
+  const movesLeft = useMemo(() => 3 - numMovesThisTurn(G), [G]);
 
   const historyEval = useMemo(() => {
     return (
@@ -100,8 +102,8 @@ export default function Sidebar({
             </div>
           </div>
           <div className="text-gray-600 flex gap-1 justify-center items-center font-medium">
-            {3 - ctx.numMoves!} remaining move
-            {ctx.numMoves !== 2 ? "s" : ""}{" "}
+            {movesLeft} remaining move
+            {movesLeft !== 1 ? "s" : ""}{" "}
           </div>
           <div className="flex gap-1 justify-center items-center">
             {currentPlayer === currentPlayerTurn || !G.isOnline ? (
