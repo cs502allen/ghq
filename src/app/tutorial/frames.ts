@@ -336,6 +336,7 @@ addFrame({
     const last = moves[moves.length - 1];
     if (moves.length === 2 && last.type === "Move" && last.capturedPiece) {
       message("Bravo! You can go to the next slide.");
+      return;
     }
     if (moves.length === 1) {
       message("Great one more move!");
