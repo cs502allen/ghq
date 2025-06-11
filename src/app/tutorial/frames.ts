@@ -237,6 +237,25 @@ addFrame({
 });
 
 addFrame({
+  slug: "capturing-with-artillery",
+  heading: "Artillery have a delayed attack",
+  details:
+    "If you aim at an enemy, you only capture their piece if they end their turn still under bombardment. If Blue ends their turn in the position below, they lose their piece!",
+  redReserve: emptyReserveFleet,
+  blueReserve: emptyReserveFleet,
+  board: [
+    [B.HQ, null, null, null, null, null, null, null],
+    [B.IN, B.IN, null, null, null, null, null, null],
+    [null, null, null, B.IN, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, R.HA, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, R.HQ],
+  ],
+});
+
+addFrame({
   slug: "deploying",
   heading: "Now deploy some Reinforcements",
   details:
@@ -341,7 +360,7 @@ addFrame({
 });
 addFrame({
   slug: "capturing-4",
-  heading: "Outnumber enemy Infantry to capture their pieces.",
+  heading: "Outnumber enemy Infantry to capture their pieces",
   details: "Can you figure out how to capture an infantry?",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
@@ -455,6 +474,35 @@ addFrame({
     if (moves.length) {
       message("Not there! Or Infantry to D5 will capture your Artillery");
       reset();
+    }
+  },
+});
+
+addFrame({
+  slug: "zones-of-control",
+  heading: "Engaged Infantry have some movement restrictions",
+  details:
+    "An engaged Infantry cannot move to or through any square where they could engage an infantry piece (including the same one they were engaged with). Notice how your mobility is limited here.",
+  redReserve: emptyReserveFleet,
+  blueReserve: emptyReserveFleet,
+  board: [
+    [B.HQ, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, B.IN, B.IN, null, null, null, null],
+    [null, null, null, R.AI, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, R.HQ],
+  ],
+  didMove: (board, moves, next, reset, message) => {
+    const last = moves[moves.length - 1];
+    if (last) {
+      if (last.type === "Move" && last.unitType === "ARMORED_INFANTRY") {
+        next();
+      } else {
+        message("That's not an infantry!");
+      }
     }
   },
 });
