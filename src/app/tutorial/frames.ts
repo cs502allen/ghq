@@ -116,7 +116,7 @@ addFrame({
     const last = moves[moves.length - 1];
     if (last) {
       if (last.type === "Move" && last.unitType === "INFANTRY") {
-        next();
+        message("Perfect! You can go to the next slide now.");
       } else {
         message("That's not an infantry!");
       }
@@ -127,7 +127,7 @@ addFrame({
 addFrame({
   slug: "moving-armored-infantry",
   heading: "Move an Armored Infantry",
-  details: "Armored Infantry can move two squares in any one direction.",
+  details: "Armored Infantry can move up to two squares in any one direction.",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -144,7 +144,7 @@ addFrame({
     const last = moves[moves.length - 1];
     if (moves.length && last) {
       if (last.type === "Move" && last.unitType === "ARMORED_INFANTRY") {
-        next();
+        message("Great! You can go to the next slide now.");
       } else {
         message("That's not an armored infantry!");
       }
@@ -175,7 +175,7 @@ addFrame({
       const bombarded = bombardedSquares(board);
       console.log(bombarded);
       if (last.type === "MoveAndOrient" && Boolean(bombarded["2,2"])) {
-        next();
+        message("Nice! You can go to the next slide now.");
       } else {
         message("You didn't aim at Blue's HQ. Try again!");
         reset();
@@ -203,7 +203,7 @@ addFrame({
   ],
   didMove: (board, moves, next, reset, message) => {
     const hasTwo = moves.filter((i) => i.type === "MoveAndOrient").length === 2;
-    if (hasTwo) next();
+    if (hasTwo) message("Good! You can go to the next slide now.");
   },
 });
 
@@ -228,7 +228,7 @@ addFrame({
     const last = moves[moves.length - 1];
     if (last) {
       if (last.type === "Move" && last.unitType === "INFANTRY") {
-        next();
+        message("Good! You can go to the next slide now.");
       } else {
         message("That's not an infantry!");
       }
@@ -253,6 +253,15 @@ addFrame({
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, R.HQ],
   ],
+  didMove: (board, moves, next, reset, message) => {
+    const last = moves[moves.length - 1];
+    if (last) {
+      if (last.unitType === "HEAVY_ARTILLERY") {
+        message("See how you won their their piece before your turn even started? You can go to the next slide now.");
+      } else {
+      }
+    }
+  },
 });
 
 addFrame({
@@ -275,7 +284,7 @@ addFrame({
   didMove: (board, moves, next, reset, message) => {
     const last = moves[moves.length - 1];
     if (last && last.type === "Reinforce") {
-      next();
+      message("Good! You can go to the next slide now.");
     }
   },
 });
@@ -300,7 +309,7 @@ addFrame({
     const last = moves[moves.length - 1];
     if (last) {
       if (last.type === "Move" && last.unitType === "INFANTRY") {
-        next();
+        message("Right, there's no way to capture this piece right now. Go to the next slide to see how.");
       }
     }
   },
@@ -326,7 +335,7 @@ addFrame({
   didMove: (board, moves, next, reset, message) => {
     const last = moves[moves.length - 1];
     if (moves.length === 2 && last.type === "Move" && last.capturedPiece) {
-      return next();
+      message("Bravo! You can go to the next slide.");
     }
     if (moves.length === 1) {
       message("Great one more move!");
@@ -355,7 +364,7 @@ addFrame({
     [null, null, null, null, null, null, null, R.HQ],
   ],
   didMove: (board, moves, next, reset, message) => {
-    if (moves.length === 2) next();
+    if (moves.length === 2) message("See? No captures. You can go to the next slide.");
   },
 });
 addFrame({
@@ -377,7 +386,7 @@ addFrame({
   didMove: (board, moves, next, reset, message) => {
     const last = moves[moves.length - 1];
     if (moves.length > 1 && last.type === "Move" && last.capturedPiece) {
-      return next();
+      message("Nice! You can go to the next slide.");
     }
     if (moves.length === 3) {
       message("That didn't work. Try again!");
@@ -407,7 +416,7 @@ addFrame({
     const last = moves[moves.length - 1];
     if (moves.length > 0) {
       if (last.type === "Move" && last.capturedPiece) {
-        return next();
+        message("You got it! You can go to the next slide.");
       } else {
         message("Line up next to the artillery");
         reset();
@@ -436,7 +445,7 @@ addFrame({
   didMove: (board, moves, next, reset, message) => {
     const last = moves[moves.length - 1];
     if (moves.length > 0) {
-      next();
+      message("Everything is safe. You can go to the next slide.");
     }
   },
 });
@@ -459,7 +468,6 @@ addFrame({
     [null, null, null, null, null, null, null, R.HQ],
   ],
   didMove: (board, moves, next, reset, message) => {
-    console.log(moves);
     const last = moves[moves.length - 1];
     if (
       last &&
@@ -468,21 +476,23 @@ addFrame({
       last.to[0] === 4 &&
       last.to[1] === 3
     ) {
-      return next();
+      message("Right! You can go to the next slide.");
+      return;
     }
-
+  
     if (moves.length) {
       message("Not there! Or Infantry to D5 will capture your Artillery");
       reset();
     }
   },
+  
 });
 
 addFrame({
   slug: "zones-of-control",
   heading: "Engaged Infantry have some movement restrictions",
   details:
-    "An engaged Infantry cannot move to or through any square where they could engage an infantry piece (including the same one they were engaged with). Notice how your mobility is limited here.",
+    "An engaged Infantry cannot move to or through any square where it could engage an infantry piece (including the same one they were engaged with). Notice how your mobility is limited here.",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -499,7 +509,7 @@ addFrame({
     const last = moves[moves.length - 1];
     if (last) {
       if (last.type === "Move" && last.unitType === "ARMORED_INFANTRY") {
-        next();
+        message("Good! You can go to the next slide.");
       } else {
         message("That's not an infantry!");
       }
@@ -511,7 +521,7 @@ addFrame({
   slug: "airborne",
   heading: "And now: the most powerful piece in the game",
   details:
-    "Each Player gets one Airborne Infantry that can parachute anywhere on the board in a moment's notice. Try it out!",
+    "Each Player gets one Airborne Infantry that can parachute from its own back row to anywhere on the board at a moment's notice. Try it out!",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -532,7 +542,7 @@ addFrame({
         last.type === "Move" &&
         last.unitType === "AIRBORNE_INFANTRY"
       ) {
-        next();
+        message("Currahee! You can go to the next slide.");
       } else {
         reset();
       }
@@ -566,7 +576,7 @@ addFrame({
         last.unitType === "AIRBORNE_INFANTRY" &&
         last.capturedPiece
       ) {
-        return next();
+        message("Good! You can go to the next slide.");
       } else {
         reset();
       }
@@ -600,7 +610,7 @@ addFrame({
         last.unitType === "AIRBORNE_INFANTRY" &&
         last.capturedPiece
       ) {
-        return next();
+        message("Good! You can go to the next slide.");
       } else {
         reset();
       }
@@ -612,7 +622,7 @@ addFrame({
   slug: "airborne-4",
   heading: "The Airborne can only jump from the back rank",
   details:
-    "Once it's in the game it behaves like a normal Infantry. Pro tip: if you walk it home you can use it again.",
+    "Once it's in the game it behaves like a normal Infantry. Use it like a normal infantry here to capture your opponent. Pro tip: if you walk it home you can use it again!",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -629,8 +639,9 @@ addFrame({
     const last = moves[moves.length - 1];
     if (moves.length === 2) {
       if (last && last.type === "Move" && last.capturedPiece) {
-        return next();
+        message("Good! You can go to the next slide.");
       } else {
+        message("Capture their Infantry with a 2-on-1!");
         reset();
       }
     }
@@ -641,7 +652,7 @@ addFrame({
   slug: "summary",
   heading: "That's GHQ",
   details:
-    "3 Moves a Turn. Capture Infantry with 2:1s. Defend your Artillery. Have fun! If all goes well your game will end like this. To finish this tutorial capture the enemy HQ!!!",
+    "3 Moves a Turn. Capture Infantry with 2-on-1s. Defend your Artillery. Have fun! If all goes well your game will end like this. To finish this tutorial capture the enemy HQ!!!",
   redReserve: emptyReserveFleet,
   blueReserve: emptyReserveFleet,
   board: [
@@ -658,7 +669,7 @@ addFrame({
     const last = moves[moves.length - 1];
     if (moves.length === 2) {
       if (last && last.type === "Move" && last.capturedPiece) {
-        return next();
+        message("You got it! You're ready to play!");
       } else {
         reset();
       }
